@@ -1,6 +1,6 @@
 task :default do
   # Compile each file
-  Dir["*.md"].each do |input|
+  Dir["*-*.md"].each do |input|
     fix input
     print "Processing: #{input}\n"
     `pandoc .temp.md -o #{input[0..-4]}.pdf --latex-engine=xelatex \
