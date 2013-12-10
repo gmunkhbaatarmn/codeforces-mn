@@ -21,6 +21,8 @@ end
 def fix(input)
   data = open(input, "r").read
   data.gsub! "≤", "\\leq"
+  data.gsub! "×", "\\times"
+  data.gsub! "≠", "\\neq"
 
   open(".temp.md", "w+") {|f| f.write(data) }
 end
