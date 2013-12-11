@@ -10,6 +10,7 @@
 		"128": "icon128.png"
 	},
 	"permissions": [
+		"https://raw.github.com/*",
 		"http://codeforces.com/*",
 		"http://www.codeforces.com/*"
 	],
