@@ -15,6 +15,8 @@ task :default do
   # Remove temp file
   `[ -f ".temp.md" ] && rm .temp.md`
 
+  `git add out`
+  `git commit -m '[auto] problems compiled'`
   print "Done!\n"
 end
 
