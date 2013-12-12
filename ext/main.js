@@ -15,35 +15,28 @@ String.prototype.is_numeric = function() {
   return !isNaN(parseFloat(this)) && isFinite(this);
 };
 
-/*
-localStorage["mn-123-A"] = true
-*/
-
-
 $(function() {
   var problem_id, storage;
 
   storage = JSON.parse(localStorage.mn || "{}");
-  if (location.pathname.start_with("/problemset")) {
-    if (storage.updated === void 0 || storage.updated + 3600 > (new Date().getTime() / 1000)) {
-      $.ajax({
-        url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/data.txt",
-        dataType: "text",
-        async: false,
-        success: function(text) {
-          var id, _i, _len, _ref;
+  if (location.pathname.start_with("/problemset" && !location.pathname.start_with("/problemset/problem"))) {
+    $.ajax({
+      url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/data.txt",
+      dataType: "text",
+      async: false,
+      success: function(text) {
+        var id, _i, _len, _ref;
 
-          storage = {};
-          storage.updated = new Date().getTime() / 1000;
-          _ref = text.split("|");
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            id = _ref[_i];
-            storage[id] = 1;
-          }
-          return localStorage.mn = JSON.stringify(storage);
+        storage = {};
+        storage.updated = new Date().getTime() / 1000;
+        _ref = text.split("|");
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          id = _ref[_i];
+          storage[id] = 1;
         }
-      });
-    }
+        return localStorage.mn = JSON.stringify(storage);
+      }
+    });
   }
   if (location.pathname.start_with("/problemset")) {
     $("head").append("<style>\n  .mn-translated td a { color: green; font-weight: bold; text-decoration: none }\n  .mn-translation a { color: green !important; font-weight: bold; padding: 1px 5px 2px; border-radius: 3px }\n  .mn-translation a:hover { color: #fff !important; background: #069100 !important }\n  .problem-statement .math { font-size: 125%; font-family: times new roman,sans-serif }\n</style>");
@@ -51,9 +44,7 @@ $(function() {
       var problem_id;
 
       problem_id = $.trim($(this).find("td.id").text());
-      console.log("problem id: " + problem_id);
       problem_id = problem_id.slice(0, -1) + "-" + problem_id.slice(-1);
-      console.log("problem id: " + problem_id);
       if (storage[problem_id] !== void 0) {
         return $(this).addClass("mn-translated");
       }
@@ -70,7 +61,6 @@ $(function() {
     while (problem_id.length < 5) {
       problem_id = "0" + problem_id;
     }
-    console.log("problem_id: " + problem_id);
     return $.ajax({
       url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/" + problem_id + ".html",
       dataType: "html",
@@ -79,7 +69,7 @@ $(function() {
         var $data, body, curr;
 
         $data = $("<div/>").html(data);
-        $(".header .title").html($data.find("h1").html());
+        $(".header .title").html(problem_id.slice(-1)(+". " + $data.find("h1").html()));
         curr = $data.find("h1").next();
         body = [];
         while (curr.length) {
@@ -90,7 +80,6 @@ $(function() {
             curr = [];
           }
         }
-        console.log("body: " + body.join("\n"));
         $(".header").next().html(body.join("\n"));
         curr = $data.find("h3").next();
         body = [];
