@@ -70,7 +70,7 @@ $(function() {
         var $data, body, curr;
 
         $data = $("<div/>").html(data);
-        $(".header .title").html(problem_id.slice(-1)(+". " + $data.find("h1").html()));
+        $(".header .title").html("" + (problem_id.slice(-1)) + ". " + ($data.find("h1").html()));
         curr = $data.find("h1").next();
         body = [];
         while (curr.length) {
