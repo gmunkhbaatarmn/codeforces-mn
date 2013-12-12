@@ -15,29 +15,30 @@ String.prototype.is_numeric = function() {
   return !isNaN(parseFloat(this)) && isFinite(this);
 };
 
+if (location.pathname.start_with("/problemset") && !location.pathname.start_with("/problemset/problem")) {
+  $.ajax({
+    url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/data.txt",
+    dataType: "text",
+    async: false,
+    success: function(text) {
+      var id, storage, _i, _len, _ref;
+
+      storage = {};
+      storage.updated = new Date().getTime() / 1000;
+      _ref = text.split("|");
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        id = _ref[_i];
+        storage[id] = 1;
+      }
+      return localStorage.mn = JSON.stringify(storage);
+    }
+  });
+}
+
 $(function() {
   var problem_id, storage;
 
   storage = JSON.parse(localStorage.mn || "{}");
-  if (location.pathname.start_with("/problemset" && !location.pathname.start_with("/problemset/problem"))) {
-    $.ajax({
-      url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/data.txt",
-      dataType: "text",
-      async: false,
-      success: function(text) {
-        var id, _i, _len, _ref;
-
-        storage = {};
-        storage.updated = new Date().getTime() / 1000;
-        _ref = text.split("|");
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          id = _ref[_i];
-          storage[id] = 1;
-        }
-        return localStorage.mn = JSON.stringify(storage);
-      }
-    });
-  }
   if (location.pathname.start_with("/problemset")) {
     $("head").append("<style>\n  .mn-translated td a { color: green; font-weight: bold; text-decoration: none }\n  .mn-translation a { color: green !important; font-weight: bold; padding: 1px 5px 2px; border-radius: 3px }\n  .mn-translation a:hover { color: #fff !important; background: #069100 !important }\n  .problem-statement .math { font-size: 125%; font-family: times new roman,sans-serif }\n</style>");
     $("table.problems tr").each(function() {

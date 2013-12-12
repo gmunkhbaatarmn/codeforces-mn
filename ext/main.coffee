@@ -4,20 +4,20 @@ String.prototype.contain    = (str) -> @indexOf(str) > -1
 String.prototype.is_numeric = ()    -> !isNaN(parseFloat(@)) && isFinite(@)
 
 
+if location.pathname.start_with("/problemset") and not location.pathname.start_with("/problemset/problem")
+  $.ajax
+    url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/data.txt"
+    dataType: "text"
+    async: false
+    success: (text) ->
+      storage = {}
+      storage.updated = new Date().getTime() / 1000
+      for id in text.split("|")
+        storage[id] = 1
+      localStorage.mn = JSON.stringify(storage)
+
 $ ->
   storage = JSON.parse(localStorage.mn or "{}")
-
-  if location.pathname.start_with "/problemset" and not location.pathname.start_with "/problemset/problem"
-    $.ajax
-      url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/data.txt"
-      dataType: "text"
-      async: false
-      success: (text) ->
-        storage = {}
-        storage.updated = new Date().getTime() / 1000
-        for id in text.split("|")
-          storage[id] = 1
-        localStorage.mn = JSON.stringify(storage)
 
   if location.pathname.start_with "/problemset"
     $("head").append """
