@@ -8,7 +8,6 @@ task :default do
   # Compile each file to HTML
   Dir["*-*.md"].each do |input|
     fix input
-    print "Converting to HTML: #{input}\n"
     `pandoc .temp.md -o out/#{input[0..-4]}.html`
   end
 
@@ -39,12 +38,24 @@ task :pdf do
 end
 
 
+TRANSLATOR_POINT = {}
+
+
 # Prepare markdown file compile to PDF
 def fix(input)
   data = open(input, "r").read
   data.gsub! "≤", "\\leq"
   data.gsub! "×", "\\times"
   data.gsub! "≠", "\\neq"
+
+  translators = data.split("\n")[-1].strip()[3..-1].split(", ")
+  translators.each do |t|
+    TRANSLATOR_POINT[t] = (TRANSLATOR_POINT[t] or 0.0) + 1.0 / translators.length
+  end
+
+  data = data.split("\n")[0..-2].join("\n")
+  data += "\n<p style=\"text-align:right;font-style:italic\">Орчуулсан: #{translators.join(", ")}</p>"
+  print "Converting to HTML: #{input}      Translated by: #{translators.join(", ")}\n"
 
   open(".temp.md", "w+") { |f| f.write(data) }
 end
