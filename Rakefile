@@ -54,8 +54,8 @@ def fix(input)
   end
 
   data = data.split("\n")[0..-2].join("\n")
-  data += "\n<p style=\"text-align:right;font-style:italic\">Орчуулсан: #{translators.join(", ")}</p>"
-  print "Converting to HTML: #{input}      Translated by: #{translators.join(", ")}\n"
+  data += "\n<p class=\"math\">Орчуулсан: #{translators.join(", ")}</p>"
+  print "Converting to HTML: #{input} Translated by: #{translators.join(", ")}\n"
 
   open(".temp.md", "w+") { |f| f.write(data) }
 end
