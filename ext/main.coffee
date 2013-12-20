@@ -19,8 +19,7 @@ STYLE =
 """
 
 #:1 Run in before and renew data
-# console.time("Renewing")
-if location.pathname.match(/\/problemset(?!\/problem\/)/) or location.pathname.start_with("/contests")
+if location.pathname is "/" or location.pathname.match(/\/problemset(?!\/problem\/)/) or location.pathname.start_with("/contests")
   $.ajax
     url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/000-data.txt"
     dataType: "text"
@@ -41,8 +40,53 @@ if location.pathname.match(/\/problemset(?!\/problem\/)/) or location.pathname.s
         storage.credits.push(t.split(":"))
 
       localStorage.mn = JSON.stringify(storage)
-# console.timeEnd("Renewing")
 # endfold
+
+
+#:1 Page: /                     - Home page
+if location.pathname is "/"
+  BOX = """
+  <div class="roundbox sidebox top-contributed" style="">
+    <div class="roundbox-lt">&nbsp;</div>
+    <div class="roundbox-rt">&nbsp;</div>
+    <div class="caption titled">→ Top translators :)</div>
+    <table class="rtable ">
+      <tr>
+        <th class="left" style="width:2.25em">#</th>
+        <th>User</th>
+        <th></th>
+      </tr>
+      {content}
+    </table>
+  </div>
+  """
+  ROW = """
+      <tr>
+        <td class="left">{place}</td>
+        <td class="mn-credit">{name}</td>
+        <td>{score}</td>
+      </tr>
+  """
+
+  ### Contribution score panel ###
+  $ ->
+    $("head").append """
+      <style>
+        .rtable tr:last-child td { border-bottom: none !important }
+        .mn-credit { font-weight: bold; color: #000; font-size: 12px !important }
+      </style>
+      """
+    storage = JSON.parse(localStorage.mn or "{}")
+    if storage.credits
+      content = []
+
+      place = 0
+      for t in storage.credits
+        row = ROW.replace("{place}", ++place)
+        row = row.replace("{name}",  t[0])
+        row = row.replace("{score}", t[1])
+        content.push(row)
+      $("#sidebar .top-contributed:last")[0].outerHTML = BOX.replace("{content}", content.join("\n"))
 
 
 #:1 Page: /problemset/          - List of problems
