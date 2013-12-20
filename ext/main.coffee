@@ -19,18 +19,29 @@ STYLE =
 """
 
 #:1 Run in before and renew data
+# console.time("Renewing")
 if location.pathname.match(/\/problemset(?!\/problem\/)/) or location.pathname.start_with("/contests")
   $.ajax
-    url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/data.txt"
+    url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/000-data.txt"
     dataType: "text"
-    # [todo] - make sure is async true is better idea?
-    # async: false
     success: (text) ->
       storage = {}
       storage.updated = new Date().getTime() / 1000
-      for id in text.split("|")
-        storage[id] = 1
+      for i in text.split("\r")[0].split("|")
+        storage["problem:#{i}"] = 1
+
+      for c in text.split("\r")[1].split("|")
+        i = c.split(":")[0]
+        ready = Number(c.split(":")[1].split("/")[0])
+        total = Number(c.split(":")[1].split("/")[1])
+        storage["contest:#{i}"] = {ready: ready, total: total}
+
+      storage.credits = []
+      for t in text.split("\r")[2].split("|")
+        storage.credits.push(t.split(":"))
+
       localStorage.mn = JSON.stringify(storage)
+# console.timeEnd("Renewing")
 # endfold
 
 
@@ -50,9 +61,8 @@ if location.pathname.match(/\/problemset(?!\/problem\/)/)
     $(".problems tr").each ->
       problem_id = $.trim($(this).find("td.id").text())
       problem_id = problem_id[0..-2] + "-" + problem_id[-1..-1]
-      console.log problem_id
 
-      if storage[problem_id] isnt undefined
+      if storage["problem:#{problem_id}"] isnt undefined
         $(this).addClass("mn")
 
 
@@ -65,7 +75,7 @@ if location.pathname.match(/\/problemset\/problem\//)
 
     problem_id = location.pathname.replace("/problemset/problem/", "").replace("/", "-").toUpperCase()
 
-    if storage[problem_id] isnt undefined
+    if storage["problem:#{problem_id}"] isnt undefined
       $(".problem-statement .header .title").after """
         <div class="mn-please"><a href="javascript:;">Монголоор унших</a></div>
       """
@@ -75,29 +85,31 @@ if location.pathname.match(/\/problemset\/problem\//)
 
 #:1 Page: /contests/            - List of contests
 if location.pathname.start_with("/contests")
-  # [todo] - parse contest id from location
-  contest_id = ""
-
   ### Stats about translated problems ###
   $ ->
     $("head").append """
       <style>
-        .mn      { font-size: 0.9em; color: #488b00 }
-        .mn-full { font-size: 0.9em; color: #c900a9 }
+        .mn      { font-size: 0.9em; color: #666666 }
+        .mn-full { font-size: 0.9em; color: #c900a9; font-weight: 600 }
       </style>
       """
     storage = JSON.parse(localStorage.mn or "{}")
 
     $(".contests-table tr td:nth-child(1)").each ->
-      $(this).find("a:first").html("Enter").next()[0].outerHTML = "<span>&middot;</span> "
-      $(this).find("a:last").html("Virtual participation")
-      return
+      $(this).find("a")[0].innerHTML = "Enter"
+      if $(this).find("a").length == 2
+        $(this).find("a:first").next()[0].outerHTML = "<span>&middot;</span> "
+        $(this).find("a")[1].innerHTML = "Virtual participation"
+      else
+        # Hide contest are not possible to practice
+        $(this).closest("tr").hide()
 
-      # [todo] - fill ready, total variables
-      # ready = storage["contest-#{contest_id}"]?.ready or 0
-      # total = storage["contest-#{contest_id}"]?.total or 0
-      ready = 2
-      total = 5
+      contest_id = $(this).find("a:first").attr("href").replace("/contest/", "")
+      while contest_id.length < 3
+        contest_id = "0#{contest_id}"
+
+      ready = storage["contest:#{contest_id}"]?.ready or 0
+      total = storage["contest:#{contest_id}"]?.total or 0
 
       return if ready <= 0
       span = if ready is total then "mn-full" else "mn"
@@ -121,13 +133,12 @@ if location.pathname.match(/^\/contest\/\d+\/?$/)
     $(".problems tr").each ->
       problem_id = location.pathname.replace("/contest/", "") + "-" + $.trim($(this).find("td.id").text())
 
-      if storage[problem_id] isnt undefined
+      if storage["problem:#{problem_id}"] isnt undefined
         $(this).addClass("mn")
 
 
 #:1 Page: /contest/ID/problem/  - Read a problem in contest
 if location.pathname.match(/^\/contest\/\d+\/problem\//)
-  console.log("Read a problem in contest")
   ### Append "Монголоор унших" button ###
   $ ->
     $("head").append(STYLE)
@@ -135,9 +146,8 @@ if location.pathname.match(/^\/contest\/\d+\/problem\//)
 
     problem_id = location.pathname.replace("/contest/", "")
     problem_id = problem_id.replace("/problem/", "-").toUpperCase()
-    console.log("problem_id: " + problem_id)
 
-    if storage[problem_id] isnt undefined
+    if storage["problem:#{problem_id}"] isnt undefined
       $(".problem-statement .header .title").after """
         <div class="mn-please"><a href="javascript:;">Монголоор унших</a></div>
       """
@@ -173,7 +183,7 @@ translate = ->
       # Replace problem statement
       body = []
       curr = $data.find("h1").next()
-      while curr[0]?.tagName is "P"
+      while curr[0] and curr[0].tagName isnt "H3"
         body.push(curr[0].outerHTML)
         curr = curr.next()
       $(".header").next().html body.join("\n")
@@ -181,7 +191,7 @@ translate = ->
       # Replace input
       body = []
       curr = $data.find("h3").next()
-      while curr[0]?.tagName is "P"
+      while curr[0] and curr[0].tagName isnt "H3"
         body.push(curr[0].outerHTML)
         curr = curr.next()
       $(".input-specification").html """<div class="section-title">Оролт</div>#{body.join("\n")}"""
@@ -189,7 +199,7 @@ translate = ->
       # Replace output
       body = []
       curr = $data.find("h3:last").next()
-      while curr[0]?.tagName is "P"
+      while curr[0] and curr[0].tagName isnt "H3"
         body.push(curr[0].outerHTML)
         curr = curr.next()
       $(".output-specification").html """<div class="section-title">Гаралт</div>#{body.join("\n")}"""
