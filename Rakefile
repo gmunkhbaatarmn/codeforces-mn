@@ -12,7 +12,7 @@ task :default do
     code = input[0..-4]
 
     fix input
-    # `pandoc .temp.md -o out/#{code}.html`
+    `pandoc .temp.md -o out/#{code}.html`
 
     if links[code]
       `cp out/#{code}.html out/#{links[code]}.html`
@@ -38,6 +38,7 @@ task :default do
   `git commit -m '[auto] problems compiled'`
 
   puts "Done!"
+  print TRANSLATOR_POINT
 end
 
 
@@ -56,6 +57,7 @@ task :pdf do#:1
   # Remove temp file
   `[ -f ".temp.md" ] && rm .temp.md`
 
+  puts TRANSLATOR_POINT
   print "Done!\n"
 end#endfold
 
