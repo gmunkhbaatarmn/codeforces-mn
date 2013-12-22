@@ -5,8 +5,8 @@ Mongolian translations of Codeforces.com problems.
 1. Танд [Google Chrome][1] хөтөч хэрэг болно.
 2. Chrome-д зориулсан нэмэлтийг татаж суулгана уу: [Codeforces Mongolia][2]
 3. Codeforces.com-н **PROBLEMSET** цэс рүү орно.
-   (http://codeforces.com/problemset) Монголоор орчуулагдсан бодлогууд ногоон
-   өнгөөр тод ялгарч харагдана.
+   (http://codeforces.com/problemset) Монголоор орчуулагдсан бодлогуудын өмнө
+   ягаан од ялгарч харагдана.
 4. Тод ногооноор ялгарч харагдсан бодлогыг нээгээд бодлогын нэрний доор байх
    "Монголоор унших" гэсэн линк дээр дарахад бодлогын өгүүлбэр өөрөө
    орчуулагдсан байх болно.
@@ -24,5 +24,3 @@ Mongolian translations of Codeforces.com problems.
 
   [1]: https://www.google.com/intl/en/chrome/browser/
   [2]: https://chrome.google.com/webstore/detail/codeforces-mongolia/fghdlncknpkheekfjgdlnahjpomhbpbj
-
-> [todo] - fix ө
