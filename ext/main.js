@@ -21,7 +21,7 @@ STYLE = "<style>\n  .mn-please a { color: green !important; font-weight: bold; p
 
 if (location.pathname === "/" || location.pathname.match(/\/problemset(?!\/problem\/)/) || location.pathname.start_with("/contests")) {
   $.ajax({
-    url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/000-data.txt",
+    url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/000-data.txt?" + (new Date().getTime()),
     dataType: "text",
     success: function(text) {
       var c, i, ready, storage, t, total, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
