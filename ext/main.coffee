@@ -39,6 +39,8 @@ if location.pathname is "/" or location.pathname.match(/\/problemset(?!\/problem
       for t in text.split("\r")[2].split("|")
         storage.credits.push(t.split(":"))
 
+      storage.total = text.split("\r")[3]
+
       localStorage.mn = JSON.stringify(storage)
 # endfold
 
@@ -49,12 +51,12 @@ if location.pathname is "/"
   <div class="roundbox sidebox top-contributed" style="">
     <div class="roundbox-lt">&nbsp;</div>
     <div class="roundbox-rt">&nbsp;</div>
-    <div class="caption titled">→ Top translators :)</div>
+    <div class="caption titled">→ Top translators</div>
     <table class="rtable ">
       <tr>
         <th class="left" style="width:2.25em">#</th>
         <th>User</th>
-        <th></th>
+        <th style="font-weight:normal;font-size:13px">{total}</th>
       </tr>
       {content}
     </table>
@@ -81,12 +83,15 @@ if location.pathname is "/"
       content = []
 
       place = 0
+      ready = 0
       for t in storage.credits
         row = ROW.replace("{place}", ++place)
         row = row.replace("{name}",  t[0])
         row = row.replace("{score}", t[1])
+
+        ready += Number(t[1])
         content.push(row)
-      $("#sidebar .top-contributed:last")[0].outerHTML = BOX.replace("{content}", content.join("\n"))
+      $("#sidebar .top-contributed:last")[0].outerHTML = BOX.replace("{total}", "#{ready}/#{storage.total}").replace("{content}", content.join("\n"))
 
 
 #:1 Page: /problemset/          - List of problems
