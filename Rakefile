@@ -1,10 +1,4 @@
 task :default do
-  data = []
-  Dir["*-*.md"].each do |input|
-    data << "#{input[0..-4].split("-")[0].to_i}-#{input[0..-4].split("-")[1]}"
-  end
-  open("out/000-data.txt", "w+") { |f| f.write(data.join("|")) }
-
   links = problem_link
 
   # Compile each file to HTML
@@ -18,6 +12,12 @@ task :default do
       `cp out/#{code}.html out/#{links[code]}.html`
     end
   end
+
+  data = []
+  Dir["out/*-*.html"].each do |input|
+    data << "#{input[4..-6].split("-")[0].to_i}-#{input[4..-6].split("-")[1]}"
+  end
+  open("out/000-data.txt", "w+") { |f| f.write(data.join("|")) }
 
   # Remove temp file
   `[ -f ".temp.md" ] && rm .temp.md`
