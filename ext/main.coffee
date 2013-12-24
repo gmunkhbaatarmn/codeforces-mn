@@ -11,8 +11,8 @@ STYLE =
 <style>
   .mn-please a { color: green !important; font-weight: bold; padding: 1px 5px 2px; border-radius: 3px }
   .mn-please a:hover { color: #fff !important; background: #069100 !important }
-
-  .problem-statement .math { font-size: 125%; font-family: times new roman,sans-serif }
+  .mn-statement ul { margin-bottom: 1em }
+  .mn-statement .math { font-size: 125%; font-family: times new roman,sans-serif }
   .sample-tests .section-title { margin-bottom: 0.5em }
   .sample-tests .title { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important; font-size: 1em !important; text-transform: none !important }
 </style>
@@ -224,6 +224,8 @@ translate = ->
     url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/#{problem_id}.html"
     dataType: "html"
     success: (data) ->
+      $(".problem-statement").addClass(".mn-statement")
+
       $data = $("<div/>").html(data)
 
       # Replace problem name

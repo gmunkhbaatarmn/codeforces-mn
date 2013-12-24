@@ -17,7 +17,7 @@ String.prototype.is_numeric = function() {
   return !isNaN(parseFloat(this)) && isFinite(this);
 };
 
-STYLE = "<style>\n  .mn-please a { color: green !important; font-weight: bold; padding: 1px 5px 2px; border-radius: 3px }\n  .mn-please a:hover { color: #fff !important; background: #069100 !important }\n\n  .problem-statement .math { font-size: 125%; font-family: times new roman,sans-serif }\n  .sample-tests .section-title { margin-bottom: 0.5em }\n  .sample-tests .title { font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif !important; font-size: 1em !important; text-transform: none !important }\n</style>";
+STYLE = "<style>\n  .mn-please a { color: green !important; font-weight: bold; padding: 1px 5px 2px; border-radius: 3px }\n  .mn-please a:hover { color: #fff !important; background: #069100 !important }\n  .mn-statement ul { margin-bottom: 1em }\n  .mn-statement .math { font-size: 125%; font-family: times new roman,sans-serif }\n  .sample-tests .section-title { margin-bottom: 0.5em }\n  .sample-tests .title { font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif !important; font-size: 1em !important; text-transform: none !important }\n</style>";
 
 if (location.pathname === "/" || location.pathname.match(/^\/contest\/\d+\/?$/) || location.pathname.match(/\/problemset(?!\/problem\/)/) || location.pathname.start_with("/contests")) {
   $.ajax({
@@ -217,6 +217,7 @@ translate = function() {
     success: function(data) {
       var $data, body, curr;
 
+      $(".problem-statement").addClass(".mn-statement");
       $data = $("<div/>").html(data);
       $(".header .title").html("" + (problem_id.slice(-1)) + ". " + ($data.find("h1")[0].innerHTML));
       body = [];
