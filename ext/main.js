@@ -19,7 +19,7 @@ String.prototype.is_numeric = function() {
 
 STYLE = "<style>\n  .mn-please a { color: green !important; font-weight: bold; padding: 1px 5px 2px; border-radius: 3px }\n  .mn-please a:hover { color: #fff !important; background: #069100 !important }\n\n  .problem-statement .math { font-size: 125%; font-family: times new roman,sans-serif }\n  .sample-tests .section-title { margin-bottom: 0.5em }\n  .sample-tests .title { font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif !important; font-size: 1em !important; text-transform: none !important }\n</style>";
 
-if (location.pathname === "/" || location.pathname.match(/\/problemset(?!\/problem\/)/) || location.pathname.start_with("/contests")) {
+if (location.pathname === "/" || location.pathname.match(/^\/contest\/\d+\/?$/) || location.pathname.match(/\/problemset(?!\/problem\/)/) || location.pathname.start_with("/contests")) {
   $.ajax({
     url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/000-data.txt?" + (new Date().getTime()),
     dataType: "text",

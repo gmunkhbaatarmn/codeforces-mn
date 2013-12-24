@@ -19,7 +19,7 @@ STYLE =
 """
 
 #:1 Run in before and renew data
-if location.pathname is "/" or location.pathname.match(/\/problemset(?!\/problem\/)/) or location.pathname.start_with("/contests")
+if location.pathname is "/" or location.pathname.match(/^\/contest\/\d+\/?$/) or location.pathname.match(/\/problemset(?!\/problem\/)/) or location.pathname.start_with("/contests")
   $.ajax
     url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/000-data.txt?#{(new Date().getTime())}"
     dataType: "text"
