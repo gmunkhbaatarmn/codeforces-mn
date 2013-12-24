@@ -1862,3 +1862,8 @@
 374 C - Inna and Dima
 374 D - Inna and Sequence
 374 E - Inna and Babies
+376 A - Lever
+376 B - I.O.U
+376 C - Divisible by Seven
+376 D - Maximum Submatrix 2
+376 E - Circling Round Treasures
