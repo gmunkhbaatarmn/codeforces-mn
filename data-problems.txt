@@ -1570,6 +1570,11 @@
 374 C - Inna and Dima
 374 D - Inna and Sequence
 374 E - Inna and Babies
+375 A - Divisible by Seven
+375 B - Maximum Submatrix 2
+375 C - Circling Round Treasures
+375 D - Tree and Queries
+375 E - Red and Black Tree
 376 A - Lever
 376 B - I.O.U
 376 C - Divisible by Seven

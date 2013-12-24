@@ -24,6 +24,7 @@ task :default do
 
   data = contest_data
   Dir["out/*-*.html"].each do |input|
+    print input, " ", data[input[4..6]], "\n"
     data[input[4..6]][0] += 1
   end
 
