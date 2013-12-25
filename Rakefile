@@ -3,7 +3,11 @@ task :default do
 
   # Compile each file to HTML
   Dir["*-*.md"].each do |input|
-    code = input[0..-4]
+    if input[0] == "+"
+      code = input[1..-4]
+    else
+      code = input[0..-4]
+    end
 
     fix input
     `pandoc .temp.md -o out/#{code}.html`
