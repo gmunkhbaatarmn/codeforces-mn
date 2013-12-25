@@ -109,6 +109,8 @@ if location.pathname.match(/\/problemset(?!\/problem\/)/)
 
     $(".problems tr").each ->
       problem_id = $.trim($(this).find("td.id").text())
+      while $.isNumeric(problem_id.slice(-1))
+        problem_id = problem_id.slice(0, -1)
       problem_id = problem_id[0..-2] + "-" + problem_id[-1..-1]
 
       if storage["problem:#{problem_id}"] isnt undefined
@@ -123,6 +125,9 @@ if location.pathname.match(/\/problemset\/problem\//)
     storage = JSON.parse(localStorage.mn or "{}")
 
     problem_id = location.pathname.replace("/problemset/problem/", "").replace("/", "-").toUpperCase()
+
+    while $.isNumeric(problem_id.slice(-1))
+      problem_id = problem_id.slice(0, -1)
 
     if storage["problem:#{problem_id}"] isnt undefined
       $(".problem-statement .header .title").after """
@@ -181,6 +186,8 @@ if location.pathname.match(/^\/contest\/\d+\/?$/)
 
     $(".problems tr").each ->
       problem_id = location.pathname.replace("/contest/", "") + "-" + $.trim($(this).find("td.id").text())
+      while $.isNumeric(problem_id.slice(-1))
+        problem_id = problem_id.slice(0, -1)
 
       if storage["problem:#{problem_id}"] isnt undefined
         $(this).addClass("mn")
@@ -195,6 +202,9 @@ if location.pathname.match(/^\/contest\/\d+\/problem\//)
 
     problem_id = location.pathname.replace("/contest/", "")
     problem_id = problem_id.replace("/problem/", "-").toUpperCase()
+
+    while $.isNumeric(problem_id.slice(-1))
+      problem_id = problem_id.slice(0, -1)
 
     if storage["problem:#{problem_id}"] isnt undefined
       $(".problem-statement .header .title").after """
@@ -213,6 +223,9 @@ translate = ->
   if location.pathname.start_with("/contest/")
     problem_id = location.pathname.replace("/contest/", "")
     problem_id = problem_id.replace("/problem/", "-").toUpperCase()
+
+  while $.isNumeric(problem_id.slice(-1))
+    problem_id = problem_id.slice(0, -1)
 
   while problem_id.length < 5
     problem_id = "0#{problem_id}"

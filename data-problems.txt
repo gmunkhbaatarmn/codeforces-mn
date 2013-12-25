@@ -828,6 +828,19 @@
 176 C - Playing with Superglue
 176 D - Hyper String
 176 E - Archaeology
+177 A - Good Matrix Elements
+177 B - Rectangular Game
+177 C - Party
+177 D - Encrypting Messages
+177 E - Space Voyage
+177 F - Script Generation
+177 G - Fibonacci Strings
+178 A - Educational Game
+178 B - Greedy Merchants
+178 C - Smart Beaver and Resolving Collisions
+178 D - Magic Squares
+178 E - The Beaver's Problem 2
+178 F - Representative Sampling
 180 A - Defragmentation
 180 B - Divisibility Rules
 180 C - Letter

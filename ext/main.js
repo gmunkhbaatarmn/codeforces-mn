@@ -98,6 +98,9 @@ if (location.pathname.match(/\/problemset(?!\/problem\/)/)) {
       var problem_id;
 
       problem_id = $.trim($(this).find("td.id").text());
+      while ($.isNumeric(problem_id.slice(-1))) {
+        problem_id = problem_id.slice(0, -1);
+      }
       problem_id = problem_id.slice(0, -1) + "-" + problem_id.slice(-1);
       if (storage["problem:" + problem_id] !== void 0) {
         return $(this).addClass("mn");
@@ -116,6 +119,9 @@ if (location.pathname.match(/\/problemset\/problem\//)) {
     $("head").append(STYLE);
     storage = JSON.parse(localStorage.mn || "{}");
     problem_id = location.pathname.replace("/problemset/problem/", "").replace("/", "-").toUpperCase();
+    while ($.isNumeric(problem_id.slice(-1))) {
+      problem_id = problem_id.slice(0, -1);
+    }
     if (storage["problem:" + problem_id] !== void 0) {
       $(".problem-statement .header .title").after("<div class=\"mn-please\"><a href=\"javascript:;\">Монголоор унших</a></div>");
     }
@@ -170,6 +176,9 @@ if (location.pathname.match(/^\/contest\/\d+\/?$/)) {
       var problem_id;
 
       problem_id = location.pathname.replace("/contest/", "") + "-" + $.trim($(this).find("td.id").text());
+      while ($.isNumeric(problem_id.slice(-1))) {
+        problem_id = problem_id.slice(0, -1);
+      }
       if (storage["problem:" + problem_id] !== void 0) {
         return $(this).addClass("mn");
       }
@@ -188,6 +197,9 @@ if (location.pathname.match(/^\/contest\/\d+\/problem\//)) {
     storage = JSON.parse(localStorage.mn || "{}");
     problem_id = location.pathname.replace("/contest/", "");
     problem_id = problem_id.replace("/problem/", "-").toUpperCase();
+    while ($.isNumeric(problem_id.slice(-1))) {
+      problem_id = problem_id.slice(0, -1);
+    }
     if (storage["problem:" + problem_id] !== void 0) {
       $(".problem-statement .header .title").after("<div class=\"mn-please\"><a href=\"javascript:;\">Монголоор унших</a></div>");
     }
@@ -204,6 +216,9 @@ translate = function() {
   if (location.pathname.start_with("/contest/")) {
     problem_id = location.pathname.replace("/contest/", "");
     problem_id = problem_id.replace("/problem/", "-").toUpperCase();
+  }
+  while ($.isNumeric(problem_id.slice(-1))) {
+    problem_id = problem_id.slice(0, -1);
   }
   while (problem_id.length < 5) {
     problem_id = "0" + problem_id;
