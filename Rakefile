@@ -36,7 +36,7 @@ task :default do
     formatted = data.find_all{|c| c[1][0] > 0}.map{|c| "%s:%s/%s" % [c[0], c[1][0], c[1][1]]}
     f.write("\r#{formatted.join("|")}")
     f.write("\r" + TRANSLATOR_POINT.sort_by {|k,v| v}.reverse.map{|t| "%s:%s" % [t[0], t[1]]}.join("|"))
-    f.write("\r1654") #Total problems
+    f.write("\r1677") #Total problems
   end
 
   `git add out`
