@@ -35,7 +35,7 @@ task :default do
   open("out/000-data.txt", "a+") do |f|
     formatted = data.find_all{|c| c[1][0] > 0}.map{|c| "%s:%s/%s" % [c[0], c[1][0], c[1][1]]}
     f.write("\r#{formatted.join("|")}")
-    f.write("\r" + TRANSLATOR_POINT.sort_by {|k,v| v}.reverse.map{|t| "%s:%s" % [t[0], t[1]]}.join("|"))
+    f.write("\r" + TRANSLATOR_POINT.sort_by{|k,v| v}.reverse.map{|t| color(t)}.join("|"))
     f.write("\r1677") #Total problems
   end
 
@@ -138,4 +138,21 @@ def contest_data
   end
 
   data
+end
+
+
+def color(t)
+  if t[1] >= 100.0
+    color = "red"
+  elsif t[1] >= 75.0
+    color = "#ff8c00"
+  elsif t[1] >= 50.0
+    color = "blue"
+  elsif t[1] >= 25.0
+    color = "green"
+  else
+    color = "gray"
+  end
+
+  "<span style='color:#{color}'>%s</span>:%s" % [t[0], t[1]]
 end
