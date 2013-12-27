@@ -145,7 +145,7 @@ def color(t)
   if t[1] >= 100.0
     color = "red"
   elsif t[1] >= 75.0
-    color = "#ff8c00"
+    color = "orange"
   elsif t[1] >= 50.0
     color = "blue"
   elsif t[1] >= 25.0
@@ -154,5 +154,5 @@ def color(t)
     color = "gray"
   end
 
-  "<span style='color:#{color}'>%s</span>:%s" % [t[0], t[1]]
+  "<span class='user-#{color}'>%s</span>:%s" % [t[0], t[1]]
 end
