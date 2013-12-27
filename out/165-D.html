@@ -1,0 +1,26 @@
+<h1 id="сахал-граф">Сахал граф</h1>
+<p><span class="math"><em>n</em></span> орой, <span class="math"><em>n</em> − 1</span> ирмэгтэй, чиглэлгүй холбоост графын хамгийн ихдээ ганцхан орой нь <span class="math">2</span>-оос их өнцөгтэй ба бусад орой нь <span class="math">2</span> эсвэл <span class="math">1</span> оройн өнцөгтэй байдаг бол тэр графыг <strong>сахал</strong> гэе. Мөн оройн өнцөг гэдгээр тухайн оройд хэдэн ирмэг холбогдож буйг илэрхийлдэгийг эргэн санаарай.</p>
+<p>Бүх ирмэг зөвхөн хар эсвэл цагаан өнгөтэй байна. Эхэндээ бүх ирмэг хар өнгөтэй байна.</p>
+<p>Танд сахал граф өгөгдсөн байгаа ба та дараах төрлийн хүсэлтүүдэд анализ хийх хэрэгтэй.</p>
+<ul>
+<li><span class="math"><em>i</em></span>-р ирмэгийг хараар буд. Ирмэгийн дугаар <span class="math"><em>i</em></span> нь оролтонд өгөгдсөн байгаа ба энэ хүсэлт ирэх үед тухайн <span class="math"><em>i</em></span>-р ирмэг цагаан өнгөтэй байна.</li>
+<li><span class="math"><em>i</em></span>-р ирмэгийг цагаанаар буд. Энэ хүсэлт ирэх үед тухайн <span class="math"><em>i</em></span>-р ирмэг хар өнгөтэй байна.</li>
+<li><span class="math"><em>a</em></span> оройгоос <span class="math"><em>b</em></span> оройруу зөвхөн <strong>хар ирмэгүүдээр дамжин</strong> очих хамгийн богино замын уртыг олох эсвэл тийм зам байхгүй гэдгийг илэрхийлэх(замын урт гэдэг нь тэр замд буй ирмэгийн тоонууд)</li>
+</ul>
+<p>Оройнууд <span class="math">1</span>-с <span class="math"><em>n</em></span> хүртэл дугаарлагдсан ба ирмэгүүд <span class="math">1</span>-с <span class="math"><em>n</em> − 1</span> хүртэл дугаарлагдсан.</p>
+<h3 id="оролт">Оролт</h3>
+<p>Эхний мөрөнд бүхэл тоо <span class="math"><em>n</em></span> (<span class="math">2 ≤ <em>n</em> ≤ 10<sup>5</sup></span>) байх ба энэ нь граф дахь оройн тоонууд. Дараагийн <span class="math"><em>n</em> − 1</span> мөрөнд <span class="math"><em>v</em><sub><em>i</em></sub></span>, <span class="math"><em>u</em><sub><em>i</em></sub></span> (<span class="math">1 ≤ <em>v</em><sub><em>i</em></sub>, <em>u</em><sub><em>i</em></sub> ≤ <em>n</em></span>, <span class="math"><em>v</em><sub><em>i</em></sub> ≠ <em>u</em><sub><em>i</em></sub></span>) гэсэн хоёр оройгоор илэрхийлэгдэх ирмэгийн мэдээллүүд байрлана. Өгөгдсөн граф нь холбоост, сахал байх ба дотроо цикл үүсгэдэггүй байна гэдэгт итгэлтэй байж болно.</p>
+<p>Дараагийн мөр нь хүсэлтүүдийн тоо болох <span class="math"><em>m</em></span> (<span class="math">1 ≤ <em>m</em> ≤ 3·10<sup>5</sup></span>)-ийг агуулах ба дараагийн <span class="math"><em>m</em></span> мөрөнд хүсэлтүүд байрлах ба хүсэлт нь эхлээд <span class="math"><em>t</em><em>y</em><em>p</em><em>e</em></span> (хүсэлтийн төрлийг илэрхийлнэ 1-ээс 3 хүртэлх утгуудтай) дараа <span class="math"><em>t</em><em>y</em><em>p</em><em>e</em></span>-аасаа хамаарсан мэдээлэлтэй байна.</p>
+<ul>
+<li>хэрэв <span class="math"><em>t</em><em>y</em><em>p</em><em>e</em> = 1</span> бол энэ хүсэлт ямар нэгэн ирмэгийг хараар будах хүсэлт бөгөөд будах ирмэгийн дугаар <span class="math"><em>i</em><em>d</em></span> (<span class="math">1 ≤ <em>i</em><em>d</em> ≤ <em>n</em> − 1</span>) ард нь байрлана.</li>
+<li>хэрэв <span class="math"><em>t</em><em>y</em><em>p</em><em>e</em> = 2</span> бол энэ хүсэлт нь ямар нэгэн ирмэгийг цагаанаар будах хүсэлт бөгөөд будах цагаанаар ирмэгийн дугаар <span class="math"><em>i</em><em>d</em></span> (<span class="math">1 ≤ <em>i</em><em>d</em> ≤ <em>n</em> − 1</span>) ард нь байрлана.</li>
+<li>хэрэв <span class="math"><em>t</em><em>y</em><em>p</em><em>e</em> = 3</span> бол энэ нь <span class="math"><em>a</em></span>, <span class="math"><em>b</em></span> (<span class="math">1 ≤ <em>a</em>, <em>b</em> ≤ <em>n</em></span>, a,b нь тэнцүү байж болно) оройнуудын хоорондох хамгийн богино замыг олох хүсэлт юм.</li>
+</ul>
+<p>Дараагийн мөр нь хүсэлтүүдийн тоо болох <span class="math"><em>m</em></span> (<span class="math">1 ≤ <em>m</em> ≤ 3·10<sup>5</sup></span>)-ийг агуулах ба дараагийн <span class="math"><em>m</em></span> мөрөнд хүсэлтүүд нь эхлээд <span class="math"><em>t</em><em>y</em><em>p</em><em>e</em></span> (хүсэлтийн төрлийг илэрхийлнэ, 1-ээс 3 хүртэлх утгуудтай) дараа <span class="math"><em>t</em><em>y</em><em>p</em><em>e</em></span>-аасаа хамаарсан мэдээлэлтэй байна.</p>
+<p>Оролтын мөрнүүд дэх тоонууд яг нэг хоосон зайгаар тусгаарлагдсан ба ирмэгүүдийн дугаар нь оролтод байсантайгаа ижил.</p>
+<h3 id="гаралт">Гаралт</h3>
+<p>&quot;а болон b орой хоорондын хамгийн богино замыг олох&quot; хүсэлт бүрд хариу хэвлэх ба <span class="math"><em>a</em></span> болон <span class="math"><em>b</em></span> орой хоёрын хооронд зам байхгүй бол &quot;-1&quot; хэвлэнэ. Хариунуудыг орж ирсэн хүсэлтийнх дарааллаар хэвлэх ба тоонуудыг хооронд хоосон зай эсвэл мөр шилжүүлэлтээр тусгаарлана.</p>
+<p class="math" style="text-align:right;font-style:italic">
+Орчуулсан: mmur
+</p>
+
