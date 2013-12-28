@@ -943,6 +943,10 @@
 204 E - Little Elephant and Strings
 205 A - Little Elephant and Rozdil
 205 B - Little Elephant and Sorting
+207 A - Beaver's Calculator 1.0
+207 B - Military Trainings
+207 C - Game with Two Trees
+207 D - The Beaver's Problem - 3
 208 A - Dubstep
 208 B - Solitaire
 208 C - Police Station
@@ -1361,6 +1365,13 @@
 314 E - Sereja and Squares
 315 A - Sereja and Bottles
 315 B - Sereja and Array
+316 A - Special Task
+316 B - EKG
+316 C - Tidying Up
+316 D - PE Lesson
+316 E - Summer Homework
+316 F - Suns and Rays
+316 G - Good Substrings
 317 A - Perfect Pair
 317 B - Ants
 317 C - Balance
@@ -1404,6 +1415,11 @@
 329 E - Evil
 330 A - Cakeminator
 330 B - Road Construction
+331 A - Oh Sweet Beaverette
+331 B - Shave Beaver!
+331 C - The Great Julya Calendar
+331 D - Escaping on Beaveractor
+331 E - Deja Vu
 332 A - Down the Hatch!
 332 B - Maximum Absurdity
 332 C - Students' Revenge
