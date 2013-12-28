@@ -227,7 +227,7 @@ translate = function() {
     return $(this).html("<strong>Орчуулж байна...</strong>").fadeIn("fast");
   });
   return $.ajax({
-    url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/" + problem_id + ".html",
+    url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/" + problem_id + ".html?" + (new Date().getTime()),
     dataType: "html",
     success: function(data) {
       var $data, body, curr;
