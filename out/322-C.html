@@ -1,18 +1,17 @@
-<h1 id="сиел-ба-робот">Сиел ба робот</h1>
-<p>Сиел үнэгний робот <span class="math">2</span> хэмжээст хавтгайн (<span class="math">0, 0</span>) цэг дээр байгаа. Сиел роботдоо гүйцэтгэх ёстой командуудыг нь заасан код өгчээ. Энэхүү код нь <span class="math"><em>s</em></span> тэмдэгт мөрөөр илэрхийлэгдэх ба тэмдэгт бүр нэг үйлдлийг илэрхийлнэ. Дараах <span class="math">4</span> төрлийн үйлдэл тодорхойлогдсон:</p>
+<h1 id="сиал-болон-робот">Сиал болон робот</h1>
+<p>Фокс Сиалд <span class="math">2<em>D</em></span> талбай дээр робот байгаа. Анх (<span class="math">0, 0</span>) цэг дээр байрлана. Фокс Сиалд нэг тэмдэгт мөр комманд өгнө. Тэмдэгт мөрийн үсэг бүр нь дараах дөрвөн үйлдэлийн аль нэг байна.</p>
 <ul>
-<li>&quot;U&quot;: дээшээ алхах (<span class="math"><em>x</em>, <em>y</em></span>) → (<span class="math"><em>x</em>, <em>y</em> + 1</span>)</li>
-<li>&quot;D&quot;: доошоо алхах, (<span class="math"><em>x</em>, <em>y</em></span>) → (<span class="math"><em>x</em>, <em>y</em> − 1</span>)</li>
-<li>&quot;L&quot;: зүүн тийшээ алхах, (<span class="math"><em>x</em>, <em>y</em></span>) → (<span class="math"><em>x</em> − 1, <em>y</em></span>)</li>
-<li>&quot;R&quot;: баруун тийшээ алхах, (<span class="math"><em>x</em>, <em>y</em></span>) → (<span class="math"><em>x</em> + 1, <em>y</em></span>)</li>
+<li>'U': дээшээ явна, (<span class="math"><em>x</em>, <em>y</em></span>) → (<span class="math"><em>x</em>, <em>y</em> + 1</span>);</li>
+<li>'D': доошоо явна, (<span class="math"><em>x</em>, <em>y</em></span>) → (<span class="math"><em>x</em>, <em>y</em> − 1</span>);</li>
+<li>'L': зүүн явна, (<span class="math"><em>x</em>, <em>y</em></span>) → (<span class="math"><em>x</em> − 1, <em>y</em></span>);</li>
+<li>'R': баруун явна, (<span class="math"><em>x</em>, <em>y</em></span>) → (<span class="math"><em>x</em> + 1, <em>y</em></span>).</li>
 </ul>
-<p>Робот үйлдлүүдийн командыг эхнээс нь төгсгөл хүртэл нь гүйцэтгээд дахиад эхнээс нь эхлэх ба энэ мэтээр зогсолтгүй гүйцэтгэсээр байна. Сиел түүний робот хэзээ нэгэн цагт (<span class="math"><em>a</em>, <em>b</em></span>) цэг дээр очих эсэхийг сонирхож байгаа тул түүнд тусална уу.</p>
+<p>Робот <span class="math"><em>s</em></span> тэмдэгт мөрийг зүүнээс баруунлуу төгсгөлгүй давтана. Робот тодорхой алхамын дараа (<span class="math"><em>a</em>, <em>b</em></span>) байрлал дээр очиж чадах эсэхийг тооцоолно уу?</p>
 <h3 id="оролт">Оролт</h3>
-<p>Эхний мөрөнд <span class="math"><em>a</em></span>, <span class="math"><em>b</em></span> хоёр тоо (<span class="math"> − 10<sup>9</sup> ≤ <em>a</em>, <em>b</em> ≤ 10<sup>9</sup></span>).</p>
-<p>Дараагийн мөрөнд 'U', 'D', 'L', 'R' тэмдэгтүүдээс тогтох <span class="math"><em>s</em></span> тэмдэгт мөр (<span class="math">1 ≤ ∣<em>s</em>∣ ≤ 100</span>).</p>
+<p>Эхний мөрөнд <span class="math"><em>a</em></span> болон <span class="math"><em>b</em></span> (<span class="math"> − 10<sup>9</sup> ≤ <em>a</em>, <em>b</em> ≤ 10<sup>9</sup></span>) бүхэл тоо өгөгдөнө. Дараагийн мөрөнд <span class="math"><em>s</em></span> (<span class="math">1 ≤ ∣<em>s</em>∣ ≤ 100</span>, <span class="math"><em>s</em></span> нь зөвхөн 'U', 'D', 'L', 'R' тэмдэгтүүдээс тогтоно) тэмдэгт мөр өгөгдөнө.</p>
 <h3 id="гаралт">Гаралт</h3>
-<p>Робот (<span class="math"><em>a</em>, <em>b</em></span>) цэг дээр очих бол &quot;Yes&quot; үгүй бол &quot;No&quot; гэж хэвлэнэ үү.</p>
+<p>Хэрвээ робот (<span class="math"><em>a</em>, <em>b</em></span>) байрлал дээр очиж чадах бол &quot;YES&quot; эсрэг тохиолдолд &quot;NO&quot; гэж хэвлэ.</p>
 <p class="math" style="text-align:right;font-style:italic">
-Орчуулсан: gmunkhbaatarmn
+Орчуулсан: Хүрэлцоож
 </p>
 
