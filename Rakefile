@@ -10,7 +10,9 @@ task :default do
     end
 
     fix input
+    # if input.start_with? "LIVE_CONTEST_ID"
     `pandoc .temp.md -o out/#{code}.html`
+    # end
 
     if links[code]
       `cp out/#{code}.html out/#{links[code]}.html`
@@ -107,6 +109,9 @@ def problem_link
       hash = ("%03d" % (line[0..2].to_i - i)).to_s + " - " + line[8..-1] unless problem[hash]
     end
 
+    unless problem[hash]
+      puts hash
+    end
     unless problem[hash].include?(code)
       problem[hash] <<= code
     end

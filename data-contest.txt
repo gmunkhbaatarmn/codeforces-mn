@@ -1885,3 +1885,20 @@
 376 C - Divisible by Seven
 376 D - Maximum Submatrix 2
 376 E - Circling Round Treasures
+377 A - Maze
+377 B - Preparing for the Contest
+377 C - Captains Mode
+377 D - Developing Game
+377 E - Cookie Clicker
+378 A - Playing with Dice
+378 B - Semifinals
+378 C - Maze
+378 D - Preparing for the Contest
+378 E - Captains Mode
+379 A - New Year Candles
+379 B - New Year Present
+379 C - New Year Rating Change
+379 D - New Year Letter
+379 E - New Year Tree Decorations
+379 F - New Year Tree
+379 G - New Year Cactus
