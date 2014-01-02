@@ -240,6 +240,7 @@ translate = ->
       $(".problem-statement").addClass("mn-statement")
 
       $data = $("<div/>").html(data)
+      credit = $data.find("p:last")[0].outerHTML; $data.find("p:last").remove()
 
       # Replace problem name
       $(".header .title").html "#{problem_id.slice(-1)}. #{$data.find("h1")[0].innerHTML}"
@@ -262,16 +263,25 @@ translate = ->
 
       # Replace output
       body = []
-      curr = $data.find("h3:last").next()
+      curr = $data.find("h3:eq(1)").next()
       while curr[0] and curr[0].tagName isnt "H3"
         body.push(curr[0].outerHTML)
         curr = curr.next()
-      $(".output-specification").html """<div class="section-title">Гаралт</div>#{body.join("\n")}"""
+      $(".output-specification").html """<div class="section-title">Гаралт</div>#{body.join("\n")}#{credit}"""
 
       # Replace sample test(s)
       $(".sample-tests .section-title").html "Жишээ тэстүүд"
       $(".sample-tests .section-title").html "Жишээ тэстүүд"
       $(".sample-tests .sample-test .input .title").html "Оролт"
       $(".sample-tests .sample-test .output .title").html "Гаралт"
+
+      # Replace note
+      if $data.find("h3:eq(2)")
+        body = []
+        curr = $data.find("h3:eq(2)").next()
+        while curr[0] and curr[0].tagName isnt "H3"
+          body.push(curr[0].outerHTML)
+          curr = curr.next()
+        $(".problem-statement .note").html """<div class="section-title">Тэмдэглэл</div>#{body.join("\n")}"""
 
       $(".mn-please").fadeOut("fast")

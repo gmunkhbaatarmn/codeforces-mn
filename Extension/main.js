@@ -230,10 +230,12 @@ translate = function() {
     url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/" + problem_id + ".html?" + (new Date().getTime()),
     dataType: "html",
     success: function(data) {
-      var $data, body, curr;
+      var $data, body, credit, curr;
 
       $(".problem-statement").addClass("mn-statement");
       $data = $("<div/>").html(data);
+      credit = $data.find("p:last")[0].outerHTML;
+      $data.find("p:last").remove();
       $(".header .title").html("" + (problem_id.slice(-1)) + ". " + ($data.find("h1")[0].innerHTML));
       body = [];
       curr = $data.find("h1").next();
@@ -250,16 +252,25 @@ translate = function() {
       }
       $(".input-specification").html("<div class=\"section-title\">Оролт</div>" + (body.join("\n")));
       body = [];
-      curr = $data.find("h3:last").next();
+      curr = $data.find("h3:eq(1)").next();
       while (curr[0] && curr[0].tagName !== "H3") {
         body.push(curr[0].outerHTML);
         curr = curr.next();
       }
-      $(".output-specification").html("<div class=\"section-title\">Гаралт</div>" + (body.join("\n")));
+      $(".output-specification").html("<div class=\"section-title\">Гаралт</div>" + (body.join("\n")) + credit);
       $(".sample-tests .section-title").html("Жишээ тэстүүд");
       $(".sample-tests .section-title").html("Жишээ тэстүүд");
       $(".sample-tests .sample-test .input .title").html("Оролт");
       $(".sample-tests .sample-test .output .title").html("Гаралт");
+      if ($data.find("h3:eq(2)")) {
+        body = [];
+        curr = $data.find("h3:eq(2)").next();
+        while (curr[0] && curr[0].tagName !== "H3") {
+          body.push(curr[0].outerHTML);
+          curr = curr.next();
+        }
+        $(".problem-statement .note").html("<div class=\"section-title\">Тэмдэглэл</div>" + (body.join("\n")));
+      }
       return $(".mn-please").fadeOut("fast");
     }
   });
