@@ -262,7 +262,7 @@ translate = function() {
       $(".sample-tests .section-title").html("Жишээ тэстүүд");
       $(".sample-tests .sample-test .input .title").html("Оролт");
       $(".sample-tests .sample-test .output .title").html("Гаралт");
-      if ($data.find("h3:eq(2)")) {
+      if ($data.find("h3:eq(2)").length) {
         body = [];
         curr = $data.find("h3:eq(2)").next();
         while (curr[0] && curr[0].tagName !== "H3") {

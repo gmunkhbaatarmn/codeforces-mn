@@ -276,7 +276,7 @@ translate = ->
       $(".sample-tests .sample-test .output .title").html "Гаралт"
 
       # Replace note
-      if $data.find("h3:eq(2)")
+      if $data.find("h3:eq(2)").length
         body = []
         curr = $data.find("h3:eq(2)").next()
         while curr[0] and curr[0].tagName isnt "H3"
