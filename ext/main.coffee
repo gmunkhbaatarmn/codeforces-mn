@@ -185,7 +185,7 @@ if location.pathname.match(/^\/contest\/\d+\/?$/)
     storage = JSON.parse(localStorage.mn or "{}")
 
     $(".problems tr").each ->
-      problem_id = location.pathname.replace("/contest/", "") + "-" + $.trim($(this).find("td.id").text())
+      problem_id = location.pathname.replace("/contest/", "").replace("/", "") + "-" + $.trim($(this).find("td.id").text())
       while $.isNumeric(problem_id.slice(-1))
         problem_id = problem_id.slice(0, -1)
 
@@ -237,7 +237,7 @@ translate = ->
     url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/#{problem_id}.html?#{(new Date().getTime())}"
     dataType: "html"
     success: (data) ->
-      $(".problem-statement").addClass(".mn-statement")
+      $(".problem-statement").addClass("mn-statement")
 
       $data = $("<div/>").html(data)
 

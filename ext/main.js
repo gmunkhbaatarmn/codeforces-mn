@@ -175,7 +175,7 @@ if (location.pathname.match(/^\/contest\/\d+\/?$/)) {
     return $(".problems tr").each(function() {
       var problem_id;
 
-      problem_id = location.pathname.replace("/contest/", "") + "-" + $.trim($(this).find("td.id").text());
+      problem_id = location.pathname.replace("/contest/", "").replace("/", "") + "-" + $.trim($(this).find("td.id").text());
       while ($.isNumeric(problem_id.slice(-1))) {
         problem_id = problem_id.slice(0, -1);
       }
@@ -232,7 +232,7 @@ translate = function() {
     success: function(data) {
       var $data, body, curr;
 
-      $(".problem-statement").addClass(".mn-statement");
+      $(".problem-statement").addClass("mn-statement");
       $data = $("<div/>").html(data);
       $(".header .title").html("" + (problem_id.slice(-1)) + ". " + ($data.find("h1")[0].innerHTML));
       body = [];
