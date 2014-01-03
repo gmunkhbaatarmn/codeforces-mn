@@ -24,3 +24,7 @@ Mongolian translations of Codeforces.com problems.
 
   [1]: https://www.google.com/intl/en/chrome/browser/
   [2]: https://chrome.google.com/webstore/detail/codeforces-mongolia/fghdlncknpkheekfjgdlnahjpomhbpbj
+
+
+
+Берл? Бэрл
