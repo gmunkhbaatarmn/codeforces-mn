@@ -43,9 +43,6 @@ task :default do
     f.write("\r1608") #Total problems
   end
 
-  `git add out`
-  `git commit -m '[auto] problems compiled'`
-
   json_name = []
   json_dict = {}
   json = []
@@ -64,6 +61,9 @@ task :default do
     json << ([i] + json_dict[i])
   end
   open("out/000-problemset.json", "w+") { |f| f.write(JSON.dump(json)) }
+
+  `git add out`
+  `git commit -m '[auto] problems compiled'`
 
   puts "Done!"
   print TRANSLATOR_POINT
