@@ -1,0 +1,56 @@
+{% extends "Layout.html" %}
+
+{% set title = "Тэмцээн" %}
+{% set menu = "problemset" %}
+
+{% block content %}
+	<div class="problem-statement">
+		<h1>A. Шинэ жилийн лаанууд</h1>
+		<h3><strong>хугацааны хязгаарлалт</strong> 1 секунд</h3>
+		<h3><strong>санах ойн хязгаарлалт</strong> 256 мегабайт</h3>
+		<h3><strong>оролт</strong> стандарт оролт</h3>
+		<h3><strong>гаралт</strong> стандарт гаралт</h3>
+
+		<div>
+			<p>Vasily the Programmer loves romance, so this year he decided to illuminate his room with candles.</p>
+			<p>Vasily has <span class="tex-span"><i>a</i></span> candles.When Vasily lights up a new candle, it first burns for an hour and then it goes out. Vasily is smart, so he can make <span class="tex-span"><i>b</i></span> went out candles into a new candle. As a result, this new candle can be used like any other new candle.</p>
+			<p>Now Vasily wonders: for how many hours can his candles light up the room if he acts optimally well? Help him find this number.</p>
+			<p style="text-align:right;font-style:italic">Орчуулсан: Хүрэлцоож</p>
+		</div>
+
+		<h2>Оролт</h2>
+		<p>The single line contains two integers, <span class="tex-span"><i>a</i></span> and <span class="tex-span"><i>b</i></span> <span class="tex-span">(1 ≤ <i>a</i> ≤ 1000;&nbsp;2 ≤ <i>b</i> ≤ 1000)</span>.</p>
+
+		<h2>Гаралт</h2>
+		<p>Print a single integer — the number of hours Vasily can light up the room for.</p>
+
+		<h4>Жишээ тэстүүд</h4>
+		<div class="sample">
+			<h5>Оролт</h5>
+			<pre>4 2<br></pre>
+			<h5>Гаралт</h5>
+			<pre>7<br></pre>
+		</div>
+
+		<div class="sample">
+			<h5>Оролт</h5>
+			<pre>4 2<br></pre>
+			<h5>Гаралт</h5>
+			<pre>7<br></pre>
+		</div>
+
+		<h2>Тэмдэглэл</h2>
+		<p>Consider the first sample. For the first four hours Vasily lights up new candles, then he uses four burned out candles to make two new ones and lights them up. When these candles go out (stop burning), Vasily can make another candle. Overall, Vasily can light up the room for 7 hours.</p>
+	</div>
+{% endblock %}
+
+{% block sidebar %}
+	<div class="box">
+		<h2>Бодолт илгээх?</h2>
+		<div>
+			Codeforces.com-руу орж бодолтоо шалгана уу.
+			<br>
+			<a href="">Codeforces дээрх хаяг</a>
+		</div>
+	</div>
+{% endblock %}

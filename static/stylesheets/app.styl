@@ -1,0 +1,309 @@
+@import url("http://fonts.googleapis.com/css?family=Ubuntu+Condensed&subset=cyrillic-ext,cyrillic")
+@import "normalize.css"
+@import "/Users/mb/.snippets/stylus/mixins"
+
+a
+  color #0000cc
+
+body
+  font-size 87.5%
+  font-family Verdana, Arial, sans-serif;
+
+#container
+  margin 0 auto
+  width 1200px
+
+.button
+  color #fff
+  background-color #5cb85c
+  border-color #4cae4c
+  display inline-block
+  font-size 14px
+  padding 6px 12px
+  border-radius 4px
+  cursor pointer
+  vertical-align middle
+  white-space nowrap
+  text-align center
+  user-select none
+  text-decoration none
+.button:hover
+  background-color #47a447
+  border-color #398439
+.user-red
+  color red !important
+  font-weight bold
+.user-orange
+  color #ff8c00 !important
+  font-weight bold
+.user-blue
+  color blue !important
+  font-weight bold
+.user-green
+  color green !important
+  font-weight bold
+.user-gray
+  color gray !important
+  font-weight bold
+
+//:1 header
+#header
+  height 5em
+  margin 14px 1em 0
+  clearfix()
+
+#header .logo
+  background url("http://worker.codeforces.ru/static/images/codeforces-logo-with-upper-beta.png")
+  display block
+  float left
+  width 300px
+  height 65px
+  text-decoration none
+  font-weight bold
+  font-size 11px
+  position relative
+#header .logo:before
+  content "Монгол"
+  position absolute
+  top 45px
+  display inline-block
+  width 213px
+  text-align right
+  color #333
+#header .logo:after
+  content "орчуулга"
+  position absolute
+  top 45px
+  left 216px
+  display inline-block
+  color #3b5998
+
+#header .lang
+  float right
+#header .lang a
+  display block
+  float left
+  margin-left 5px
+  width 24px
+  height 24px
+  font-size 0
+#header .lang a.mn
+  background url("http://worker.codeforces.ru/static/images/flags-24/mn.png")
+#header .lang a.en
+  background url("http://worker.codeforces.ru/static/images/flags-24/gb.png")
+#header .lang a.ru
+  background url("http://worker.codeforces.ru/static/images/flags-24/ru.png")
+
+//:1 menu
+#menu
+  border 1px solid #b9b9b9
+  position relative
+  height 42px
+  margin 0 1em
+  border-radius 7px
+  padding 0 1.5em
+
+#menu li
+  font-family "Ubuntu Condensed", sans-serif
+  font-size 16px
+  list-style none
+  float left
+  display block
+  margin 11px 24px 0 0
+  text-transform uppercase
+  line-height 22px
+#menu li.current
+  border-bottom 3px solid #3b5998
+#menu li a
+  color #000
+  text-decoration none
+
+//:1 sidebar
+#sidebar
+  float right
+  width 280px
+  margin 2em 1em 1em 0
+#sidebar .box
+  border 1px solid #b9b9b9
+  position relative
+  border-radius 7px 7px 0 0
+  margin-bottom 1.5em
+
+#sidebar .box > h2
+  padding 0 0 0.3em 0.5em
+  border-bottom 1px solid #b9b9b9
+  color #3b5998
+  font-size 15px
+  font-weight bold
+  margin 3px 0
+  position relative
+  height 18px
+  &:before
+    content "→"
+    font-weight normal
+    margin-right 5px
+
+#sidebar .box > div
+  padding 10px 15px 15px
+
+#sidebar .box table
+  width 100%
+  margin-top -3px
+
+#sidebar .box table.no-title
+  margin-top 0
+
+#sidebar .box table th
+  border 1px solid #b9b9b9
+  border-top 0
+  border-right 0
+
+#sidebar .box table tr th:first-child
+  border-left 0
+
+#sidebar .box table td
+  border 1px solid #b9b9b9
+  border-right none
+  border-top none
+  padding 4px
+  text-align center
+  font-size 0.9em
+  font-size 12px
+
+#sidebar .box table tr:last-child td
+  border-bottom 0
+
+#sidebar .box table tr td:first-child
+  border-left 0
+
+//:1 content
+#content
+  margin 2em 320px 1em 1em
+  color #222
+
+//:1 content table
+#content .table-title
+  padding 4px 0 0 6px
+  font-size 1em
+  font-weight normal
+  margin 0
+  border-radius 7px 7px 0 0
+  background #e1e1e1
+#content .table-container
+  background #e1e1e1
+  border 3px solid #e1e1e1
+  border-radius 0px 0px 5px 5px
+#content .table-container table
+  background #fff
+  width 100%
+  border-radius 5px 5px 3px 3px
+#content .table-container table td, table th
+  border-right 1px solid #e1e1e1
+  padding 0.5em
+  font-size 0.9em
+  text-align center
+  overflow hidden
+#content .table-container table td
+  border-top 1px solid #e1e1e1
+  text-align left
+#content table tr.dark td
+  background-color #f8f8f8
+
+//:1 content pagination
+#content .pagination ul
+  margin 1em 0
+  padding 0
+  clearfix()
+#content .pagination ul li
+  display block
+  float left
+  margin-right 7px
+#content .pagination ul li a
+  padding 4px
+  color #000
+  text-decoration none
+  font-size 14px
+  display inline-block
+  height 17px
+  line-height 17px
+  border 1px solid transparent
+#content .pagination ul li.active a
+  border 1px solid #ddd
+  background-color #eee
+  font-weight bold
+#content .pagination ul li.inactive
+  font-size 28px
+  height 27px
+  line-height 22px
+  color #ccc
+#content .pagination ul li.plain
+  line-height 27px
+  height 27px
+#content .pagination ul li a.arrow
+  font-size 28px
+  line-height 10px
+
+//:1 content problem-statement
+#content .problem-statement
+  font-family "Helvetica Neue", Helvetica, Arial, sans-serif
+#content .problem-statement h1
+  font-size 150%
+  text-align center
+  margin 0
+  margin-bottom 0.5em
+  font-weight normal
+  line-height 21px
+// input output
+#content .problem-statement h2
+  font-size 16px
+  margin 1.5em 0 -0.5em
+// header
+#content .problem-statement h3
+  font-weight normal
+  text-align center
+  margin 0
+  font-size 13px
+  color #333
+  line-height 21px
+#content .problem-statement h3 strong
+  font-weight normal
+#content .problem-statement h3 strong:after
+  content ":"
+// sample tests
+#content .problem-statement h4
+  font-size 14px
+  margin 1em 0 0.5em
+#content .problem-statement .sample
+  border 1px solid #888
+  border-bottom 0
+  margin-bottom 1em
+#content .problem-statement h5
+  margin 0
+  padding 2px 6px
+  line-height 21px
+  font-size 13px
+  border-top 0
+  border-bottom 0
+#content .problem-statement pre
+  color #800
+  line-height 1.25em
+  padding 2px 6px
+  margin 0
+  background-color #efefef
+  border-top 1px solid #888
+  border-bottom 1px solid #888
+
+//:1 footer
+#footer
+  margin-top 1em
+  padding 1em 0
+  border-top 1px solid #ccc
+  text-align center
+  font-size 1em
+  clear both
+#footer p
+  color #777
+  font-size 12px
+#footer p a
+  color #777
+  font-weight bold

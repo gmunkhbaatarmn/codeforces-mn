@@ -1,0 +1,31 @@
+application: codeforces-mn
+version: beta
+
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /(robots\.txt|humans\.txt|favicon\.ico)
+  static_files: static/\1
+  upload: static/.*
+
+- url: /static
+  static_dir: static
+  expiration: "1s"
+
+- url: /.*
+  script: app.app
+
+libraries:
+- { name: webapp2,    version: "2.5.2" }
+- { name: jinja2,     version: "2.6"   }
+- { name: markupsafe, version: "0.15"  } # required for jinja2
+- { name: django,     version: "1.3"   }
+- { name: lxml,       version: "2.3"   }
+
+skip_files:
+- ^(app|index)\.y(a)?ml         # appengine config files
+- ^(.*/)?.*\.(styl|coffee|json) # some extensions not need to deploy
+- ^(.*/)?(#.*#)|(.*~)           # editor temp files
+- ^(.*/)?.*\.py[co]             # environment temp files

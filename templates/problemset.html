@@ -1,0 +1,40 @@
+{% extends "Layout.html" %}
+
+{% set title = "Бодлогууд" %}
+{% set menu = "problemset" %}
+
+{% block content %}
+	<h1 class="table-title">Бүх бодлогууд</h1>
+	<div class="table-container">
+		<table>
+			<tr>
+				<th style="width:4em">#</th>
+				<th>Бодлогын нэр</th>
+				<th style="width:12em">Орчуулсан</th>
+			</tr>
+			<tr class="dark">
+				<td style="text-align:center"><a href="/problemset/problem/100/A">100A</a></td>
+				<td><a href="/problemset/problem/100/A">Үнэхээр урт гарчигтай бодлого</a></td>
+				<td style="text-align:center;color:#666">zoloogg, sugardorj</td>
+			</tr>
+			<tr>
+				<td style="text-align:center"><a href="/problemset/problem/32/D">32D</a></td>
+				<td><a href="/problemset/problem/32/D">Lorem ipsum</a></td>
+				<td style="text-align:center;color:#666"></td>
+			</tr>
+		</table>
+	</div>
+
+	<div class="pagination">
+		<ul>
+			<li class="inactive">←</li>
+			<li class="active"><a href="/problemset/page/1">1</a></li>
+			<li><a href="/problemset/page/2">2</a></li>
+			<li><a href="/problemset/page/3">3</a></li>
+			<li class="plain">...</li>
+			<li><a href="/problemset/page/16">16</a></li>
+			<li><a href="/problemset/page/17">17</a></li>
+			<li><a href="/problemset/page/2" class="arrow">→</a></li>
+		</ul>
+	</div>
+{% endblock %}

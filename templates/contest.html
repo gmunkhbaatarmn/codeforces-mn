@@ -1,0 +1,47 @@
+{% extends "Layout.html" %}
+
+{% set title = "Тэмцээн" %}
+{% set menu = "contests" %}
+
+{% block content %}
+	<h1 class="table-title">Бодлогууд</h1>
+	<div class="table-container">
+		<table>
+			<tr>
+				<th style="width:3em">#</th>
+				<th>Нэр</th>
+				<th style="width:12em">Орчуулсан</th>
+			</tr>
+			<tr class="dark">
+				<td style="text-align:center"><a href="/contest/1/problem/A">A</a></td>
+				<td>
+					<a href="/contest/1/problem/A">Шинэ жилийн лаанууд</a>
+					<div style="float:right;font-size:11px;color:#888">1 сек, 256 MB</div>
+				</td>
+				<td style="text-align:center;color:#666">zoloogg, sugardorj</td>
+			</tr>
+			<tr>
+				<td style="text-align:center"><a href="/contest/1/problem/B">B</a></td>
+				<td>
+					<a href="/contest/1/problem/B">Шинэ жилийн бэлэгнүүд</a>
+					<div style="float:right;font-size:11px;color:#888">1 сек, 256 MB</div>
+				</td>
+				<td style="text-align:center;color:#666">zoloogg, sugardorj</td>
+			</tr>
+		</table>
+	</div>
+{% endblock %}
+
+
+{% block sidebar %}
+	<div class="box">
+		<div>
+			<a href="">Codeforces Round #222 (Div. 1)</a>
+			<br>
+			<br>
+			Codeforces.com дээрх хаяг:
+			<br>
+			<a href="">Codeforces Round #222 (Div. 1)</a>
+		</div>
+	</div>
+{% endblock %}

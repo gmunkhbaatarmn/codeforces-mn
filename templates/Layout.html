@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>{{ title }}</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="/static/stylesheets/app.css">
+	<link href="favicon.ico" rel="shortcut icon" type="image/png">
+</head>
+<body>
+<div id="container">
+	<div id="header">
+		<a href="/" class="logo"></a>
+
+		<div class="lang">
+			<a class="mn" href="http://codeforces.mn">Монгол хэлээр</a>
+			<a class="en" href="http://codeforces.com">In English</a>
+			<a class="ru" href="http://codeforces.ru">По-Русски</a>
+		</div>
+	</div>
+
+	<ul id="menu">
+		<li {{- ' class="current"'|safe if menu == "home"       }}><a href="/">Нүүр</a></li>
+		<li {{- ' class="current"'|safe if menu == "contests"   }}><a href="/contests">Тэмцээнүүд</a></li>
+		<li {{- ' class="current"'|safe if menu == "problemset" }}><a href="/problemset">Бодлогууд</a></li>
+		{# <li><a href="">Хичээлүүд</a></li> #}
+		<li {{- ' class="current"'|safe if menu == "ratings"    }}><a href="/ratings">Чансаа</a></li>
+	</ul>
+
+	<div id="sidebar">
+		{% block sidebar %} {% endblock %}
+		<div class="box">
+			<h2>Plugin суулгана уу</h2>
+
+			<div style="font-size:13px;color:#555">
+				Та бодлогуудыг орчуулагдсанаар нь <em>Codeforces.com</em> дээрээс ч
+				гэсэн уншиж болох ба ингэхийн тулд Chrome хөтчид зориулсан нэмэлтийг
+				суулгаж ашиглана уу.
+				{#
+				-г бүрэн хүчин чадлаар нь Монгол хэлээр ашиглахын тулд та
+				Chrome хөтчид зориулсан нэмэлтийг суулгаж ашиглана уу.
+				#}
+				<br>
+				<br>
+				<div>
+					<a href="https://chrome.google.com/webstore/detail/codeforces-mongolia/fghdlncknpkheekfjgdlnahjpomhbpbj" class="button">Суулгах</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="box">
+			<h2>Шилдэг орчуулагчид</h2>
+			<div>
+				<p style="text-align:center;color:#777">Coming soon...<br> <br> Хөгжүүлэгч маш шаргуу ажиллаж байгаа бөгөөд тун удахгүй энэ хэсгийг ажилладаг болгоно ^^</p>
+			</div>
+			{#
+			<table>
+				<tr>
+					<th style="width:2.25em">#</th>
+					<th>Нэр</th>
+					<th style="font-weight:normal;font-size:13px">546/1608</th>
+				</tr>
+				<tr>
+					<td>1</td>
+					<td><span class="user-orange">zoloogg</span></td>
+					<td>83.5</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td><span class="user-orange">Энхсанаа</span></td>
+					<td>75.5</td>
+				</tr>
+				<tr>
+					<td>3</td>
+					<td><span class="user-blue">Sugardorj</span></td>
+					<td>74.5</td>
+				</tr>
+				<tr>
+					<td>4</td>
+					<td><span class="user-blue">gmunkhbaatarmn</span></td>
+					<td>54.5</td>
+				</tr>
+				<tr>
+					<td>5</td>
+					<td><span class="user-green">Говьхүү</span></td>
+					<td>29.0</td>
+				</tr>
+				<tr>
+					<td>6</td>
+					<td><span class="user-green">khongoro</span></td>
+					<td>29.0</td>
+				</tr>
+				<tr>
+					<td>7</td>
+					<td><span class="user-green">Баттулга</span></td>
+					<td>26.0</td>
+				</tr>
+			</table>
+			#}
+		</div>
+
+		<div class="box">
+			<h2>Topcoder чансаа</h2>
+			<div>
+				<p style="text-align:center;color:#777">Coming soon...<br> <br> Хөгжүүлэгч маш шаргуу ажиллаж байгаа бөгөөд тун удахгүй энэ хэсгийг ажилладаг болгоно ^^</p>
+			</div>
+		</div>
+
+		<div class="box">
+			<h2>Codeforces чансаа</h2>
+			<div>
+				<p style="text-align:center;color:#777">Coming soon...<br> <br> Хөгжүүлэгч маш шаргуу ажиллаж байгаа бөгөөд тун удахгүй энэ хэсгийг ажилладаг болгоно ^^</p>
+			</div>
+		</div>
+	</div>
+
+	<div id="content">{% block content %} {% endblock %}</div>
+
+	<div id="footer">
+		<div>
+			<a href="/">Codeforces.mn</a> (c) Монгол орчуулгын баг
+		</div>
+		<p>
+			This site contain translated copy of codeforces.com's <a href="http://codeforces.com/blog/entry/967">problems</a>.
+			<br>
+			Original <a href="http://codeforces.com">codeforces.com</a> is creature of Mike Mirzayanov
+			<br><br>
+			PS: Thank you Mike Mirzayanov for great platform.
+		</p>
+	</div>
+
+	<script src="/static/javascripts/app.js"></script>
+	{# <script src="jquery.js"></script> #}
+</div>
+{# analytics #}
+</body>
+</html>
