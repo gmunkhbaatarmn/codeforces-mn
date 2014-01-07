@@ -65,7 +65,51 @@ class Problemset(View):#1
 
 class ProblemsetProblem(View):#1
     def get(self, contest, problem):
-        return self.render("problemset-problem.html")
+        source = open("templates/translations/%03d-%s.html" % (int(contest), problem)).read().decode("utf-8")
+
+        state = ""
+        name, content, inputs, outputs, notes, credit = tuple([""] * 6)
+        for line in source.split("\n"):
+            if line.startswith("<h1"):
+                name = line.split('">', 1)[1].replace("</h1>", "")
+                state = "content"
+                continue
+            if line.startswith("<h3") and state == "content":
+                state = "inputs"
+                continue
+            if line.startswith("<h3") and state == "inputs":
+                state = "outputs"
+                continue
+            if line.startswith("<h3") and state == "outputs":
+                state = "notes"
+                continue
+            if line.startswith('<p class="credit"'):
+                credit = line
+                continue
+
+            if state == "content":
+                content += line
+                continue
+            if state == "inputs":
+                inputs += line
+                continue
+            if state == "outputs":
+                outputs += line
+                continue
+            if state == "notes":
+                notes += line
+                continue
+
+        return self.render("problemset-problem.html",
+                           contest=contest,
+                           problem=problem,
+                           name=name,
+                           content=content,
+                           inputs=inputs,
+                           outputs=outputs,
+                           notes=notes,
+                           credit=credit,
+                          )
 
 
 class Contests(View):#1
