@@ -11,10 +11,7 @@ task :default do
       code = input[0..-4]
     end
 
-    fix input
-    # if input.start_with? "LIVE_CONTEST_ID"
-    `pandoc .temp.md -o out/#{code}.html`
-    # end
+    fix input, code
 
     if links[code]
       `cp out/#{code}.html out/#{links[code]}.html`
@@ -94,7 +91,7 @@ TRANSLATOR_POINT = {}
 
 
 #:1 def fix
-def fix(input)
+def fix(input, code)
   # Prepare markdown file compile to PDF
   data = open(input, "r").read
   data.gsub! "≤", "\\leq"
@@ -107,10 +104,12 @@ def fix(input)
   end
 
   data = data.split("\n")[0..-2].join("\n")
-  data += "\n<p class=\"math\" style=\"text-align:right;font-style:italic\">Орчуулсан: #{translators.join(", ")}</p>"
   print "Converting to HTML: #{input} Translated by: #{translators.join(", ")}\n"
 
   open(".temp.md", "w+") { |f| f.write(data) }
+  `pandoc .temp.md -o out/#{code}.html`
+
+  open("out/#{code}.html", "a") { |f| f.write("<p class=\"credit\" style=\"text-align:right;font-style:italic\">Орчуулсан: #{translators.join(", ")}</p>") }
 end
 
 
