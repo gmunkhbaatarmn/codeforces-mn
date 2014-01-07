@@ -46,8 +46,8 @@ body{font-size:87.5%;font-family:Verdana,Arial,sans-serif}
 #content .pagination ul{margin:1em 0;padding:0;}
 #content .pagination ul:after{display:table;content:"";clear:both}
 #content .pagination ul li{display:block;float:left;margin-right:7px}
-#content .pagination ul li a{padding:4px;color:#000;text-decoration:none;font-size:14px;display:inline-block;height:17px;line-height:17px;border:1px solid transparent}
-#content .pagination ul li.active a{border:1px solid #ddd;background-color:#eee;font-weight:bold}
+#content .pagination ul li a{padding:4px;color:#333;text-decoration:none;font-size:14px;display:inline-block;height:17px;line-height:17px;border:1px solid transparent}
+#content .pagination ul li.active a{border:1px solid #ddd;background-color:#eee;color:#000}
 #content .pagination ul li.inactive{font-size:28px;height:27px;line-height:22px;color:#ccc}
 #content .pagination ul li.plain{line-height:27px;height:27px}
 #content .pagination ul li a.arrow{font-size:28px;line-height:10px}

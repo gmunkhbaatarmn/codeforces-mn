@@ -50,8 +50,8 @@ class Home(View):#1
 
 
 class Problemset(View):#1
-    def get(self):
-        return self.render("problemset.html")
+    def get(self, page="1"):
+        return self.render("problemset.html", page=int(page))
 
 
 class ProblemsetProblem(View):#1
@@ -86,6 +86,7 @@ app = webapp2.WSGIApplication([
     ("/contest/(\d+)",                  Contest),
     ("/contest/(\d+)/problem/(\w+)",    ContestProblem),
     ("/problemset",                     Problemset),
+    ("/problemset/page/(\d+)",          Problemset),
     ("/problemset/problem/(\d+)/(\w+)", ProblemsetProblem),
     ("/ratings",                        Ratings),
 
