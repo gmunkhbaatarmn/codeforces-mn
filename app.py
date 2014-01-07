@@ -1,4 +1,4 @@
-import webapp2
+import webapp2, json
 from webapp2_extras import jinja2, sessions
 
 
@@ -51,7 +51,16 @@ class Home(View):#1
 
 class Problemset(View):#1
     def get(self, page="1"):
-        return self.render("problemset.html", page=int(page))
+        def nozero(x):
+            while x.startswith("0"):
+                x = x[1:]
+            return x
+
+        return self.render("problemset.html",
+                           nozero=nozero,
+                           reversed=reversed,
+                           page=int(page),
+                           data=json.loads(open("data.yml").read()))
 
 
 class ProblemsetProblem(View):#1

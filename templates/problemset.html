@@ -4,14 +4,28 @@
 {% set menu = "problemset" %}
 
 {% block content %}
-	<h1 class="table-title">Бүх бодлогууд</h1>
+	<h1 class="table-title">Бүх бодлогууд ({{ data|length }})</h1>
 	<div class="table-container">
 		<table>
 			<tr>
 				<th style="width:4em">#</th>
-				<th>Бодлогын нэр</th>
-				<th style="width:12em">Орчуулсан</th>
+				<th style="border-right:0">Бодлогын нэр</th>
+				<th style="width:16em"></th>
 			</tr>
+			{% for t in reversed(data[(17-page) * 100:(18-page)*100]) %}
+				<tr {{- loop.cycle(' class="dark"', "")|safe }}>
+					{% if t|length == 3 %}
+						<td style="text-align:center"><a href="/problemset/problem/{{ nozero(t[0].replace("-", "/")) }}">{{ nozero(t[0].replace("-", "")) }}</a></td>
+						<td style="border-right:0"><a href="/problemset/problem/{{ nozero(t[0].replace("-", "/")) }}">{{ nozero(t[1]) }}</a></td>
+						<td style="text-align:right;color:#666;font-size:11px">{{ t[2] }}</td>
+					{% else %}
+						<td style="text-align:center">{{ nozero(t[0].replace("-", "")) }}</td>
+						<td style="border-right:0">{{ t[1] }}</td>
+						<td style="text-align:center;color:#666"></td>
+					{% endif %}
+				</tr>
+			{% endfor %}
+			{#
 			<tr class="dark">
 				<td style="text-align:center"><a href="/problemset/problem/100/A">100A</a></td>
 				<td><a href="/problemset/problem/100/A">Үнэхээр урт гарчигтай бодлого</a></td>
@@ -22,12 +36,13 @@
 				<td><a href="/problemset/problem/32/D">Lorem ipsum</a></td>
 				<td style="text-align:center;color:#666"></td>
 			</tr>
+			#}
 		</table>
 	</div>
 
 	<div class="pagination">
 		<ul>
-			{% for p in range(1, 18) %}
+			{% for p in range(1, 17) %}
 				<li {{- ' class="active"'|safe if page == p }}><a href="/problemset/page/{{ p }}">{{ p }}</a></li>{#
 			#}{% endfor %}
 		</ul>
