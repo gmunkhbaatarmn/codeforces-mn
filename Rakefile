@@ -1,3 +1,5 @@
+require "json"
+
 task :default do
   links = problem_link
 
@@ -44,6 +46,25 @@ task :default do
   `git add out`
   `git commit -m '[auto] problems compiled'`
 
+  json_name = []
+  json_dict = {}
+  json = []
+  open("data-problems.txt").read().split("\n").each do |line|
+    json_name << "#{line[0..2]}-#{line[4..4]}"
+    json_dict["#{line[0..2]}-#{line[4..4]}"] = [line[8..-1]]
+  end
+
+  Dir["*-*.md"].each do |input|
+    title = open(input).read().split("\n")[0]
+    users = open(input).read().split("\n")[-1][3..-1]
+    json_dict[input[0..-4]] = [title, users]
+  end
+
+  for i in json_name
+    json << ([i] + json_dict[i])
+  end
+  open("out/000-problemset.json", "w+") { |f| f.write(JSON.dump(json)) }
+
   puts "Done!"
   print TRANSLATOR_POINT
 end
@@ -72,8 +93,9 @@ end#endfold
 TRANSLATOR_POINT = {}
 
 
-#:1 Prepare markdown file compile to PDF
+#:1 def fix
 def fix(input)
+  # Prepare markdown file compile to PDF
   data = open(input, "r").read
   data.gsub! "≤", "\\leq"
   data.gsub! "×", "\\times"
@@ -92,7 +114,7 @@ def fix(input)
 end
 
 
-#:1 Problem link
+#:1 def problem_link
 def problem_link
   problem = {}
   for line in open("data-problems.txt").read().split("\n")
@@ -130,6 +152,7 @@ def problem_link
 end
 
 
+#:1 def contest_data
 def contest_data
   data = {}
 
@@ -146,6 +169,7 @@ def contest_data
 end
 
 
+#:1 def color
 def color(t)
   if t[1] >= 100.0
     color = "red"
