@@ -1066,6 +1066,10 @@
 205 C - Little Elephant and Interval
 205 D - Little Elephant and Cards
 205 E - Little Elephant and Furik and Rubik
+207 A - Beaver's Calculator 1.0
+207 B - Military Trainings
+207 C - Game with Two Trees
+207 D - The Beaver's Problem - 3
 208 A - Dubstep
 208 B - Solitaire
 208 C - Police Station
