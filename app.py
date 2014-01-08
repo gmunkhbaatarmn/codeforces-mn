@@ -1,4 +1,4 @@
-import webapp2, json
+import webapp2, magic as _
 from webapp2_extras import jinja2, sessions
 
 
@@ -26,6 +26,7 @@ class View(webapp2.RequestHandler):#1
             "debug":      self.app.debug,
             "flash":      self.flash,
             "url":        webapp2.uri_for,
+            "top":        _.parse_top(),
         }
 
     def render(self, *args, **kwargs):
@@ -60,7 +61,7 @@ class Problemset(View):#1
                            nozero=nozero,
                            reversed=reversed,
                            page=int(page),
-                           data=json.loads(open("data.yml").read()))
+                           data=_.parse_problemset())
 
 
 class ProblemsetProblem(View):#1
