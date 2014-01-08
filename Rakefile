@@ -57,7 +57,7 @@ task :default do
   for i in json_name
     json << ([i] + json_dict[i])
   end
-  open("out/000-problemset.json", "w+") { |f| f.write(JSON.dump(json)) }
+  open("out/000-problemset.txt", "w+") { |f| f.write(JSON.dump(json)) }
 
   `git add out`
   `git commit -m '[auto] problems compiled'`
