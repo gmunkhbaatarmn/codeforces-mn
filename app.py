@@ -1,4 +1,4 @@
-import webapp2, magic as _
+import webapp2, logging, urllib, magic as _
 from webapp2_extras import jinja2, sessions
 
 
@@ -66,7 +66,10 @@ class Problemset(View):#1
 
 class ProblemsetProblem(View):#1
     def get(self, contest, problem):
-        source = open("templates/translations/%03d-%s.html" % (int(contest), problem)).read().decode("utf-8")
+        try:
+            source = open("templates/translations/%03d-%s.html" % (int(contest), problem)).read().decode("utf-8")
+        except IOError:
+            return self.abort(404)
 
         state = ""
         name, content, inputs, outputs, notes, credit = tuple([""] * 6)
@@ -148,7 +151,7 @@ class Error(View, webapp2.BaseHandlerAdapter):#1
         return self.handler()
 
     def handle_404(self):
-        import urllib
+        logging.warning("404 Page: %s" % self.request.url)
 
         # redirect /page/ => /page
         if self.request.path.endswith("/"):
