@@ -131,6 +131,37 @@ class ContestProblem(View):#1
 class Ratings(View):#1
     def get(self):
         return self.render("ratings.html")
+
+
+class Error(View, webapp2.BaseHandlerAdapter):#1
+    context = lambda x: {"top": _.parse_top()}
+
+    def __init__(self, error=None, request=None, response=None):
+        self.handler = {404: self.handle_404}[error]
+        self.initialize(request, response)
+
+    def __call__(self, request, response, exception):
+        self.exception = exception
+        self.request   = request
+        self.response  = response
+
+        return self.handler()
+
+    def handle_404(self):
+        import urllib
+
+        # redirect /page/ => /page
+        if self.request.path.endswith("/"):
+            for r in self.app.router.match_routes:
+                if r.regex.match(urllib.unquote(self.request.path[:-1])):
+                    return self.redirect(self.request.path[:-1] + "?" + self.request.query_string)
+        # redirect /page => /page/
+        else:
+            for r in self.app.router.match_routes:
+                if r.regex.match(urllib.unquote(self.request.path + "/")):
+                    return self.redirect(self.request.path + "/?" + self.request.query_string)
+
+        self.render("error-404.html")
 # endfold1
 
 
@@ -143,5 +174,7 @@ app = webapp2.WSGIApplication([
     ("/problemset/page/(\d+)",          Problemset),
     ("/problemset/problem/(\d+)/(\w+)", ProblemsetProblem),
     ("/ratings",                        Ratings),
-
 ], debug=True, config={"webapp2_extras.sessions":{"secret_key":"epe9hoongi6Yeeghoo4iopein1Boh9"}})
+
+
+app.error_handlers[404] = Error(404)
