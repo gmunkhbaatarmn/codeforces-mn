@@ -1,3 +1,4 @@
+{%- from "Macros.html" import cf_user, cf_rating -%}
 <!DOCTYPE html>
 <html>
 <head>
@@ -70,15 +71,32 @@
 				</tr>
 			</table>
 		</div>
-		<div class="box">
-			<h2>Topcoder чансаа</h2>
-			<div>
-				<p style="text-align:center;color:#777">Coming soon...<br> <br> Хөгжүүлэгч маш шаргуу ажиллаж байгаа бөгөөд тун удахгүй энэ хэсгийг ажилладаг болгоно ^^</p>
-			</div>
-		</div>
 
 		<div class="box">
 			<h2>Codeforces чансаа</h2>
+			<table>
+				<tr>
+					<th style="width:2.25em">#</th>
+					<th>Нэр</th>
+					<th colspan="2">Чансаа</th>
+				</tr>
+				{% for u in codeforces %}
+					<tr {{- ' class="hidden"'|safe if loop.index > 10 }}>
+					<td>{{ loop.index }}</td>
+					<td>{{ cf_user(u.handle, u.rating)|safe }}</td>
+					<td><span class="rating">{{ u.rating }}</span></td>
+					<td style="border-left:0">{{ cf_rating(u.change, u.last_contest_id) }}</td>
+				</tr>
+			{% endfor %}
+				<tr>
+					<td colspan="2"></td>
+					<td style="border-left:0"><a href="javascript:;" class="js-more">бүгд &rarr;</a></td>
+				</tr>
+			</table>
+		</div>
+
+		<div class="box">
+			<h2>Topcoder чансаа</h2>
 			<div>
 				<p style="text-align:center;color:#777">Coming soon...<br> <br> Хөгжүүлэгч маш шаргуу ажиллаж байгаа бөгөөд тун удахгүй энэ хэсгийг ажилладаг болгоно ^^</p>
 			</div>

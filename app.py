@@ -1,4 +1,5 @@
-import webapp2, logging, urllib, magic as _
+import json, webapp2, logging, urllib, magic as _
+from google.appengine.api import memcache
 from webapp2_extras import jinja2, sessions
 
 
@@ -27,6 +28,7 @@ class View(webapp2.RequestHandler):#1
             "flash":      self.flash,
             "url":        webapp2.uri_for,
             "top":        _.parse_top(),
+            "codeforces": json.loads(memcache.get("rating:codeforces") or "[]"),
         }
 
     def render(self, *args, **kwargs):
@@ -137,7 +139,7 @@ class Ratings(View):#1
 
 
 class Error(View, webapp2.BaseHandlerAdapter):#1
-    context = lambda x: {"top": _.parse_top()}
+    context = {}
 
     def __init__(self, error=None, request=None, response=None):
         self.handler = {404: self.handle_404}[error]
@@ -164,8 +166,19 @@ class Error(View, webapp2.BaseHandlerAdapter):#1
                 if r.regex.match(urllib.unquote(self.request.path + "/")):
                     return self.redirect(self.request.path + "/?" + self.request.query_string)
 
+        self.context = lambda x: {
+            "top": _.parse_top(),
+            "codeforces": json.loads(memcache.get("rating:codeforces", "")),
+        }
+
         self.render("error-404.html")
 # endfold1
+
+class Codeforces(View):
+    def get(self):
+        data = _.get_active_users()
+        memcache.set("rating:codeforces", json.dumps(data))
+        self.response.write("OK")
 
 
 app = webapp2.WSGIApplication([
@@ -177,6 +190,7 @@ app = webapp2.WSGIApplication([
     ("/problemset/page/(\d+)",          Problemset),
     ("/problemset/problem/(\d+)/(\w+)", ProblemsetProblem),
     ("/ratings",                        Ratings),
+    ("/-/codeforces",                   Codeforces),
 ], debug=True, config={"webapp2_extras.sessions":{"secret_key":"epe9hoongi6Yeeghoo4iopein1Boh9"}})
 
 

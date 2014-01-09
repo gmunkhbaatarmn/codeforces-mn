@@ -1,0 +1,25 @@
+{%- macro cf_user(handle, rating) -%}
+	{%   if rating >= 2200 %}
+		{% set color = "red" %}
+	{% elif rating >= 1900 %}
+		{% set color = "orange" %}
+	{% elif rating >= 1700 %}
+		{% set color = "purple" %}
+	{% elif rating >= 1500 %}
+		{% set color = "blue" %}
+	{% elif rating >= 1200 %}
+		{% set color = "green" %}
+	{% else %}
+		{% set color = "gray" %}
+	{% endif %}
+	<a class="cf-user-{{ color }}" href="http://codeforces.com/profile/{{ handle }}">{{ handle }}</a>
+{%- endmacro -%}
+
+
+{%- macro cf_rating(change, contest_id) -%}
+	{% if change >= 0 %}
+		<a href="http://codeforces.com/contest/{{ contest_id }}" class="rating-up">+{{ change }}</a>
+	{% else %}
+		<a href="http://codeforces.com/contest/{{ contest_id }}" class="rating-down">{{ change }}</a>
+	{% endif %}
+{%- endmacro -%}

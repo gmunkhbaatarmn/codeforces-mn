@@ -14,6 +14,10 @@ handlers:
   static_dir: static
   expiration: "1s"
 
+- url: /-/.*
+  script: app.app
+  login: admin
+
 - url: /.*
   script: app.app
 
