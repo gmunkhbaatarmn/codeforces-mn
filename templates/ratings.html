@@ -4,7 +4,43 @@
 {% set menu = "ratings" %}
 
 {% block content %}
-	<div>
-		<p style="text-align:center;color:#777">Coming soon...<br> <br> Хөгжүүлэгч маш шаргуу ажиллаж байгаа бөгөөд тун удахгүй энэ хэсгийг ажилладаг болгоно ^^</p>
+	<div style="margin:0 auto;text-align:center;padding:0 0 1.5em 0;font-size:1.25em">Идэвхтэй буюу сүүлийн 180 хоногт тэмцээнд оролцсон тамирчдын чансаа</div>
+	<div style="float:left;width:49%">
+		<h1 class="table-title">Codeforces чансаа</h1>
+		<div class="table-container">
+			<table>
+				<tr>
+					<th style="width:4em">#</th>
+					<th>Нэр</th>
+					<th style="width:5em">Чансаа</th>
+					<th style="width:5em">Өөрчлөлт</th>
+				</tr>
+				{% for u in codeforces %}
+					<tr>
+						<td style="text-align:center">{{ loop.index }}</td>
+						<td>{{ cf_user(u.handle, u.rating)|safe }}</td>
+						<td style="text-align:center">{{ u.rating }}</td>
+						<td style="text-align:center">{{ cf_rating(u.change, u.last_contest_id, "center") }}</td>
+					</tr>
+				{% endfor %}
+			</table>
+		</div>
+	</div>
+
+	<div style="float:right;width:49%">
+		<h1 class="table-title">Topcoder чансаа</h1>
+		<div class="table-container">
+			<table>
+				<tr>
+					<th style="width:4em">#</th>
+					<th>Нэр</th>
+					<th style="width:5em">Чансаа</th>
+					<th style="width:5em">Өөрчлөлт</th>
+				</tr>
+				<tr>
+					<td colspan="4"><p style="text-align:center;color:#777">Coming soon...<br> <br> Хөгжүүлэгч маш шаргуу ажиллаж байгаа бөгөөд тун удахгүй энэ хэсгийг ажилладаг болгоно ^^</p></td>
+				</tr>
+			</table>
+		</div>
 	</div>
 {% endblock %}
