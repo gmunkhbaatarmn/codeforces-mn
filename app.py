@@ -1,6 +1,20 @@
 import json, webapp2, logging, urllib, magic as _
 from google.appengine.api import memcache
+from google.appengine.ext import db
 from webapp2_extras import jinja2, sessions
+
+
+class Config(db.Model):
+    name  = db.StringProperty()
+    value = db.TextProperty()
+
+    @classmethod
+    def find(cls, **kwargs):
+        q = cls.all()
+        for k, v in kwargs.items():
+            q.filter("%s =" % k, v)
+
+        return q.get()
 
 
 class View(webapp2.RequestHandler):#1
@@ -28,7 +42,7 @@ class View(webapp2.RequestHandler):#1
             "flash":      self.flash,
             "url":        webapp2.uri_for,
             "top":        _.parse_top(),
-            "codeforces": json.loads(memcache.get("rating:codeforces") or "[]"),
+            "codeforces": json.loads(Config.find(name="rating:codeforces").value),
         }
 
     def render(self, *args, **kwargs):
@@ -168,17 +182,22 @@ class Error(View, webapp2.BaseHandlerAdapter):#1
 
         self.context = lambda: {
             "top": _.parse_top(),
-            "codeforces": json.loads(memcache.get("rating:codeforces") or "[]"),
+            "codeforces": json.loads(Config.find(name="rating:codeforces").value),
         }
 
         self.render("error-404.html")
 # endfold1
 
-class Codeforces(View):
+
+class Codeforces(View):#1
     def get(self):
         data = _.get_active_users()
         memcache.set("rating:codeforces", json.dumps(data))
+        c = Config.find(name="rating:codeforces") or Config(name="rating:codeforces")
+        c.value = json.dumps(data)
+        c.save()
         self.response.write("OK")
+# endfold
 
 
 app = webapp2.WSGIApplication([
