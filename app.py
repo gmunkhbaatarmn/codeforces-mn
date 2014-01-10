@@ -85,8 +85,8 @@ class ProblemsetProblem(View):#1
         try:
             source = open("templates/translations/%03d-%s.html" % (int(contest), problem)).read().decode("utf-8")
         except IOError:
-            if self.problem.islower():
-                return self.redirect("/problemset/problem/%s/%s" % (contest, problem))
+            if problem.islower():
+                return self.redirect("/problemset/problem/%s/%s" % (contest, problem.upper()))
             return self.abort(404)
 
         state = ""
