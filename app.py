@@ -139,7 +139,7 @@ class Ratings(View):#1
 
 
 class Error(View, webapp2.BaseHandlerAdapter):#1
-    context = {}
+    context = lambda x: {}
 
     def __init__(self, error=None, request=None, response=None):
         self.handler = {404: self.handle_404}[error]
@@ -166,9 +166,9 @@ class Error(View, webapp2.BaseHandlerAdapter):#1
                 if r.regex.match(urllib.unquote(self.request.path + "/")):
                     return self.redirect(self.request.path + "/?" + self.request.query_string)
 
-        self.context = lambda x: {
+        self.context = lambda: {
             "top": _.parse_top(),
-            "codeforces": json.loads(memcache.get("rating:codeforces", "")),
+            "codeforces": json.loads(memcache.get("rating:codeforces") or "[]"),
         }
 
         self.render("error-404.html")
