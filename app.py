@@ -4,7 +4,7 @@ from google.appengine.ext import db
 from webapp2_extras import jinja2, sessions
 
 
-class Config(db.Model):
+class Config(db.Model):#1
     name  = db.StringProperty()
     value = db.TextProperty()
 
@@ -85,6 +85,8 @@ class ProblemsetProblem(View):#1
         try:
             source = open("templates/translations/%03d-%s.html" % (int(contest), problem)).read().decode("utf-8")
         except IOError:
+            if self.problem.islower():
+                return self.redirect("/problemset/problem/%s/%s" % (contest, problem))
             return self.abort(404)
 
         state = ""
