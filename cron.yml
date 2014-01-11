@@ -3,7 +3,6 @@ cron:
   url: /-/codeforces
   schedule: every 3 hours from 00:10 to 23:59
 
-cron:
 - description: Topcoder rating update
   url: /-/topcoder
   schedule: every 3 hours from 00:20 to 23:59
