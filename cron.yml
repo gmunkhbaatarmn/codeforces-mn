@@ -1,0 +1,4 @@
+cron:
+- description: Codeforces rating update
+  url: /-/codeforces
+  schedule: every 3 hours from 00:10 to 23:59
