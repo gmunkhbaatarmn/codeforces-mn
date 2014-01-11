@@ -66,8 +66,7 @@ def cf_get_active_users():#1
 
 
 def tc_get_all_users():#1
-    # data = urllib.urlopen("http://community.topcoder.com/tc?module=AlgoRank&cc=496").read()
-    data = open("topcoder-mn.html").read()
+    data = urllib.urlopen("http://community.topcoder.com/tc?module=AlgoRank&cc=496").read()
     tree = lxml.html.document_fromstring(data)
 
     users = []
@@ -80,7 +79,6 @@ def tc_get_all_users():#1
 
 
 def tc_get_user(handle, id):#1
-    print handle
     data = urllib.urlopen("http://community.topcoder.com/tc?module=BasicData&c=dd_rating_history&cr=%s" % id).read()
 
     row_list = lxml.etree.fromstring(data).xpath("//dd_rating_history/row")
