@@ -37,9 +37,14 @@
 					<th style="width:5em">Чансаа</th>
 					<th style="width:5em">Өөрчлөлт</th>
 				</tr>
-				<tr>
-					<td colspan="4"><p style="text-align:center;color:#777">Coming soon...<br> <br> Хөгжүүлэгч маш шаргуу ажиллаж байгаа бөгөөд тун удахгүй энэ хэсгийг ажилладаг болгоно ^^</p></td>
-				</tr>
+				{% for u in topcoder %}
+					<tr>
+						<td style="text-align:center">{{ loop.index }}</td>
+						<td>{{ tc_user(u.handle, u.rating, u.id)|safe }}</td>
+						<td style="text-align:center">{{ u.rating }}</td>
+						<td style="text-align:center">{{ tc_rating(u.change, u.contest_id, u.id, "center") }}</td>
+					</tr>
+				{% endfor %}
 			</table>
 		</div>
 	</div>
