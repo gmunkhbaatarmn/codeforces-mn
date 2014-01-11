@@ -43,6 +43,7 @@ class View(webapp2.RequestHandler):#1
             "url":        webapp2.uri_for,
             "top":        _.parse_top(),
             "codeforces": json.loads(Config.find(name="rating:codeforces").value),
+            "topcoder":   json.loads(Config.find(name="rating:topcoder").value),
         }
 
     def render(self, *args, **kwargs):
@@ -185,6 +186,7 @@ class Error(View, webapp2.BaseHandlerAdapter):#1
         self.context = lambda: {
             "top": _.parse_top(),
             "codeforces": json.loads(Config.find(name="rating:codeforces").value),
+            "topcoder":   json.loads(Config.find(name="rating:topcoder").value),
         }
 
         self.render("error-404.html")
@@ -193,9 +195,19 @@ class Error(View, webapp2.BaseHandlerAdapter):#1
 
 class Codeforces(View):#1
     def get(self):
-        data = _.get_active_users()
+        data = _.cf_get_active_users()
         memcache.set("rating:codeforces", json.dumps(data))
         c = Config.find(name="rating:codeforces") or Config(name="rating:codeforces")
+        c.value = json.dumps(data)
+        c.save()
+        self.response.write("OK")
+
+
+class Topcoder(View):#1
+    def get(self):
+        data = _.tc_get_active_users()
+        memcache.set("rating:topcoder", json.dumps(data))
+        c = Config.find(name="rating:topcoder") or Config(name="rating:topcoder")
         c.value = json.dumps(data)
         c.save()
         self.response.write("OK")
@@ -212,6 +224,7 @@ app = webapp2.WSGIApplication([
     ("/problemset/problem/(\d+)/(\w+)", ProblemsetProblem),
     ("/ratings",                        Ratings),
     ("/-/codeforces",                   Codeforces),
+    ("/-/topcoder",                     Topcoder),
 ], debug=True, config={"webapp2_extras.sessions":{"secret_key":"epe9hoongi6Yeeghoo4iopein1Boh9"}})
 
 

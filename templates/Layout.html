@@ -1,4 +1,4 @@
-{%- from "Macros.html" import cf_user, cf_rating -%}
+{%- from "Macros.html" import cf_user, cf_rating, tc_user, tc_rating -%}
 <!DOCTYPE html>
 <html>
 <head>
@@ -97,9 +97,25 @@
 
 		<div class="box">
 			<h2>Topcoder чансаа</h2>
-			<div>
-				<p style="text-align:center;color:#777">Coming soon...<br> <br> Хөгжүүлэгч маш шаргуу ажиллаж байгаа бөгөөд тун удахгүй энэ хэсгийг ажилладаг болгоно ^^</p>
-			</div>
+			<table>
+				<tr>
+					<th style="width:2.25em">#</th>
+					<th>Нэр</th>
+					<th colspan="2">Чансаа</th>
+				</tr>
+				{% for u in topcoder %}
+					<tr {{- ' class="hidden"'|safe if loop.index > 10 }}>
+						<td>{{ loop.index }}</td>
+						<td>{{ tc_user(u.handle, u.rating, u.id)|safe }}</td>
+						<td style="text-align:right">{{ u.rating }}</td>
+						<td style="border-left:0;text-align:left">{{ tc_rating(u.change, u.contest_id, u.id) }}</td>
+					</tr>
+				{% endfor %}
+				<tr>
+					<td colspan="2"></td>
+					<td colspan="2" style="border-left:0"><a href="javascript:;" class="js-more">бүгд &rarr;</a></td>
+				</tr>
+			</table>
 		</div>
 	</div>
 
