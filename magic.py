@@ -50,8 +50,8 @@ def cf_get_user(handle):#1
         "rating": log[1],
         "change": log[5],
         "active": (now < log[0] / 1000 + 180 * 24 * 3600),
-        "last_contest_at": log[0],
-        "last_contest_id": log[2],
+        "contest_at": log[0],
+        "contest_id": log[2],
     }
 
 
@@ -61,6 +61,11 @@ def cf_get_active_users():#1
         d = cf_get_user(u)
         if d["active"]:
             r.append(d)
+
+    recent = max(r, key=lambda user: user["contest_at"])
+    for i in range(len(r)):
+        r[i]["recent"] = (recent["contest_at"] == r[i]["contest_at"])
+
     return r
 # endfold
 
@@ -102,6 +107,11 @@ def tc_get_active_users():#1
         d = tc_get_user(handle, id)
         if d["active"]:
             r.append(d)
+
+    recent = max(r, key=lambda user: user["contest_id"])
+    for i in range(len(r)):
+        r[i]["recent"] = (recent["contest_id"] == r[i]["contest_id"])
+
     return r
 # endfold
 

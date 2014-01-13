@@ -81,7 +81,9 @@
 					<th colspan="2">Чансаа</th>
 				</tr>
 				{% for u in codeforces %}
-					<tr {{- ' class="hidden"'|safe if loop.index > 10 }}>
+					{% set cls = "hidden" if loop.index > 10 else ""  %}
+					{% set cls = cls ~ " recent" if u.recent else cls %}
+					<tr {{- (' class="%s"' % cls)|safe if cls.strip() else ""  }}>
 						<td>{{ loop.index }}</td>
 						<td>{{ cf_user(u.handle, u.rating)|safe }}</td>
 						<td style="text-align:right">{{ u.rating }}</td>
@@ -104,7 +106,9 @@
 					<th colspan="2">Чансаа</th>
 				</tr>
 				{% for u in topcoder %}
-					<tr {{- ' class="hidden"'|safe if loop.index > 10 }}>
+					{% set cls = "hidden" if loop.index > 10 else ""  %}
+					{% set cls = cls ~ " recent" if u.recent else cls %}
+					<tr {{- (' class="%s"' % cls)|safe if cls.strip() else ""  }}>
 						<td>{{ loop.index }}</td>
 						<td>{{ tc_user(u.handle, u.rating, u.id)|safe }}</td>
 						<td style="text-align:right">{{ u.rating }}</td>

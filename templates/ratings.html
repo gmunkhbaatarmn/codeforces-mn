@@ -16,7 +16,7 @@
 					<th style="width:5em">Өөрчлөлт</th>
 				</tr>
 				{% for u in codeforces %}
-					<tr>
+					<tr {{- ' class="recent"'|safe if u.recent }}>
 						<td style="text-align:center">{{ loop.index }}</td>
 						<td>{{ cf_user(u.handle, u.rating)|safe }}</td>
 						<td style="text-align:center">{{ u.rating }}</td>
@@ -38,7 +38,7 @@
 					<th style="width:5em">Өөрчлөлт</th>
 				</tr>
 				{% for u in topcoder %}
-					<tr>
+					<tr {{- ' class="recent"'|safe if u.recent }}>
 						<td style="text-align:center">{{ loop.index }}</td>
 						<td>{{ tc_user(u.handle, u.rating, u.id)|safe }}</td>
 						<td style="text-align:center">{{ u.rating }}</td>
