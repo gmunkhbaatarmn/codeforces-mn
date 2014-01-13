@@ -21,13 +21,16 @@ class Data(db.Model):#1
         c = cls.all().filter("name =", name).get()
         if c:
             memcache.set(name, c.value)
-        return json.loads(value)
+            return json.loads(c.value)
+        return None
 
     @classmethod
     def write(cls, name, value):
-        c = cls.fetch(name=value) or cls(name=value)
+        data = json.dumps(value)
+        memcache.set(name, data)
 
-        c.value = json.dumps(value)
+        c = cls.all().filter("name =", name).get() or cls(name=name)
+        c.value = data
         c.save()
 
 
