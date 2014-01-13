@@ -20,7 +20,7 @@
 
 		<h2>Гаралт</h2>
 		{{ outputs|safe }}
-		{{ credit|safe }}
+		{{ credit.replace('">', '">Орчуулсан: ')|safe }}
 
 		<h4>Жишээ тэстүүд</h4>
 		<div class="sample">

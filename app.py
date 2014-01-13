@@ -1,20 +1,34 @@
+import sys; sys.path.append("packages")
 import json, webapp2, logging, urllib, magic as _
 from google.appengine.api import memcache
 from google.appengine.ext import db
 from webapp2_extras import jinja2, sessions
 
 
-class Config(db.Model):#1
+class Data(db.Model):#1
+    """
+        Data.write
+        Data.fetch
+    """
     name  = db.StringProperty()
     value = db.TextProperty()
 
     @classmethod
-    def find(cls, **kwargs):
-        q = cls.all()
-        for k, v in kwargs.items():
-            q.filter("%s =" % k, v)
+    def fetch(cls, name):
+        value = memcache.get(name)
+        if value:
+            return json.loads(value)
+        c = cls.all().filter("name =", name).get()
+        if c:
+            memcache.set(name, c.value)
+        return json.loads(value)
 
-        return q.get()
+    @classmethod
+    def write(cls, name, value):
+        c = cls.fetch(name=value) or cls(name=value)
+
+        c.value = json.dumps(value)
+        c.save()
 
 
 class View(webapp2.RequestHandler):#1
@@ -42,8 +56,8 @@ class View(webapp2.RequestHandler):#1
             "flash":      self.flash,
             "url":        webapp2.uri_for,
             "top":        _.parse_top(),
-            "codeforces": json.loads(Config.find(name="rating:codeforces").value),
-            "topcoder":   json.loads(Config.find(name="rating:topcoder").value),
+            "codeforces": Data.fetch("rating:codeforces"),
+            "topcoder":   Data.fetch("rating:topcoder"),
         }
 
     def render(self, *args, **kwargs):
@@ -82,9 +96,11 @@ class Problemset(View):#1
 
 
 class ProblemsetProblem(View):#1
-    def get(self, contest, problem):
+    def get(self, contest, problem, embed):
         try:
-            source = open("templates/translations/%03d-%s.html" % (int(contest), problem)).read().decode("utf-8")
+            import codeforces
+            source = codeforces.markdown2html(open("markdown/%03d-%s.md" % (int(contest), problem)).read().decode("utf-8"))
+            # source = open("templates/translations/%03d-%s.html" % (int(contest), problem)).read().decode("utf-8")
         except IOError:
             if problem.islower():
                 return self.redirect("/problemset/problem/%s/%s" % (contest, problem.upper()))
@@ -94,7 +110,7 @@ class ProblemsetProblem(View):#1
         name, content, inputs, outputs, notes, credit = tuple([""] * 6)
         for line in source.split("\n"):
             if line.startswith("<h1"):
-                name = line.split('">', 1)[1].replace("</h1>", "")
+                name = line[4:-5]
                 state = "content"
                 continue
             if line.startswith("<h3") and state == "content":
@@ -123,6 +139,17 @@ class ProblemsetProblem(View):#1
                 notes += line
                 continue
 
+        if embed == ".html":
+            return self.render("problemset-problem-embed.html",
+                               contest=contest,
+                               problem=problem,
+                               name=name,
+                               content=content,
+                               inputs=inputs,
+                               outputs=outputs,
+                               notes=notes,
+                               credit=credit,
+                              )
         return self.render("problemset-problem.html",
                            contest=contest,
                            problem=problem,
@@ -185,8 +212,8 @@ class Error(View, webapp2.BaseHandlerAdapter):#1
 
         self.context = lambda: {
             "top": _.parse_top(),
-            "codeforces": json.loads(Config.find(name="rating:codeforces").value),
-            "topcoder":   json.loads(Config.find(name="rating:topcoder").value),
+            "codeforces": Data.fetch("rating:codeforces"),
+            "topcoder":   Data.fetch("rating:topcoder"),
         }
 
         self.render("error-404.html")
@@ -195,21 +222,13 @@ class Error(View, webapp2.BaseHandlerAdapter):#1
 
 class Codeforces(View):#1
     def get(self):
-        data = _.cf_get_active_users()
-        memcache.set("rating:codeforces", json.dumps(data))
-        c = Config.find(name="rating:codeforces") or Config(name="rating:codeforces")
-        c.value = json.dumps(data)
-        c.save()
+        Data.write("rating:codeforces", _.cf_get_active_users())
         self.response.write("OK")
 
 
 class Topcoder(View):#1
     def get(self):
-        data = _.tc_get_active_users()
-        memcache.set("rating:topcoder", json.dumps(data))
-        c = Config.find(name="rating:topcoder") or Config(name="rating:topcoder")
-        c.value = json.dumps(data)
-        c.save()
+        Data.write("rating:topcoder", _.tc_get_active_users())
         self.response.write("OK")
 # endfold
 
@@ -221,7 +240,7 @@ app = webapp2.WSGIApplication([
     ("/contest/(\d+)/problem/(\w+)",    ContestProblem),
     ("/problemset",                     Problemset),
     ("/problemset/page/(\d+)",          Problemset),
-    ("/problemset/problem/(\d+)/(\w+)", ProblemsetProblem),
+    ("/problemset/problem/(\d+)/(\w+)(.html)?", ProblemsetProblem),
     ("/ratings",                        Ratings),
     ("/-/codeforces",                   Codeforces),
     ("/-/topcoder",                     Topcoder),
