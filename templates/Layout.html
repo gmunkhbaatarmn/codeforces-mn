@@ -25,7 +25,7 @@
 		<li {{- ' class="current"'|safe if menu == "home"       }}><a href="/">Нүүр</a></li>
 		<li {{- ' class="current"'|safe if menu == "contests"   }}><a href="/contests">Тэмцээнүүд</a></li>
 		<li {{- ' class="current"'|safe if menu == "problemset" }}><a href="/problemset">Бодлогууд</a></li>
-		{# <li><a href="">Хичээлүүд</a></li> #}
+		{# <li {{- ' class="current"'|safe if menu == "lessons"    }}><a href="">Хичээлүүд</a></li> #}
 		<li {{- ' class="current"'|safe if menu == "ratings"    }}><a href="/ratings">Чансаа</a></li>
 	</ul>
 
@@ -136,6 +136,7 @@
 
 	<script src="/static/javascripts/jquery.js"></script>
 	<script src="/static/javascripts/app.js"></script>
+	<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
 </div>
 {# analytics #}
 </body>
