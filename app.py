@@ -1,4 +1,3 @@
-import sys; sys.path.append("packages")
 import json, webapp2, logging, urllib, magic as _
 from google.appengine.api import memcache
 from google.appengine.ext import db
@@ -101,8 +100,7 @@ class Problemset(View):#1
 class ProblemsetProblem(View):#1
     def get(self, contest, problem, embed):
         try:
-            import codeforces
-            source = codeforces.markdown2html(open("markdown/%03d-%s.md" % (int(contest), problem)).read().decode("utf-8"))
+            source = _.markdown2html(open("markdown/%03d-%s.md" % (int(contest), problem)).read().decode("utf-8"))
             # source = open("templates/translations/%03d-%s.html" % (int(contest), problem)).read().decode("utf-8")
         except IOError:
             if problem.islower():
@@ -223,6 +221,28 @@ class Error(View, webapp2.BaseHandlerAdapter):#1
 # endfold1
 
 
+class Hook(View):#1
+    """ Called by github's "post-receive-hook"
+        Secured by secure key
+    """
+    secure_key = "ziy1shauphu5LeighaimiSh8goo1ohG7"
+
+    def post(self):
+        if self.request.get("key") != self.secure_key:
+            logging.warning("Attempt to github-hook")
+            return self.abort(404)
+
+        for path in _.changelist(json.loads(self.request.get("payload"))):
+            # {Translation/}000-X.md => 000-X
+            code = path.replace("Translation/", "").replace(".md", "")
+            item = Data.fetch(code=code) or {"code": code}
+            item.update(_.parse_markdown(path))
+            if not item.get("memory-limit"):
+                item.update(_.parse_codeforces(code))
+
+            Data.write("problem:%s" % code, item)
+
+
 class Codeforces(View):#1
     def get(self):
         Data.write("rating:codeforces", _.cf_get_active_users())
@@ -245,6 +265,8 @@ app = webapp2.WSGIApplication([
     ("/problemset/page/(\d+)",          Problemset),
     ("/problemset/problem/(\d+)/(\w+)(.html)?", ProblemsetProblem),
     ("/ratings",                        Ratings),
+    ("/github-hook",                    Hook),
+
     ("/-/codeforces",                   Codeforces),
     ("/-/topcoder",                     Topcoder),
 ], debug=True, config={"webapp2_extras.sessions":{"secret_key":"epe9hoongi6Yeeghoo4iopein1Boh9"}})

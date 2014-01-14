@@ -1,6 +1,108 @@
+# coding: utf-8
 import lxml.html, lxml.etree
 import json, datetime
-import urllib
+import urllib, re
+import markdown2
+
+
+def changelist(payload):#1
+    changes = set([])
+
+    for commit in payload["commits"]:
+        for path in commit["added"] + commit["modified"]:
+            if re.search("^\d{3}-[A-Z].md$", path) or re.search("^Translation/\d{3}-[A-Z].md$", path):
+                changes.add(path)
+
+    # Prefer Translation/123-Z.md than 123-Z.md
+    for path in list(changes):
+        if len(path) > 8:
+            p = path.replace("Translation/", "")
+            changes.discard(p)
+
+    return list(changes)
+
+
+def markdown2html(markdown_source):#1
+    # [todo] - remove this
+    html = markdown2.markdown(markdown_source, extras=["code-friendly"])
+    html = html.replace("\n\n<p", "\n<p")
+    html = html.replace("\n\n<h3", "\n<h3")
+    html = html.replace("<p>-- ", '<p class="credit">')
+    return html
+
+
+def parse_markdown(path):#1
+    data = urllib.urlopen("https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/%s" % path).read()
+    html = markdown2.markdown(data, extras=["code-friendly"])
+    html = html.replace("\n\n<p", "\n<p")
+    html = html.replace("\n\n<h3", "\n<h3")
+
+    item = {
+        "name": "",
+        "content": "",
+        "inputs": "",
+        "outputs": "",
+        "credit": "",
+        "notes": "",
+    }
+
+    state = ""
+    for line in html.split("\n"):
+        if line.startswith("<h1"):
+            item["name"] = line[4:-5]
+            state = "content"
+            continue
+        if line.startswith("<h3") and state == "content":
+            state = "inputs"
+            continue
+        if line.startswith("<h3") and state == "inputs":
+            state = "outputs"
+            continue
+        if line.startswith("<h3") and state == "outputs":
+            state = "notes"
+            continue
+        if line.startswith('<p>-- '):
+            item["credit"] = line[6:-4]
+            continue
+
+        if state == "content":
+            item["content"] += "\n" + line
+            continue
+        if state == "inputs":
+            item["inputs"]  += "\n" + line
+            continue
+        if state == "outputs":
+            item["outputs"] += "\n" + line
+            continue
+        if state == "notes":
+            item["notes"]   += "\n" + line
+            continue
+    return item
+
+
+def parse_codeforces(code):#1
+    data = urllib.urlopen("http://codeforces.com/problemset/problem/%s/%s" % tuple(code.split("-"))).read()
+    item = {
+        "samples": [],
+        "memory-limit": data.split('property-title">memory limit per test</div>', 1)[1].split("</div>", 1)[0],
+        "time-limit": data.split('property-title">time limit per test</div>', 1)[1].split("</div", 1)[0],
+        "input-file": data.split('property-title">input</div>', 1)[1].split("</div>", 1)[0],
+        "output-file": data.split('property-title">output</div>', 1)[1].split("</div>", 1)[0],
+    }
+
+    for line in data.split('<div class="sample-test"><div class="input">', 1)[1].split("</div>\n")[0].split('<div class="input">'):
+        line = line.replace('<div class="title">Input</div><pre>', "")
+        line = line.replace("<br />", "\n")
+
+        inp, out = line.split('</pre></div><div class="output"><div class="title">Output</div><pre>')
+        inp = inp.strip()
+        out = out.split("</pre></div>", 1)[0].strip()
+
+        item["samples"].append([inp, out])
+
+    item["memory-limit"] = item["memory-limit"].replace("megabytes", "мегабайт")
+    item["time-limit"]   = item["time-limit"].replace("seconds", "секунд").replace("second", "секунд")
+    return item
 
 
 def parse_top():#1
@@ -117,6 +219,13 @@ def tc_get_active_users():#1
 
 
 if __name__ == "__main__":
-    # print parse_top()
-    # print tc_get_all_users()
-    print tc_get_active_users()
+    payload = json.loads(open("payload.txt").read())
+    for path in changelist(payload) + ["Translation/123-B.md"]:
+        code = path.replace("Translation/", "").replace(".md", "")
+
+        item = {"code": code}
+        item.update(parse_markdown(path))
+
+        if not item.get("memory-limit"):
+            item.update(parse_codeforces(code))
+        # Data.write("problem:%s" % code, value)
