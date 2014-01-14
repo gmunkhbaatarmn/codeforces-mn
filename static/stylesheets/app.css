@@ -59,6 +59,7 @@ body{font-size:87.5%;font-family:Verdana,Arial,sans-serif}
 #content .pagination ul li.plain{line-height:27px;height:27px}
 #content .pagination ul li a.arrow{font-size:28px;line-height:10px}
 #content .problem-statement{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
+#content .problem-statement .credit{text-align:right;font-style:italic}
 #content .problem-statement h1{font-size:150%;text-align:center;margin:0;margin-bottom:.5em;font-weight:normal;line-height:21px}
 #content .problem-statement h2{font-size:16px;margin:1.5em 0 -.5em}
 #content .problem-statement h3{font-weight:normal;text-align:center;margin:0;font-size:13px;color:#333;line-height:21px}
