@@ -3,6 +3,7 @@ import lxml.html, lxml.etree
 import json, datetime
 import urllib, re
 import markdown2
+import logging
 
 
 def changelist(payload):#1
@@ -81,7 +82,9 @@ def parse_markdown(path):#1
 
 
 def parse_codeforces(code):#1
-    data = urllib.urlopen("http://codeforces.com/problemset/problem/%s/%s" % tuple(code.split("-"))).read()
+    logging.info("Codeforces parse: http://codeforces.com/problemset/problem/%s/%s" % (int(code.split("-")[0]), code.split("-")[1]))
+
+    data = urllib.urlopen("http://codeforces.com/problemset/problem/%s/%s" % (int(code.split("-")[0]), code.split("-")[1])).read()
     item = {
         "samples": [],
         "memory-limit": data.split('property-title">memory limit per test</div>', 1)[1].split("</div>", 1)[0],
@@ -222,10 +225,8 @@ if __name__ == "__main__":
     payload = json.loads(open("payload.txt").read())
     for path in changelist(payload) + ["Translation/123-B.md"]:
         code = path.replace("Translation/", "").replace(".md", "")
-
         item = {"code": code}
         item.update(parse_markdown(path))
-
         if not item.get("memory-limit"):
             item.update(parse_codeforces(code))
         # Data.write("problem:%s" % code, value)

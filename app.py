@@ -235,7 +235,7 @@ class Hook(View):#1
         for path in _.changelist(json.loads(self.request.get("payload"))):
             # {Translation/}000-X.md => 000-X
             code = path.replace("Translation/", "").replace(".md", "")
-            item = Data.fetch(code=code) or {"code": code}
+            item = Data.fetch("problem:%s" % code) or {"code": code}
             item.update(_.parse_markdown(path))
             if not item.get("memory-limit"):
                 item.update(_.parse_codeforces(code))
@@ -261,12 +261,14 @@ app = webapp2.WSGIApplication([
     ("/contests",                       Contests),
     ("/contest/(\d+)",                  Contest),
     ("/contest/(\d+)/problem/(\w+)",    ContestProblem),
+
     ("/problemset",                     Problemset),
     ("/problemset/page/(\d+)",          Problemset),
     ("/problemset/problem/(\d+)/(\w+)(.html)?", ProblemsetProblem),
     ("/ratings",                        Ratings),
-    ("/github-hook",                    Hook),
 
+    # System routes
+    ("/github-hook",                    Hook),
     ("/-/codeforces",                   Codeforces),
     ("/-/topcoder",                     Topcoder),
 ], debug=True, config={"webapp2_extras.sessions":{"secret_key":"epe9hoongi6Yeeghoo4iopein1Boh9"}})
