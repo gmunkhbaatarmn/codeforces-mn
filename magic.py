@@ -10,15 +10,9 @@ def changelist(payload):#1
     changes = set([])
 
     for commit in payload["commits"]:
-        for path in commit["added"] + commit["modified"]:
-            if re.search("^\d{3}-[A-Z].md$", path) or re.search("^Translation/\d{3}-[A-Z].md$", path):
-                changes.add(path)
-
-    # Prefer Translation/123-Z.md than 123-Z.md
-    for path in list(changes):
-        if len(path) > 8:
-            p = path.replace("Translation/", "")
-            changes.discard(p)
+        for path in commit["added"] + commit["modified"] + commit["removed"]:
+            if re.search("^Translation/\d{3}-[A-Z].md$", path):
+                changes.add(path[12:-3])
 
     return list(changes)
 
@@ -32,18 +26,18 @@ def markdown2html(markdown_source):#1
     return html
 
 
-def parse_markdown(path):#1
-    data = urllib.urlopen("https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/%s" % path).read()
+def parse_markdown(code):#1
+    data = urllib.urlopen("https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/Translation/%s.md" % code).read()
     html = markdown2.markdown(data, extras=["code-friendly"])
     html = html.replace("\n\n<p", "\n<p")
     html = html.replace("\n\n<h3", "\n<h3")
 
     item = {
-        "name": "",
+        "name": "UN-NAMED",
         "content": "",
         "inputs": "",
         "outputs": "",
-        "credit": "",
+        "credit": "UN-CREDITED",
         "notes": "",
     }
 
@@ -131,6 +125,7 @@ def parse_problemset():#1
     data = open("templates/translations/000-problemset.txt").read().decode("utf-8")
 
     return json.loads(data)
+# endfold
 
 
 def cf_get_all_users():#1
@@ -222,11 +217,29 @@ def tc_get_active_users():#1
 
 
 if __name__ == "__main__":
-    payload = json.loads(open("payload.txt").read())
-    for path in changelist(payload) + ["Translation/123-B.md"]:
-        code = path.replace("Translation/", "").replace(".md", "")
-        item = {"code": code}
-        item.update(parse_markdown(path))
-        if not item.get("memory-limit"):
-            item.update(parse_codeforces(code))
-        # Data.write("problem:%s" % code, value)
+    """
+    First time generate 000-data.txt
+    First time generate each problem
+
+    Change some problems
+
+    - rating:contribution
+      list of ["sugardorj", 128.0]
+      - add
+      - change
+      - remove
+
+    - all:contest
+      list of [contest_id, contest_name, done, total]
+      - change: done
+
+    - all:problems
+      list of [problem_code, problem_name, credit]
+    """
+    print changelist({
+        "commits": [{
+            "added":    ["001-A.md"],
+            "modified": ["001-A.md"],
+            "removed":  ["001-A.md"],
+        }]
+    })
