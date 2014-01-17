@@ -63,7 +63,7 @@ if location.pathname is "/"
   </div>
   """
   ROW = """
-      <tr>
+      <tr{style}>
         <td class="left">{place}</td>
         <td class="mn-credit">{name}</td>
         <td>{score}</td>
@@ -79,18 +79,45 @@ if location.pathname is "/"
       </style>
       """
     storage = JSON.parse(localStorage.mn or "{}")
+    color = (name, score) ->
+      score = Number(score)
+      r = '<span class="user-gray">'+name+'</span>'
+      if score >= 25
+        r = '<span class="user-green">'+name+'</span>'
+      if score >= 50
+        r = '<span class="user-blue">'+name+'</span>'
+      if score >= 75
+        r = '<span class="user-orange">'+name+'</span>'
+      if score >= 100
+        r = '<span class="user-red">'+name+'</span>'
+      return r
+
     if storage.credits
       content = []
 
       place = 0
       ready = 0
+      count = 0
       for t in storage.credits
         row = ROW.replace("{place}", ++place)
-        row = row.replace("{name}",  t[0])
+        row = row.replace("{name}",  color(t[0], t[1]))
         row = row.replace("{score}", t[1])
+
+        count++
+        if count > 10
+          row = row.replace("{style}", ' style="display:none"')
+        else
+          row = row.replace("{style}", '')
 
         ready += Number(t[1])
         content.push(row)
+      content.push """
+				<tr>
+					<td colspan="2"></td>
+					<td style="border-left:0"><a href="javascript:;" onclick='$(this).closest("table").find("tr").show();$(this).closest("tr").fadeOut().remove()' class="js-more">бүгд &rarr;</a></td>
+				</tr>
+      """
+
       $("#sidebar .top-contributed:last")[0].outerHTML = BOX.replace("{total}", "#{ready}/#{storage.total}").replace("{content}", content.join("\n"))
 
 
