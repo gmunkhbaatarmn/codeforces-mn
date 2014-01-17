@@ -37,6 +37,16 @@ def similar():#1
 
 
 def main():#1
+    "Rating:contribution => Dict of {name: points}"
+    value = {}
+    for path in os.listdir("Translation/"):
+        line = open("Translation/%s" % path).read().strip().split("\n")[-1]
+        assert line.startswith("-- "), 'Credit line must be start with: "-- "'
+
+        for name in line[3:].split(", "):
+            value[name] = value.get(name, 0) + 1.0 / len(line[3:].split(", "))
+    open("migrate.py", "w+").write("CONTRIBUTION = %s\n" % sorted(value.items(), key=lambda x: -x[1]))
+
     "All:problem => list of [english name, mongolian name, credits]"
     value = {}
     # fill english name
@@ -51,7 +61,7 @@ def main():#1
         value[code][1] = name
         value[code][2] = cred
     ALL_PROBLEM = value
-    open("migrate.py", "w+").write("ALL_PROBLEM = %s\n" % sorted(value.items()))
+    open("migrate.py", "a+").write("ALL_PROBLEM = %s\n" % sorted(value.items()))
 
     "All:similar"
     SIMILAR = similar()
