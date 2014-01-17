@@ -1,5 +1,5 @@
 # coding: utf-8
-import json, webapp2, logging, urllib, magic as _
+import json, datetime, webapp2, logging, urllib, magic as _
 from webapp2_extras import jinja2
 from google.appengine.api import memcache, taskqueue
 from google.appengine.ext import db
@@ -251,7 +251,8 @@ class Hook(View):#1
 
             if not code in all_problem:
                 logging.warning("%s problem not registered in problemset" % code)
-                all_history.append(["warning", code, pusher, "", u"Ийм бодлого problemset-д алга. Файлыг problemset-дэх кодоор нэрлэнэ үү."])
+                all_history.append(["warning", code, pusher, "", u"Ийм бодлого problemset-д алга. Файлыг problemset-дэх кодоор нэрлэнэ үү.",
+                                    datetime.datetime.now().strftime("%F %H:%M")])
                 Data.write("All:history", all_history)
                 continue
 
@@ -278,7 +279,8 @@ class Hook(View):#1
                 all_problem[code][2] = "" # credit
 
                 Data.erase("problem:%s" % code)
-                all_history.append(["success", code, pusher, "", u"Амжилттай устгалаа."])
+                all_history.append(["success", code, pusher, "", u"Амжилттай устгалаа.",
+                                    datetime.datetime.now().strftime("%F %H:%M")])
                 continue
 
             item = Data.fetch("problem:%s" % code) or {"code": code}
@@ -313,7 +315,7 @@ class Hook(View):#1
                 msg = u"Амжилттай шинэчиллээ."
             all_problem[code][1] = item["name"]
             all_problem[code][2] = item["credit"]
-            all_history.append(["success", code, pusher, item["credit"], msg])
+            all_history.append(["success", code, pusher, item["credit"], msg, datetime.datetime.now().strftime("%F %H:%M")])
 
         Data.write("Contribution:done", len(filter(lambda x: x[1][1], all_problem.items())))
         Data.write("Contribution:full", len(all_problem))

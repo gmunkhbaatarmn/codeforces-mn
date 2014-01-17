@@ -11,6 +11,7 @@
 				<th style=""></th>
 				<th style="width:12em">Орчуулсан</th>
 				<th style="width:10em">Хянагч</th>
+				<th style="width:10em">Огноо, Цаг</th>
 			</tr>
 			{% for s in reversed(all_history) %}
 				<tr {{- loop.cycle(' class="dark"', "")|safe }}>
@@ -18,6 +19,7 @@
 					<td>{{ s[4] }}</td>
 					<td style="text-align:center">{{ s[3] }}</td>
 					<td style="text-align:center;color:#777">{{ s[2] }}</td>
+					<td style="text-align:center;color:#777">{{ s[5] }}</td>
 				</tr>
 			{% endfor %}
 		</table>
