@@ -52,8 +52,8 @@ class View(webapp2.RequestHandler):#1
             "request":    self.request,
             "debug":      self.app.debug,
             "top":        _.parse_top(),
-            "codeforces": Data.fetch("rating:codeforces"),
-            "topcoder":   Data.fetch("rating:topcoder"),
+            "codeforces": Data.fetch("Rating:codeforces"),
+            "topcoder":   Data.fetch("Rating:topcoder"),
             "nozero":     nozero,
             "reversed":   reversed,
         }
@@ -109,69 +109,20 @@ class Problemset(View):#1
 
 
 class ProblemsetProblem(View):#1
-    def get(self, contest, problem, embed):
-        try:
-            source = _.markdown2html(open("markdown/%03d-%s.md" % (int(contest), problem)).read().decode("utf-8"))
-            # source = open("templates/translations/%03d-%s.html" % (int(contest), problem)).read().decode("utf-8")
-        except IOError:
-            if problem.islower():
-                return self.redirect("/problemset/problem/%s/%s" % (contest, problem.upper()))
-            return self.abort(404)
+    def get(self, contest, letter, embed):
+        all_similar = Data.fetch("All:similar")
+        code = "%03d-%s" % (int(contest), letter)
+        for k, v in all_similar.items():
+            if code == v:
+                code = k
 
-        state = ""
-        name, content, inputs, outputs, notes, credit = tuple([""] * 6)
-        for line in source.split("\n"):
-            if line.startswith("<h1"):
-                name = line[4:-5]
-                state = "content"
-                continue
-            if line.startswith("<h3") and state == "content":
-                state = "inputs"
-                continue
-            if line.startswith("<h3") and state == "inputs":
-                state = "outputs"
-                continue
-            if line.startswith("<h3") and state == "outputs":
-                state = "notes"
-                continue
-            if line.startswith('<p class="credit"'):
-                credit = line
-                continue
-
-            if state == "content":
-                content += " " + line
-                continue
-            if state == "inputs":
-                inputs += " " + line
-                continue
-            if state == "outputs":
-                outputs += " " + line
-                continue
-            if state == "notes":
-                notes += " " + line
-                continue
+        problem = Data.fetch("problem:%s" % code)
+        if not problem:
+            self.abort(404)
 
         if embed == ".html":
-            return self.render("problemset-problem-embed.html",
-                               contest=contest,
-                               problem=problem,
-                               name=name,
-                               content=content,
-                               inputs=inputs,
-                               outputs=outputs,
-                               notes=notes,
-                               credit=credit,
-                              )
-        return self.render("problemset-problem.html",
-                           contest=contest,
-                           problem=problem,
-                           name=name,
-                           content=content,
-                           inputs=inputs,
-                           outputs=outputs,
-                           notes=notes,
-                           credit=credit,
-                          )
+            return self.render("problem-embed.html", problem=problem, contest=contest, letter=letter)
+        return self.render("problem-problemset.html", problem=problem, contest=contest, letter=letter)
 
 
 class Contests(View):#1
@@ -234,7 +185,8 @@ class Ratings(View):#1
 
 class Extension(View):#1
     def get(self):
-        # contribution = Data.fetch("rating:contribution")
+        # [todo] - extension serve
+        # contribution = Data.fetch("Rating:contribution")
         pass
 # endfold1
 
