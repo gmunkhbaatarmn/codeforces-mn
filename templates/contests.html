@@ -17,7 +17,7 @@
 				<tr {{- loop.cycle(' class="dark"', "")|safe }}>
 					<td style="text-align:center"><a href="/contest/{{ nozero(c[0]) }}">{{ c[1][0] }}</a></td>
 					{# <td style="text-align:center"></td> #}
-					<td style="text-align:center{{- ";background:#d4edc9"|safe if c[1][1] == c[1][2] }}">{{ c[1][1] }} / {{ c[1][2] }}</td>
+					<td style="text-align:center{{- ";background:#e6ffdb"|safe if c[1][1] == c[1][2] }}">{{ c[1][1] }} / {{ c[1][2] }}</td>
 					<td style="text-align:center"><a href="">Эцсийн дүн</a></td>
 				</tr>
 			{% endfor %}
