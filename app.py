@@ -195,9 +195,26 @@ class Ratings(View):#1
 
 class Extension(View):#1
     def get(self):
-        # [todo] - extension serve
-        # contribution = Data.fetch("Rating:contribution")
-        pass
+        self.response.headers["Content-Type"] = "text/plain"
+
+        all_problem = dict(Data.fetch("All:problem"))
+        all_similar = Data.fetch("All:similar")
+        all_contest = Data.fetch("All:contest")
+        contribution = Data.fetch("Rating:contribution")
+
+        for k, v in all_similar.items():
+            all_problem[v] = all_problem[k]
+
+        def nozero(x):
+            while x.startswith("0"):
+                x = x[1:]
+            return x
+
+        all_problem = sorted(filter(lambda x: x[1][1], all_problem.items()), key=lambda x: x[0])
+        self.response.write("|".join([nozero(i[0]) for i in all_problem]) + "\n")
+        self.response.write("|".join(["%s:%s/%s" % (i[0], i[1][1], i[1][2]) for i in all_contest]) + "\n")
+        self.response.write("|".join(["%s:%s" % (k, v) for k, v in contribution]) + "\n")
+        self.response.write("%s:%s\n" % (Data.fetch("Contribution:done"), Data.fetch("Contribution:full")))
 # endfold1
 
 
