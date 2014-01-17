@@ -1,23 +1,7 @@
 import os
 
 
-def contest_names():#1
-    """
-    Examples
-        "001": "Codeforces Round #1"
-        "123": "Codeforces Round #123"
-
-    Returns dict of {code: name}
-    """
-    values = {}
-    for line in open("contest-names.txt").read().strip().split("\n"):
-        code = line[:3]
-        name = line[4:]
-        values[code] = name
-    return values
-
-
-def problem_links():#1
+def similar():#1
     """
     Examples
         "380-A" => "381-C" (381-C not listed in problemset)
@@ -35,7 +19,6 @@ def problem_links():#1
 
     # {contest_id name: code}
     problem_hash = {l[:3] + l[5:]: l[:5] for l in open("problem-set.txt").read().strip().split("\n")}
-    # print problem_hash
 
     values = {}
     for line in find_link:
@@ -54,58 +37,39 @@ def problem_links():#1
 
 
 def main():#1
-    # ("Rating:contribution")
+    "All:problem => list of [english name, mongolian name, credits]"
     value = {}
-    for path in os.listdir("Translation/"):
-        line = open("Translation/%s" % path).read().strip().split("\n")[-1]
-        assert line.startswith("-- "), 'Credit line must be start with: "-- "'
-
-        for name in line[3:].split(", "):
-            value[name] = value.get(name, 0) + 1.0 / len(line[3:].split(", "))
-    open("migrate.py", "w+").write("CONTRIBUTION = %s\n" % sorted(value.items(), key=lambda x: -x[1]))
-
-    # ("Total:problems")
-    value = {}
+    # fill english name
     for line in open("problem-set.txt").read().strip().split("\n"):
-        code = line[:5]
-        name = line[6:]
-        value[code] = name
-    open("migrate.py", "a+").write("TOTAL_PROBLEMS = %s\n" % sorted(value.items()))
-
-    # ("Total:contests")
-    value = {}
-    for line in open("problem-contest.txt").read().strip().split("\n"):
-        code = line[:5]
-        name = line[6:]
-        value[code] = name
-    open("migrate.py", "a+").write("TOTAL_CONTESTS = %s\n" % sorted(value.items()))
-
-    # ("Ready:problems")
-    value = {}
+        value[line[:5]] = [line[6:], "", ""]
+    # fill mongolian name, credits
     for path in os.listdir("Translation/"):
+        data = open("Translation/%s" % path).read().strip()
         code = path[:-3]
-        name = open("Translation/%s" % path).read().strip().split("\n")[0]
-        cred = open("Translation/%s" % path).read().strip().split("\n")[-1][3:]
-        value[code] = [name, cred]
-    open("migrate.py", "a+").write("READY_PROBLEMS = %s\n" % sorted(value.items()))
+        name = data.split("\n")[0]
+        cred = data.split("\n")[-1]
+        value[code][1] = name
+        value[code][2] = cred
+    ALL_PROBLEM = value
+    open("migrate.py", "w+").write("ALL_PROBLEM = %s\n" % sorted(value.items()))
 
-    # ("Ready:contests")
-    CONTEST_NAMES = contest_names()
-    PROBLEM_LINKS = problem_links()
+    "All:similar"
+    SIMILAR = similar()
+    open("migrate.py", "a+").write("ALL_SIMILAR = %s\n" % SIMILAR)
+
+    "All:contest => list of [contest name, done, full]"
     value = {}
-    for code, name in CONTEST_NAMES.items():
-        ready, total = 0, 0
-        value[code] = [ready, total, name]
-
+    # fill contest name
+    for line in open("contest-names.txt").read().strip().split("\n"):
+        value[line[:3]] = [line[4:], 0, 0]
+    # fill full
     for line in open("problem-contest.txt").read().strip().split("\n"):
-        value[line[:3]][1] += 1
-
-    for path in os.listdir("Translation/"):
-        value[path[:3]][0] += 1
-        if PROBLEM_LINKS.get(path[:5]):
-            value[PROBLEM_LINKS[path[:5]][:3]][0] += 1
-    # print sorted(value.items())
-    open("migrate.py", "a+").write("READY_CONTESTS = %s\n" % sorted(value.items()))
+        value[line[:3]][2] += 1
+    # fill done
+    for line in open("problem-contest.txt").read().strip().split("\n"):
+        code = SIMILAR.get(line[:5]) or line[:5]
+        value[line[:3]][1] += code in ALL_PROBLEM
+    open("migrate.py", "a+").write("ALL_CONTEST = %s\n" % sorted(value.items()))
 
 
 if __name__ == "__main__":#1
