@@ -214,7 +214,7 @@ class Extension(View):#1
         self.response.write("|".join([nozero(i[0]) for i in all_problem]) + "\n")
         self.response.write("|".join(["%s:%s/%s" % (i[0], i[1][1], i[1][2]) for i in all_contest]) + "\n")
         self.response.write("|".join(["%s:%s" % (k, v) for k, v in contribution]) + "\n")
-        self.response.write("%s:%s\n" % (Data.fetch("Contribution:done"), Data.fetch("Contribution:full")))
+        self.response.write("%s\n" % Data.fetch("Contribution:full"))
 # endfold1
 
 
@@ -336,7 +336,7 @@ class Hook(View):#1
 
         Data.write("Contribution:done", len(filter(lambda x: x[1][1], all_problem.items())))
         Data.write("Contribution:full", len(all_problem))
-        Data.write("Rating:contribution", sorted(contribution.items(), key=lambda x: -x[1]))
+        Data.write("Rating:contribution", sorted(filter(lambda x: x[1], contribution.items()), key=lambda x: -x[1]))
         Data.write("All:contest", sorted(all_contest.items()))
         Data.write("All:problem", sorted(all_problem.items()))
         Data.write("All:similar", all_similar)

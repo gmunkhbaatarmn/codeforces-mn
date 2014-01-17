@@ -1,14 +1,14 @@
 <h1>{{ letter }}. {{ problem.name }}</h1>
 {{ problem.content|safe }}
 
-<h2>Оролт</h2>
+<h3>Оролт</h3>
 {{ problem.inputs|safe }}
 
-<h2>Гаралт</h2>
+<h3>Гаралт</h3>
 {{ problem.outputs|safe }}
 <p class="credit">Орчуулсан: {{ problem.credit }}</p>
 
 {% if notes %}
-	<h2>Тэмдэглэл</h2>
+	<h3>Тэмдэглэл</h3>
 	{{ problem.notes|safe }}
 {% endif %}
