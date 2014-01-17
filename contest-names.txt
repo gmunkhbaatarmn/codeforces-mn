@@ -54,7 +54,6 @@
 327 Codeforces Round #191 (Div. 2)
 326 MemSQL start[c]up Round 2
 325 MemSQL start[c]up Round 1
-324 ABBYY Cup 3.0 - Finals
 323 Testing Round #7
 322 Codeforces Round #190 (Div. 2)
 321 Codeforces Round #190 (Div. 1)
@@ -202,7 +201,6 @@
 173 Croc Champ 2012 - Round 1
 172 Croc Champ 2012 - Qualification Round
 171 April Fools Day Contest
-170 VK Cup 2012 Wild-card Round 2
 169 VK Cup 2012 Round 2 (Unofficial Div. 2 Edition)
 168 Codeforces Round #114 (Div. 2)
 167 Codeforces Round #114 (Div. 1)
