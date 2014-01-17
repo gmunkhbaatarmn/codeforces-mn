@@ -12,7 +12,7 @@ STYLE =
   .mn-please a { color: green !important; font-weight: bold; padding: 1px 5px 2px; border-radius: 3px }
   .mn-please a:hover { color: #fff !important; background: #069100 !important }
   .mn-statement ul { margin-bottom: 1em }
-  .mn-statement .math { font-size: 125%; font-family: times new roman,sans-serif }
+  .mn-statement .credit { text-align: right; font-style: italic; font-size: 110%; font-family: Georgia, serif }
   .sample-tests .section-title { margin-bottom: 0.5em }
   .sample-tests .title { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important; font-size: 1em !important; text-transform: none !important }
 </style>
@@ -21,25 +21,25 @@ STYLE =
 #:1 Run in before and renew data
 if location.pathname is "/" or location.pathname.match(/^\/contest\/\d+\/?$/) or location.pathname.match(/\/problemset(?!\/problem\/)/) or location.pathname.start_with("/contests")
   $.ajax
-    url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/000-data.txt?#{(new Date().getTime())}"
+    url: "http://www.codeforces.mn/extension?#{(new Date().getTime())}"
     dataType: "text"
     success: (text) ->
       storage = {}
       storage.updated = new Date().getTime() / 1000
-      for i in text.split("\r")[0].split("|")
+      for i in text.split("\n")[0].split("|")
         storage["problem:#{i}"] = 1
 
-      for c in text.split("\r")[1].split("|")
+      for c in text.split("\n")[1].split("|")
         i = c.split(":")[0]
         ready = Number(c.split(":")[1].split("/")[0])
         total = Number(c.split(":")[1].split("/")[1])
         storage["contest:#{i}"] = {ready: ready, total: total}
 
       storage.credits = []
-      for t in text.split("\r")[2].split("|")
+      for t in text.split("\n")[2].split("|")
         storage.credits.push(t.split(":"))
 
-      storage.total = text.split("\r")[3]
+      storage.total = text.split("\n")[3]
 
       localStorage.mn = JSON.stringify(storage)
 # endfold
@@ -234,13 +234,12 @@ translate = ->
     $(this).html("<strong>Орчуулж байна...</strong>").fadeIn("fast")
 
   $.ajax
-    url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/#{problem_id}.html?#{(new Date().getTime())}"
+    url: "http://www.codeforces.mn/problemset/problem/#{problem_id.replace("-", "/")}.html?#{(new Date().getTime())}"
     dataType: "html"
     success: (data) ->
       $(".problem-statement").addClass("mn-statement")
 
       $data = $("<div/>").html(data)
-      credit = $data.find("p:last")[0].outerHTML; $data.find("p:last").remove()
 
       # Replace problem name
       $(".header .title").html "#{problem_id.slice(-1)}. #{$data.find("h1")[0].innerHTML}"
@@ -267,7 +266,7 @@ translate = ->
       while curr[0] and curr[0].tagName isnt "H3"
         body.push(curr[0].outerHTML)
         curr = curr.next()
-      $(".output-specification").html """<div class="section-title">Гаралт</div>#{body.join("\n")}#{credit}"""
+      $(".output-specification").html """<div class="section-title">Гаралт</div>#{body.join("\n")}"""
 
       # Replace sample test(s)
       $(".sample-tests .section-title").html "Жишээ тэстүүд"
@@ -285,3 +284,13 @@ translate = ->
         $(".problem-statement .note").html """<div class="section-title">Тэмдэглэл</div>#{body.join("\n")}"""
 
       $(".mn-please").fadeOut("fast")
+
+      head = document.getElementsByTagName("head")[0]
+      script = document.createElement("script")
+      script.type = "text/x-mathjax-config"
+      script[(if window.opera then "innerHTML" else "text")] = 'MathJax.Hub.Config({tex2jax:{inlineMath:[["$", "$"]],displayMath:[["$$", "$$"]]}, showMathMenu:false});'
+      head.appendChild(script)
+      script = document.createElement("script")
+      script.type = "text/javascript"
+      script.src  = "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"
+      head.appendChild(script)

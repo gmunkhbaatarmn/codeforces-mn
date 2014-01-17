@@ -17,23 +17,23 @@ String.prototype.is_numeric = function() {
   return !isNaN(parseFloat(this)) && isFinite(this);
 };
 
-STYLE = "<style>\n  .mn-please a { color: green !important; font-weight: bold; padding: 1px 5px 2px; border-radius: 3px }\n  .mn-please a:hover { color: #fff !important; background: #069100 !important }\n  .mn-statement ul { margin-bottom: 1em }\n  .mn-statement .math { font-size: 125%; font-family: times new roman,sans-serif }\n  .sample-tests .section-title { margin-bottom: 0.5em }\n  .sample-tests .title { font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif !important; font-size: 1em !important; text-transform: none !important }\n</style>";
+STYLE = "<style>\n  .mn-please a { color: green !important; font-weight: bold; padding: 1px 5px 2px; border-radius: 3px }\n  .mn-please a:hover { color: #fff !important; background: #069100 !important }\n  .mn-statement ul { margin-bottom: 1em }\n  .mn-statement .credit { text-align: right; font-style: italic; font-size: 110%; font-family: Georgia, serif }\n  .sample-tests .section-title { margin-bottom: 0.5em }\n  .sample-tests .title { font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif !important; font-size: 1em !important; text-transform: none !important }\n</style>";
 
 if (location.pathname === "/" || location.pathname.match(/^\/contest\/\d+\/?$/) || location.pathname.match(/\/problemset(?!\/problem\/)/) || location.pathname.start_with("/contests")) {
   $.ajax({
-    url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/000-data.txt?" + (new Date().getTime()),
+    url: "http://www.codeforces.mn/extension?" + (new Date().getTime()),
     dataType: "text",
     success: function(text) {
       var c, i, ready, storage, t, total, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
 
       storage = {};
       storage.updated = new Date().getTime() / 1000;
-      _ref = text.split("\r")[0].split("|");
+      _ref = text.split("\n")[0].split("|");
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         i = _ref[_i];
         storage["problem:" + i] = 1;
       }
-      _ref1 = text.split("\r")[1].split("|");
+      _ref1 = text.split("\n")[1].split("|");
       for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
         c = _ref1[_j];
         i = c.split(":")[0];
@@ -45,12 +45,12 @@ if (location.pathname === "/" || location.pathname.match(/^\/contest\/\d+\/?$/) 
         };
       }
       storage.credits = [];
-      _ref2 = text.split("\r")[2].split("|");
+      _ref2 = text.split("\n")[2].split("|");
       for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
         t = _ref2[_k];
         storage.credits.push(t.split(":"));
       }
-      storage.total = text.split("\r")[3];
+      storage.total = text.split("\n")[3];
       return localStorage.mn = JSON.stringify(storage);
     }
   });
@@ -227,15 +227,13 @@ translate = function() {
     return $(this).html("<strong>Орчуулж байна...</strong>").fadeIn("fast");
   });
   return $.ajax({
-    url: "https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/out/" + problem_id + ".html?" + (new Date().getTime()),
+    url: "http://www.codeforces.mn/problemset/problem/" + (problem_id.replace("-", "/")) + ".html?" + (new Date().getTime()),
     dataType: "html",
     success: function(data) {
-      var $data, body, credit, curr;
+      var $data, body, curr, head, script;
 
       $(".problem-statement").addClass("mn-statement");
       $data = $("<div/>").html(data);
-      credit = $data.find("p:last")[0].outerHTML;
-      $data.find("p:last").remove();
       $(".header .title").html("" + (problem_id.slice(-1)) + ". " + ($data.find("h1")[0].innerHTML));
       body = [];
       curr = $data.find("h1").next();
@@ -257,7 +255,7 @@ translate = function() {
         body.push(curr[0].outerHTML);
         curr = curr.next();
       }
-      $(".output-specification").html("<div class=\"section-title\">Гаралт</div>" + (body.join("\n")) + credit);
+      $(".output-specification").html("<div class=\"section-title\">Гаралт</div>" + (body.join("\n")));
       $(".sample-tests .section-title").html("Жишээ тэстүүд");
       $(".sample-tests .section-title").html("Жишээ тэстүүд");
       $(".sample-tests .sample-test .input .title").html("Оролт");
@@ -271,7 +269,16 @@ translate = function() {
         }
         $(".problem-statement .note").html("<div class=\"section-title\">Тэмдэглэл</div>" + (body.join("\n")));
       }
-      return $(".mn-please").fadeOut("fast");
+      $(".mn-please").fadeOut("fast");
+      head = document.getElementsByTagName("head")[0];
+      script = document.createElement("script");
+      script.type = "text/x-mathjax-config";
+      script[(window.opera ? "innerHTML" : "text")] = 'MathJax.Hub.Config({tex2jax:{inlineMath:[["$", "$"]],displayMath:[["$$", "$$"]]}, showMathMenu:false});';
+      head.appendChild(script);
+      script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src = "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML";
+      return head.appendChild(script);
     }
   });
 };
