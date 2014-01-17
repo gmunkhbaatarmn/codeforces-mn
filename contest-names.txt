@@ -48,7 +48,6 @@
 334 Codeforces Round #194 (Div. 2)
 333 Codeforces Round #194 (Div. 1)
 332 Codeforces Round #193 (Div. 2)
-331 ABBYY Cup 3.0 - Finals (online version)
 330 Codeforces Round #192 (Div. 2)
 329 Codeforces Round #192 (Div. 1)
 328 Testing Round #8
@@ -63,7 +62,6 @@
 319 Codeforces Round #189 (Div. 1)
 318 Codeforces Round #188 (Div. 2)
 317 Codeforces Round #188 (Div. 1)
-316 ABBYY Cup 3.0
 315 Codeforces Round #187 (Div. 2)
 314 Codeforces Round #187 (Div. 1)
 313 Codeforces Round #186 (Div. 2)
@@ -71,7 +69,6 @@
 311 Codeforces Round #185 (Div. 1)
 309 Croc Champ 2013 - Finals (online version, Div. 1)
 308 Croc Champ 2013 - Finals
-307 Croc Champ 2013 - Trial Contest (Finals)
 306 Testing Round #6
 305 Codeforces Round #184 (Div. 2)
 304 Codeforces Round #183 (Div. 2)
@@ -171,7 +168,6 @@
 209 VK Cup 2012 Finals, Practice Session
 208 Codeforces Round #130 (Div. 2)
 207 Abbyy Cup 2.0 - Final (unofficial)
-206 Abbyy Cup 2.0 - Final
 205 Codeforces Round #129 (Div. 2)
 204 Codeforces Round #129 (Div. 1)
 203 Codeforces Round #128 (Div. 2)
