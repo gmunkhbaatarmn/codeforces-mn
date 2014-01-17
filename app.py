@@ -106,7 +106,9 @@ class Home(View):#1
 
 class Status(View):#1
     def get(self):
-        return self.render("status.html", all_status=Data.fetch("All:status"))
+        all_history=Data.fetch("All:history")
+
+        return self.render("status.html", all_history=all_history)
 
 
 class Problemset(View):#1
@@ -242,7 +244,7 @@ class Hook(View):#1
         all_similar  = Data.fetch("All:similar")
         all_history  = Data.fetch("All:history") or []
 
-        pusher = json.loads(self.request.get("payload"))["pusher"]
+        pusher = json.loads(self.request.get("payload"))["pusher"]["name"]
 
         for code in _.changelist(json.loads(self.request.get("payload"))):
             logging.info("Touched problem: %s" % code)
