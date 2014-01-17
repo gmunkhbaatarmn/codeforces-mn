@@ -257,7 +257,7 @@ class Hook(View):#1
 
                 "linked similar problem"
                 link = all_similar.get(code)
-                if link and all_problem[link][1]:
+                if link:
                     all_contest[link[:3][1]] -= 1
 
                 # Problem
@@ -290,7 +290,7 @@ class Hook(View):#1
 
             "linked similar problem"
             link = all_similar.get(code)
-            if link and not all_problem[link][1]:
+            if link:
                 all_contest[link[:3][1]] += 1
 
             # Problems - name, credit (must be in last)
