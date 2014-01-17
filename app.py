@@ -100,7 +100,6 @@ class Error(View, webapp2.BaseHandlerAdapter):#1
 
 class Home(View):#1
     def get(self):
-        return self.redirect("/ratings")
         return self.render("home.html")
 
 
@@ -259,7 +258,7 @@ class Hook(View):#1
                 "linked similar problem"
                 link = all_similar.get(code)
                 if link:
-                    all_contest[link[:3][1]] -= 1
+                    all_contest[link[:3]][1] -= 1
 
                 # Problem
                 all_problem[code][1] = "" # name
@@ -292,7 +291,7 @@ class Hook(View):#1
             "linked similar problem"
             link = all_similar.get(code)
             if link:
-                all_contest[link[:3][1]] += 1
+                all_contest[link[:3]][1] += 1
 
             # Problems - name, credit (must be in last)
             all_problem[code][1] = item["name"]
