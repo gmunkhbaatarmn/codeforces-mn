@@ -45,6 +45,8 @@ body{font-size:87.5%;font-family:Verdana,Arial,sans-serif}
 #sidebar .box table tr td:first-child{border-left:0}
 #content{margin:2em 320px 1em 1em;color:#222;}
 #content:after{display:table;content:"";clear:both}
+#content h1{color:#3b5998 !important;font-size:24px;font-weight:normal}
+#content .post{border-left:4px solid #b9b9b9;margin:1em 0;padding-left:1em;line-height:20px;font-size:13px}
 #content .table-title{padding:4px 0 0 6px;font-size:1em;font-weight:normal;margin:0;-ms-border-radius:7px 7px 0 0;-moz-border-radius:7px 7px 0 0;-webkit-border-radius:7px 7px 0 0;border-radius:7px 7px 0 0;background:#e1e1e1}
 #content .table-container{background:#e1e1e1;border:3px solid #e1e1e1;-ms-border-radius:0 0 5px 5px;-moz-border-radius:0 0 5px 5px;-webkit-border-radius:0 0 5px 5px;border-radius:0 0 5px 5px}
 #content .table-container table{background:#fff;width:100%;-ms-border-radius:5px 5px 3px 3px;-moz-border-radius:5px 5px 3px 3px;-webkit-border-radius:5px 5px 3px 3px;border-radius:5px 5px 3px 3px}
