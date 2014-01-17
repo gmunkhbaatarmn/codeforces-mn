@@ -64,6 +64,10 @@ class View(webapp2.RequestHandler):#1
             self.session_store.save_sessions(self.response)
 
     def context(self):
+        def nozero(x):
+            while x.startswith("0"):
+                x = x[1:]
+            return x
         return {
             "request":    self.request,
             "session":    self.session,
@@ -73,6 +77,8 @@ class View(webapp2.RequestHandler):#1
             "top":        _.parse_top(),
             "codeforces": Data.fetch("rating:codeforces"),
             "topcoder":   Data.fetch("rating:topcoder"),
+            "nozero":     nozero,
+            "reversed":   reversed,
         }
 
     def render(self, *args, **kwargs):
@@ -111,10 +117,17 @@ class Error(View, webapp2.BaseHandlerAdapter):#1
                 if r.regex.match(urllib.unquote(self.request.path + "/")):
                     return self.redirect(self.request.path + "/?" + self.request.query_string)
 
+        def nozero(x):
+            while x.startswith("0"):
+                x = x[1:]
+            return x
+
         self.context = lambda: {
             "top": _.parse_top(),
             "codeforces": Data.fetch("rating:codeforces"),
             "topcoder":   Data.fetch("rating:topcoder"),
+            "reversed":   reversed,
+            "nozero":     nozero,
         }
 
         return self.render("error-404.html")
@@ -127,14 +140,7 @@ class Home(View):#1
 
 class Problemset(View):#1
     def get(self, page="1"):
-        def nozero(x):
-            while x.startswith("0"):
-                x = x[1:]
-            return x
-
         return self.render("problemset.html",
-                           nozero=nozero,
-                           reversed=reversed,
                            page=int(page),
                            data=_.parse_problemset())
 
@@ -206,13 +212,35 @@ class ProblemsetProblem(View):#1
 
 
 class Contests(View):#1
-    def get(self):
-        return self.render("contests.html")
+    def get(self, page="1"):
+        return self.render("contests.html",
+                           page=int(page),
+                           all_contest=Data.fetch("All:contest"))
 
 
 class Contest(View):#1
     def get(self, id):
-        return self.render("contest.html")
+        all_contest = dict(Data.fetch("All:contest"))
+        all_problem = dict(Data.fetch("All:problem"))
+        all_similar = Data.fetch("All:similar")
+
+        for k, v in all_similar.items():
+            all_problem[v] = all_problem[k]
+
+        contest_id = "%03d" % int(id)
+        if not all_contest.get(contest_id):
+            return self.abort(404)
+
+        def limit(letter):
+            return u'1 \u0441\u0435\u043a, 256 \u041c\u0411'
+            problem = Data.fetch("problem:%s-%s" % (contest_id, letter))
+            return "%s, %s" % (problem["time-limit"], problem["memory-limit"])
+
+        return self.render("contest.html",
+                           limit=limit,
+                           all_problem=all_problem,
+                           contest_id=contest_id,
+                           contest=all_contest[contest_id])
 
 
 class ContestProblem(View):#1
@@ -355,6 +383,8 @@ class Topcoder(View):#1
 app = webapp2.WSGIApplication([
     ("/",                                       Home),
     ("/contests",                               Contests),
+    ("/contests/page/(\d+)",                    Contests),
+
     ("/contest/(\d+)",                          Contest),
     ("/contest/(\d+)/problem/(\w+)",            ContestProblem),
 

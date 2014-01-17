@@ -12,7 +12,7 @@
 				<th style="border-right:0">Бодлогын нэр</th>
 				<th style="width:16em"></th>
 			</tr>
-			{% for t in reversed(data[(17-page) * 100:(18-page)*100]) %}
+			{% for t in reversed(data[(17-page) * 100:(18-page) * 100]) %}
 				<tr {{- loop.cycle(' class="dark"', "")|safe }}>
 					{% if t|length == 3 %}
 						<td style="text-align:center"><a href="/problemset/problem/{{ nozero(t[0].replace("-", "/")) }}">{{ nozero(t[0].replace("-", "")) }}</a></td>
@@ -25,18 +25,6 @@
 					{% endif %}
 				</tr>
 			{% endfor %}
-			{#
-			<tr class="dark">
-				<td style="text-align:center"><a href="/problemset/problem/100/A">100A</a></td>
-				<td><a href="/problemset/problem/100/A">Үнэхээр урт гарчигтай бодлого</a></td>
-				<td style="text-align:center;color:#666">zoloogg, sugardorj</td>
-			</tr>
-			<tr>
-				<td style="text-align:center"><a href="/problemset/problem/32/D">32D</a></td>
-				<td><a href="/problemset/problem/32/D">Lorem ipsum</a></td>
-				<td style="text-align:center;color:#666"></td>
-			</tr>
-			#}
 		</table>
 	</div>
 

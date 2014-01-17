@@ -12,22 +12,25 @@
 				<th>Нэр</th>
 				<th style="width:12em">Орчуулсан</th>
 			</tr>
-			<tr class="dark">
-				<td style="text-align:center"><a href="/contest/1/problem/A">A</a></td>
-				<td>
-					<a href="/contest/1/problem/A">Шинэ жилийн лаанууд</a>
-					<div style="float:right;font-size:11px;color:#888">1 сек, 256 MB</div>
-				</td>
-				<td style="text-align:center;color:#666">zoloogg, sugardorj</td>
-			</tr>
-			<tr>
-				<td style="text-align:center"><a href="/contest/1/problem/B">B</a></td>
-				<td>
-					<a href="/contest/1/problem/B">Шинэ жилийн бэлэгнүүд</a>
-					<div style="float:right;font-size:11px;color:#888">1 сек, 256 MB</div>
-				</td>
-				<td style="text-align:center;color:#666">zoloogg, sugardorj</td>
-			</tr>
+			{% for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:contest[2]] %}
+				<tr {{- loop.cycle(' class="dark"', "")|safe }}>
+					{% set code = contest_id ~ "-" ~ letter %}
+					{% if all_problem[code][1] %}
+						<td style="text-align:center"><a href="/contest/{{ contest_id }}/problem/{{ letter }}">{{ letter }}</a></td>
+						<td>
+							<a href="/contest/{{ contest_id }}/problem/{{ letter }}">{{ all_problem[code][1] }}</a>
+							<div style="float:right;font-size:11px;color:#888">{{ limit(letter) }}</div>
+						</td>
+						<td style="text-align:center;color:#666">{{ all_problem[code][2] }}</td>
+					{% else %}
+						<td style="text-align:center">{{ letter }}</td>
+						<td>
+							{{ all_problem[code][0] }}
+						</td>
+						<td style="text-align:center;color:#666"></td>
+					{% endif %}
+				</tr>
+			{% endfor %}
 		</table>
 	</div>
 {% endblock %}
@@ -35,13 +38,11 @@
 
 {% block sidebar %}
 	<div class="box">
-		<div>
-			<a href="">Codeforces Round #222 (Div. 1)</a>
+		<div style="text-align:center">
+			<span style="color:#000;font-weight:bold">{{ contest[0].replace("(", "<br>(")|safe }}</span>
 			<br>
 			<br>
-			Codeforces.com дээрх хаяг:
-			<br>
-			<a href="">Codeforces Round #222 (Div. 1)</a>
+			<a href="">Codeforces.com дээрх хаяг</a>
 		</div>
 	</div>
 {% endblock %}

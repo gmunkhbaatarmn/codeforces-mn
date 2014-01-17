@@ -4,41 +4,31 @@
 {% set menu = "contests" %}
 
 {% block content %}
-	<p style="text-align:center;color:#777">Coming soon...<br> <br> Хөгжүүлэгч маш шаргуу ажиллаж байгаа бөгөөд тун удахгүй энэ хэсгийг ажилладаг болгоно ^^</p>
-	{#
 	<h1 class="table-title">Тэмцээнүүд</h1>
 	<div class="table-container">
 		<table>
 			<tr>
-				<th style="width:3em">#</th>
 				<th>Нэр</th>
 				<th style="width:5em">Огноо</th>
-				<th style="width:5em">Бодлого</th>
+				{# <th style="width:5em">Бодлого</th> #}
 				<th style="width:9em"></th>
 			</tr>
-			<tr class="dark">
-				<td style="text-align:center">2</td>
-				<td style="text-align:center"><a href="/contest/1">Codeforces Round #222 (Div. 1)</a></td>
-				<td style="text-align:center">12/30/2013</td>
-				<td style="text-align:center">5</td>
-				<td style="text-align:center"><a href="">Эцсийн дүн</a></td>
-			</tr>
-			<tr>
-				<td style="text-align:center">1</td>
-				<td style="text-align:center"><a href="/contest/1">MemSQL start[c]up Round 2 - online version</a></td>
-				<td style="text-align:center">12/30/2013</td>
-				<td style="text-align:center">5</td>
-				<td style="text-align:center"><a href="">Эцсийн дүн</a></td>
-			</tr>
+			{% for c in reversed(all_contest[(4-page) * 100:(5-page) * 100]) %}
+				<tr {{- loop.cycle(' class="dark"', "")|safe }}>
+					<td style="text-align:center"><a href="/contest/{{ nozero(c[0]) }}">{{ c[1][0] }}</a></td>
+					{# <td style="text-align:center"></td> #}
+					<td style="text-align:center{{- ";background:#d4edc9"|safe if c[1][1] == c[1][2] }}">{{ c[1][1] }} / {{ c[1][2] }}</td>
+					<td style="text-align:center"><a href="">Эцсийн дүн</a></td>
+				</tr>
+			{% endfor %}
 		</table>
 	</div>
+
 	<div class="pagination">
 		<ul>
-			<li class="active"><a href="/problemset/page/1">1</a></li>
-			<li><a href="/problemset/page/2">2</a></li>
-			<li><a href="/problemset/page/3">3</a></li>
-			<li><a href="/problemset/page/4">4</a></li>
+			{% for p in range(1, 5) %}
+				<li {{- ' class="active"'|safe if page == p }}><a href="/contests/page/{{ p }}">{{ p }}</a></li>{#
+			#}{% endfor %}
 		</ul>
 	</div>
-	#}
 {% endblock %}
