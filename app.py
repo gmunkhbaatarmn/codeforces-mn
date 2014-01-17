@@ -277,7 +277,7 @@ class Hook(View):#1
 
             # Contribution
             count = len(all_problem[code][2].split(", "))
-            for name in all_problem[code][2].split(", "):
+            for name in filter(lambda x: x, all_problem[code][2].split(", ")):
                 contribution[name] -= 1.0 / count
 
             count = len(item["credit"].split(", "))
