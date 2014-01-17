@@ -272,6 +272,7 @@ class Hook(View):#1
         all_similar  = Data.fetch("All:similar")
 
         for code in _.changelist(json.loads(self.request.get("payload"))):
+            logging.info("Touched problem: %s" % code)
             r = urllib.urlopen("https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/Translation/%s.md" % code)
 
             if not code in all_problem:

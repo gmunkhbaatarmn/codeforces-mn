@@ -27,7 +27,8 @@ def markdown2html(markdown_source):#1
 
 
 def parse_markdown(code):#1
-    data = urllib.urlopen("https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/Translation/%s.md" % code).read()
+    logging.info("Github parse: https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/Translation/%s.md" % code)
+    data = urllib.urlopen("https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/Translation/%s.md" % code).read().decode("utf-8")
     html = markdown2.markdown(data, extras=["code-friendly"])
     html = html.replace("\n\n<p", "\n<p")
     html = html.replace("\n\n<h3", "\n<h3")
@@ -82,7 +83,7 @@ def parse_codeforces(code):#1
     if r.url == "http://codeforces.com/":
         logging.info("Codeforces parse: http://codeforces.com/problemset/problem/%s/%s1" % (int(code.split("-")[0]), code.split("-")[1]))
         r = urllib.urlopen("http://codeforces.com/problemset/problem/%s/%s1" % (int(code.split("-")[0]), code.split("-")[1]))
-    data = r.read()
+    data = r.read().decode("utf-8")
 
     item = {
         "samples": [],
