@@ -9,16 +9,16 @@ def similar():#1
     Returns {..., "380-A": "381-C", ...}
     """
     # {contest_id: name}
-    problems = set(open("problem-set.txt").read().strip().split("\n"))
+    problems = set(open("problem-set.txt").read().decode("utf-8").strip().split("\n"))
 
     # problems not listed in problemset
     find_link = []
-    for line in open("problem-contest.txt").read().strip().split("\n"):
+    for line in open("problem-contest.txt").read().decode("utf-8").strip().split("\n"):
         if not line in problems:
             find_link.append(line)
 
     # {contest_id name: code}
-    problem_hash = {l[:3] + l[5:]: l[:5] for l in open("problem-set.txt").read().strip().split("\n")}
+    problem_hash = {l[:3] + l[5:]: l[:5] for l in open("problem-set.txt").read().decode("utf-8").strip().split("\n")}
 
     values = {}
     for line in find_link:
@@ -40,7 +40,7 @@ def main():#1
     "Rating:contribution => Dict of {name: points}"
     value = {}
     for path in os.listdir("Translation/"):
-        line = open("Translation/%s" % path).read().strip().split("\n")[-1]
+        line = open("Translation/%s" % path).read().decode("utf-8").strip().split("\n")[-1]
         assert line.startswith("-- "), 'Credit line must be start with: "-- "'
 
         for name in line[3:].split(", "):
@@ -50,14 +50,14 @@ def main():#1
     "All:problem => list of [english name, mongolian name, credits]"
     value = {}
     # fill english name
-    for line in open("problem-set.txt").read().strip().split("\n"):
+    for line in open("problem-set.txt").read().decode("utf-8").strip().split("\n"):
         value[line[:5]] = [line[6:], "", ""]
     # fill mongolian name, credits
     for path in os.listdir("Translation/"):
-        data = open("Translation/%s" % path).read().strip()
+        data = open("Translation/%s" % path).read().decode("utf-8").strip()
         code = path[:-3]
         name = data.split("\n")[0]
-        cred = data.split("\n")[-1]
+        cred = data.split("\n")[-1][3:]
         value[code][1] = name
         value[code][2] = cred
     ALL_PROBLEM = value
@@ -70,13 +70,13 @@ def main():#1
     "All:contest => list of [contest name, done, full]"
     value = {}
     # fill contest name
-    for line in open("contest-names.txt").read().strip().split("\n"):
+    for line in open("contest-names.txt").read().decode("utf-8").strip().split("\n"):
         value[line[:3]] = [line[4:], 0, 0]
     # fill full
-    for line in open("problem-contest.txt").read().strip().split("\n"):
+    for line in open("problem-contest.txt").read().decode("utf-8").strip().split("\n"):
         value[line[:3]][2] += 1
     # fill done
-    for line in open("problem-contest.txt").read().strip().split("\n"):
+    for line in open("problem-contest.txt").read().decode("utf-8").strip().split("\n"):
         code = SIMILAR.get(line[:5]) or line[:5]
         value[line[:3]][1] += code in ALL_PROBLEM
     open("migrate.py", "a+").write("ALL_CONTEST = %s\n" % sorted(value.items()))
