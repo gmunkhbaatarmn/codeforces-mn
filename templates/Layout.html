@@ -1,4 +1,4 @@
-{%- from "Macros.html" import cf_user, cf_rating, tc_user, tc_rating -%}
+{%- from "Macros.html" import user, cf_user, cf_rating, tc_user, tc_rating -%}
 <!DOCTYPE html>
 <html>
 <head>
@@ -50,13 +50,13 @@
 				<tr>
 					<th style="width:2.25em">#</th>
 					<th>Нэр</th>
-					<th style="font-weight:normal;font-size:13px">{{ top.done }}/{{ top.total }}</th>
+					<th style="font-weight:normal;font-size:13px">{{ top_done }}/{{ top_full }}</th>
 				</tr>
-				{% for u in top.users %}
+				{% for u in top %}
 				<tr {{- ' class="hidden"'|safe if loop.index > 10 }}>
 					<td>{{ loop.index }}</td>
-					<td>{{ u.name|safe }}</td>
-					<td>{{ u.point }}</td>
+					<td>{{ user(u[0], u[1])|safe }}</td>
+					<td>{{ u[1] }}</td>
 				</tr>
 				{% endfor %}
 				<tr>

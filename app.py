@@ -51,6 +51,8 @@ class View(webapp2.RequestHandler):#1
         return {
             "request":    self.request,
             "debug":      self.app.debug,
+            "top_done":   Data.fetch("Contribution:done"),
+            "top_full":   Data.fetch("Contribution:full"),
             "top":        Data.fetch("Rating:contribution"),
             "codeforces": Data.fetch("Rating:codeforces"),
             "topcoder":   Data.fetch("Rating:topcoder"),
@@ -196,6 +198,9 @@ class Migrate(View):#1
         try:
             import migrate
             Data.write("Rating:contribution", migrate.CONTRIBUTION)
+            Data.write("Contribution:done", len(filter(lambda x: x[1][1], migrate.ALL_PROBLEM)))
+            Data.write("Contribution:full", len(migrate.ALL_PROBLEM))
+
             Data.write("All:problem", migrate.ALL_PROBLEM)
             Data.write("All:contest", migrate.ALL_CONTEST)
             Data.write("All:similar", migrate.ALL_SIMILAR)
@@ -292,6 +297,8 @@ class Hook(View):#1
             all_problem[code][1] = item["name"]
             all_problem[code][2] = item["credit"]
 
+        Data.write("Contribution:done", len(filter(lambda x: x[1], all_problem)))
+        Data.write("Contribution:full", len(all_problem))
         Data.write("Rating:contribution", sorted(contribution.items(), key=lambda x: -x[1]))
         Data.write("All:contest", sorted(all_contest.items()))
         Data.write("All:problem", sorted(all_problem.items()))

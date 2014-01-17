@@ -1,3 +1,18 @@
+{% macro user(handle, point) %}
+	{%   if point >= 100 %}
+		{% set color = "red" %}
+	{% elif point >=  75 %}
+		{% set color = "orange" %}
+	{% elif point >=  50 %}
+		{% set color = "blue" %}
+	{% elif point >=  25 %}
+		{% set color = "green" %}
+	{% else %}
+		{% set color = "gray" %}
+	{% endif %}
+	<span class="user-{{ color }}">{{ handle }}</span>
+{% endmacro %}
+
 {%- macro cf_user(handle, rating) -%}
 	{%   if rating >= 2200 %}
 		{% set color = "red" %}
