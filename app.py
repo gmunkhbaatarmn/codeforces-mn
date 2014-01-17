@@ -233,7 +233,11 @@ class Contest(View):#1
             return self.abort(404)
 
         def limit(letter):
-            problem = Data.fetch("problem:%s-%s" % (contest_id, letter))
+            code = "%03d-%s" % (int(id), letter)
+            for k, v in all_similar.items():
+                if code == v:
+                    code = k
+            problem = Data.fetch("problem:%s" % code)
             return "%s, %s" % (problem["time-limit"], problem["memory-limit"])
 
         return self.render("contest.html",
