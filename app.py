@@ -100,6 +100,7 @@ class Error(View, webapp2.BaseHandlerAdapter):#1
 
 class Home(View):#1
     def get(self):
+        return self.redirect("/ratings")
         return self.render("home.html")
 
 
