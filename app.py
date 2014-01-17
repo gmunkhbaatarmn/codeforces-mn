@@ -1,3 +1,4 @@
+# coding: utf-8
 import json, webapp2, logging, urllib, magic as _
 from webapp2_extras import jinja2
 from google.appengine.api import memcache, taskqueue
@@ -101,6 +102,11 @@ class Error(View, webapp2.BaseHandlerAdapter):#1
 class Home(View):#1
     def get(self):
         return self.render("home.html")
+
+
+class Status(View):#1
+    def get(self):
+        return self.render("status.html", all_status=Data.fetch("All:status"))
 
 
 class Problemset(View):#1
@@ -234,15 +240,20 @@ class Hook(View):#1
         all_contest  = dict(Data.fetch("All:contest"))
         all_problem  = dict(Data.fetch("All:problem"))
         all_similar  = Data.fetch("All:similar")
+        all_history  = Data.fetch("All:history") or []
+
+        pusher = json.loads(self.request.get("payload"))["pusher"]
 
         for code in _.changelist(json.loads(self.request.get("payload"))):
             logging.info("Touched problem: %s" % code)
-            r = urllib.urlopen("https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/Translation/%s.md" % code)
 
             if not code in all_problem:
                 logging.warning("%s problem not registered in problemset" % code)
+                all_history.append(["warning", code, pusher, "", u"Ийм бодлого problemset-д алга. Файлыг problemset-дэх кодоор нэрлэнэ үү."])
+                Data.write("All:history", all_history)
                 continue
 
+            r = urllib.urlopen("https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/Translation/%s.md" % code)
             # translation deleted
             if r.code == 400:
                 # Contribution
@@ -265,6 +276,7 @@ class Hook(View):#1
                 all_problem[code][2] = "" # credit
 
                 Data.erase("problem:%s" % code)
+                all_history.append(["success", code, pusher, "", u"Амжилттай устгалаа."])
                 continue
 
             item = Data.fetch("problem:%s" % code) or {"code": code}
@@ -294,8 +306,12 @@ class Hook(View):#1
                 all_contest[link[:3]][1] += 1
 
             # Problems - name, credit (must be in last)
+            msg = u"Амжилттай орууллаа."
+            if all_problem[code][1]:
+                msg = u"Амжилттай шинэчиллээ."
             all_problem[code][1] = item["name"]
             all_problem[code][2] = item["credit"]
+            all_history.append(["success", code, pusher, item["credit"], msg])
 
         Data.write("Contribution:done", len(filter(lambda x: x[1][1], all_problem.items())))
         Data.write("Contribution:full", len(all_problem))
@@ -303,6 +319,7 @@ class Hook(View):#1
         Data.write("All:contest", sorted(all_contest.items()))
         Data.write("All:problem", sorted(all_problem.items()))
         Data.write("All:similar", all_similar)
+        Data.write("All:history", all_history[-50:])
 
 
 class Codeforces(View):#1
@@ -320,6 +337,7 @@ class Topcoder(View):#1
 
 app = webapp2.WSGIApplication([
     ("/",                                       Home),
+    ("/status",                                 Status),
     ("/contests",                               Contests),
     ("/contests/page/(\d+)",                    Contests),
 
