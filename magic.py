@@ -77,8 +77,13 @@ def parse_markdown(code):#1
 
 def parse_codeforces(code):#1
     logging.info("Codeforces parse: http://codeforces.com/problemset/problem/%s/%s" % (int(code.split("-")[0]), code.split("-")[1]))
+    r = urllib.urlopen("http://codeforces.com/problemset/problem/%s/%s" % (int(code.split("-")[0]), code.split("-")[1]))
 
-    data = urllib.urlopen("http://codeforces.com/problemset/problem/%s/%s" % (int(code.split("-")[0]), code.split("-")[1])).read()
+    if r.url == "http://codeforces.com/":
+        logging.info("Codeforces parse: http://codeforces.com/problemset/problem/%s/%s1" % (int(code.split("-")[0]), code.split("-")[1]))
+        r = urllib.urlopen("http://codeforces.com/problemset/problem/%s/%s1" % (int(code.split("-")[0]), code.split("-")[1]))
+    data = r.read()
+
     item = {
         "samples": [],
         "memory-limit": data.split('property-title">memory limit per test</div>', 1)[1].split("</div>", 1)[0],
@@ -87,15 +92,16 @@ def parse_codeforces(code):#1
         "output-file": data.split('property-title">output</div>', 1)[1].split("</div>", 1)[0],
     }
 
-    for line in data.split('<div class="sample-test"><div class="input">', 1)[1].split("</div>\n")[0].split('<div class="input">'):
-        line = line.replace('<div class="title">Input</div><pre>', "")
-        line = line.replace("<br />", "\n")
+    if '<div class="sample-test"><div class="input">' in data:
+        for line in data.split('<div class="sample-test"><div class="input">', 1)[1].split("</div>\n")[0].split('<div class="input">'):
+            line = line.replace('<div class="title">Input</div><pre>', "")
+            line = line.replace("<br />", "\n")
 
-        inp, out = line.split('</pre></div><div class="output"><div class="title">Output</div><pre>')
-        inp = inp.strip()
-        out = out.split("</pre></div>", 1)[0].strip()
+            inp, out = line.split('</pre></div><div class="output"><div class="title">Output</div><pre>')
+            inp = inp.strip()
+            out = out.split("</pre></div>", 1)[0].strip()
 
-        item["samples"].append([inp, out])
+            item["samples"].append([inp, out])
 
     item["memory-limit"] = item["memory-limit"].replace("megabytes", "мегабайт")
     item["time-limit"]   = item["time-limit"].replace("seconds", "секунд").replace("second", "секунд")

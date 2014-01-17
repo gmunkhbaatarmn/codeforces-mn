@@ -1,6 +1,6 @@
 import json, webapp2, logging, urllib, magic as _
 from webapp2_extras import jinja2, sessions
-from google.appengine.api import memcache
+from google.appengine.api import memcache, taskqueue
 from google.appengine.ext import db
 
 
@@ -234,66 +234,61 @@ class Extension(View):#1
 
 
 class Migrate(View):#1
-    """
-        First time generate "problem:%s"
-    """
     def get(self):
-        Data.write("rating:contribution", {
-            "Sugardorj": 125.0,
-            "Zoljargal": 100.0,
-        })
+        try:
+            import migrate
+            Data.write("rating:contribution", migrate.CONTRIBUTION)
+            Data.write("total:problems", migrate.TOTAL_PROBLEMS)
+            Data.write("total:contests", migrate.TOTAL_CONTESTS)
 
-        Data.write("all:problem", {
-            "001-A": ["Teatr Square", "Sugardorj"],
-            "123-A": ["Lorem ipsum", "gmunkhbaatarmn"],
-        })
-
-        Data.write("all:contest", {
-            # id: done, total, name
-            1:  [3, 3, "Codeforces Beta Round #1"],
-            32: [3, 5, "Codeforces Beta Round #32 (Div. 2, Codeforces format)"],
-        })
-
-        '''
-        list_of_path = ["..."]
-        for path in list_of_path:
-            # {Translation/}000-X.md => 000-X
-            code = path.replace("Translation/", "").replace(".md", "")
-            item = Data.fetch("problem:%s" % code) or {"code": code}
-            item.update(_.parse_markdown(path))
-
-            if not item.get("memory-limit"):
-                item.update(_.parse_codeforces(code))
-
-            Data.write("problem:%s" % code, item)
-        '''
+            Data.write("ready:problems", migrate.READY_PROBLEMS)
+            Data.write("ready:contests", migrate.READY_CONTESTS)
+        except ImportError:
+            logging.warning("No migrate.py file")
 
 
 class Hook(View):#1
+    """
+    - Route /github-hook?key=[:KEY] => Github hook
+    - Route /github-hook?run=[:KEY] => Taskqueue run (10 minute deadline)
+    """
     secure_key = "ziy1shauphu5LeighaimiSh8goo1ohG7"
 
     def post(self):
-        if self.request.get("key") != self.secure_key:
+        if self.request.get("key") == self.secure_key:
+            taskqueue.add(url="/github-hook", params={"run": self.secure_key, "payload": self.request.get("payload")})
+            return
+
+        if self.request.get("run") != self.secure_key:
             logging.warning("Attempt to github-hook")
             return self.abort(404)
 
-        contribution = Data.fetch("rating:contribution") or {}
-        all_problem  = Data.fetch("all:problem")         or {}
-        all_contest  = Data.fetch("all:contest")         or {}
+        contribution   = dict(Data.fetch("rating:contribution"))
+        ready_problems = dict(Data.fetch("ready:problems"))
+        ready_contests = dict(Data.fetch("ready:contests"))
+
+        total_problems = dict(Data.fetch("total:problems"))
+        total_contests = dict(Data.fetch("total:contests"))
 
         for code in _.changelist(json.loads(self.request.get("payload"))):
             r = urllib.urlopen("https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/Translation/%s.md" % code)
 
-            # [todo] code is must be on data-contest
-            # [todo] code is must be on data-problemset
-            if r.code == 400:# translation is deleted
+            if not code in total_problems:
+                logging.warning("%s problem not registered in problemset" % code)
+                continue
+            if not code in total_contests:
+                logging.warning("%s problem not registered in contest" % code)
+                continue
+
+            # translation deleted
+            if r.code == 400:
                 # 1. contribution
-                count = len(all_problem[code][1].split(", "))
-                for name in all_problem[code][1].split(", "):
+                count = len(ready_problems[code][1].split(", "))
+                for name in ready_problems[code][1].split(", "):
                     contribution[name] -= 1.0 / count
 
                 # 2. all problem
-                all_problem.pop(code, None)
+                ready_problems.pop(code, None)
 
                 # 3. all contest
                 # [todo] - contest data re-fill
@@ -308,26 +303,26 @@ class Hook(View):#1
             if not item.get("memory-limit"):
                 item.update(_.parse_codeforces(code))
 
-            # 1. Contribution
-            count = len(all_problem[code][1].split(", "))
-            for name in all_problem[code][1].split(", "):
+            Data.write("problem:%s" % code, item)
+
+            # 1. All Problem
+            ready_problems[code] = [item["name"], item["credit"]]
+
+            # 2. Contribution
+            count = len(ready_problems[code][1].split(", "))
+            for name in ready_problems[code][1].split(", "):
                 contribution[name] -= 1.0 / count
 
             count = len(item["credit"].split(", "))
             for name in filter(lambda x: x, item["credit"].split(", ")):
                 contribution[name] = contribution.get(name, 0) + (1.0 / count)
 
-            # 2. All Problem
-            all_problem[code] = [item["name"], item["credit"]]
-
             # 3. All Contest
             # all_contest[code.split("-")[0]] = []
 
-            Data.write("problem:%s" % code, item)
-
-        Data.write("rating:contribution", contribution)
-        Data.write("all:problem", all_problem)
-        Data.write("all:contest", all_contest)
+        Data.write("rating:contribution", sorted(contribution.items(), key=lambda x: -x[1]))
+        Data.write("ready:problems", sorted(ready_problems.items()))
+        Data.write("ready:contests", sorted(ready_contests.items()))
 
 
 class Codeforces(View):#1
