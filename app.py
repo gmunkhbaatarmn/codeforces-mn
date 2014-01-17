@@ -251,7 +251,7 @@ class ContestProblem(View):#1
             if code == v:
                 code = k
 
-        problem = Data.fetch("problem:%03d-%s" % code)
+        problem = Data.fetch("problem:%s" % code)
         if not problem:
             self.abort(404)
 
