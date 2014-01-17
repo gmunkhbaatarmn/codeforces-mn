@@ -14,13 +14,13 @@
 			</tr>
 			{% for t in reversed(data[(17-page) * 100:(18-page) * 100]) %}
 				<tr {{- loop.cycle(' class="dark"', "")|safe }}>
-					{% if t|length == 3 %}
+					{% if t[1][1] %}
 						<td style="text-align:center"><a href="/problemset/problem/{{ nozero(t[0].replace("-", "/")) }}">{{ nozero(t[0].replace("-", "")) }}</a></td>
-						<td style="border-right:0"><a href="/problemset/problem/{{ nozero(t[0].replace("-", "/")) }}">{{ nozero(t[1]) }}</a></td>
-						<td style="text-align:right;color:#666;font-size:11px">{{ t[2] }}</td>
+						<td style="border-right:0"><a href="/problemset/problem/{{ nozero(t[0].replace("-", "/")) }}">{{ nozero(t[1][1]) }}</a></td>
+						<td style="text-align:right;color:#666;font-size:11px">{{ t[1][2] }}</td>
 					{% else %}
 						<td style="text-align:center">{{ nozero(t[0].replace("-", "")) }}</td>
-						<td style="border-right:0">{{ t[1] }}</td>
+						<td style="border-right:0">{{ t[1][0] }}</td>
 						<td style="text-align:center;color:#666"></td>
 					{% endif %}
 				</tr>

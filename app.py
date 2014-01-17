@@ -51,7 +51,7 @@ class View(webapp2.RequestHandler):#1
         return {
             "request":    self.request,
             "debug":      self.app.debug,
-            "top":        _.parse_top(),
+            "top":        Data.fetch("Rating:contribution"),
             "codeforces": Data.fetch("Rating:codeforces"),
             "topcoder":   Data.fetch("Rating:topcoder"),
             "nozero":     nozero,
@@ -105,7 +105,7 @@ class Problemset(View):#1
     def get(self, page="1"):
         return self.render("problemset.html",
                            page=int(page),
-                           data=_.parse_problemset())
+                           data=Data.fetch("All:problem"))
 
 
 class ProblemsetProblem(View):#1
