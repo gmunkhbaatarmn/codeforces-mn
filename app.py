@@ -232,25 +232,28 @@ class Extension(View):#1
 # endfold1
 
 
-
 class Migrate(View):#1
     def get(self):
         try:
             import migrate
-            Data.write("rating:contribution", migrate.CONTRIBUTION)
-            Data.write("total:problems", migrate.TOTAL_PROBLEMS)
-            Data.write("total:contests", migrate.TOTAL_CONTESTS)
-
-            Data.write("ready:problems", migrate.READY_PROBLEMS)
-            Data.write("ready:contests", migrate.READY_CONTESTS)
+            Data.write("Rating:contribution", migrate.CONTRIBUTION)
+            Data.write("All:problem", migrate.ALL_PROBLEM)
+            Data.write("All:contest", migrate.ALL_CONTEST)
+            Data.write("All:similar", migrate.ALL_SIMILAR)
+            self.response.write("OK")
         except ImportError:
             logging.warning("No migrate.py file")
+            self.response.write("No migrate.py file")
 
 
 class Hook(View):#1
     """
     - Route /github-hook?key=[:KEY] => Github hook
     - Route /github-hook?run=[:KEY] => Taskqueue run (10 minute deadline)
+
+    Usage
+        Must be work after push on github
+        Must be work fine in hook-test
     """
     secure_key = "ziy1shauphu5LeighaimiSh8goo1ohG7"
 
@@ -263,36 +266,38 @@ class Hook(View):#1
             logging.warning("Attempt to github-hook")
             return self.abort(404)
 
-        contribution   = dict(Data.fetch("rating:contribution"))
-        ready_problems = dict(Data.fetch("ready:problems"))
-        ready_contests = dict(Data.fetch("ready:contests"))
-
-        total_problems = dict(Data.fetch("total:problems"))
-        total_contests = dict(Data.fetch("total:contests"))
+        contribution = dict(Data.fetch("Rating:contribution"))
+        all_contest  = dict(Data.fetch("All:contest"))
+        all_problem  = dict(Data.fetch("All:problem"))
+        all_similar  = Data.fetch("All:similar")
 
         for code in _.changelist(json.loads(self.request.get("payload"))):
             r = urllib.urlopen("https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/Translation/%s.md" % code)
 
-            if not code in total_problems:
+            if not code in all_problem:
                 logging.warning("%s problem not registered in problemset" % code)
-                continue
-            if not code in total_contests:
-                logging.warning("%s problem not registered in contest" % code)
                 continue
 
             # translation deleted
             if r.code == 400:
-                # 1. contribution
-                count = len(ready_problems[code][1].split(", "))
-                for name in ready_problems[code][1].split(", "):
-                    contribution[name] -= 1.0 / count
+                # Contribution
+                if all_problem[code][2]:
+                    count = len(all_problem[code][2].split(", "))
+                    for name in all_problem[code][2].split(", "):
+                        contribution[name] -= 1.0 / count
 
-                # 2. all problem
-                ready_problems.pop(code, None)
+                # Contest
+                if all_problem[code][1]:
+                    all_contest[code[:3]][1] -= 1
 
-                # 3. all contest
-                # [todo] - contest data re-fill
-                # all_contest[contest_id].pop(problem_id)
+                "linked similar problem"
+                link = all_similar.get(code)
+                if link and all_problem[link][1]:
+                    all_contest[link[:3][1]] -= 1
+
+                # Problem
+                all_problem[code][1] = "" # name
+                all_problem[code][2] = "" # credit
 
                 Data.erase("problem:%s" % code)
                 continue
@@ -305,35 +310,43 @@ class Hook(View):#1
 
             Data.write("problem:%s" % code, item)
 
-            # 1. All Problem
-            ready_problems[code] = [item["name"], item["credit"]]
-
-            # 2. Contribution
-            count = len(ready_problems[code][1].split(", "))
-            for name in ready_problems[code][1].split(", "):
+            # Contribution
+            count = len(all_problem[code][2].split(", "))
+            for name in all_problem[code][2].split(", "):
                 contribution[name] -= 1.0 / count
 
             count = len(item["credit"].split(", "))
-            for name in filter(lambda x: x, item["credit"].split(", ")):
+            for name in item["credit"].split(", "):
                 contribution[name] = contribution.get(name, 0) + (1.0 / count)
 
-            # 3. All Contest
-            # all_contest[code.split("-")[0]] = []
+            # Contest - done (increment for newly added problem)
+            if not all_problem[code][1]:
+                all_contest[code[:3]][1] += 1
 
-        Data.write("rating:contribution", sorted(contribution.items(), key=lambda x: -x[1]))
-        Data.write("ready:problems", sorted(ready_problems.items()))
-        Data.write("ready:contests", sorted(ready_contests.items()))
+            "linked similar problem"
+            link = all_similar.get(code)
+            if link and not all_problem[link][1]:
+                all_contest[link[:3][1]] += 1
+
+            # Problems - name, credit (must be in last)
+            all_problem[code][1] = item["name"]
+            all_problem[code][2] = item["credit"]
+
+        Data.write("Rating:contribution", sorted(contribution.items(), key=lambda x: -x[1]))
+        Data.write("All:contest", sorted(all_contest.items()))
+        Data.write("All:problem", sorted(all_problem.items()))
+        Data.write("All:similar", all_similar)
 
 
 class Codeforces(View):#1
     def get(self):
-        Data.write("rating:codeforces", _.cf_get_active_users())
+        Data.write("Rating:codeforces", _.cf_get_active_users())
         self.response.write("OK")
 
 
 class Topcoder(View):#1
     def get(self):
-        Data.write("rating:topcoder", _.tc_get_active_users())
+        Data.write("Rating:topcoder", _.tc_get_active_users())
         self.response.write("OK")
 # endfold
 
