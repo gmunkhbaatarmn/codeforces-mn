@@ -9,16 +9,15 @@
 			<tr>
 				<th style="width:5em">#</th>
 				<th style=""></th>
-				<th style="width:9em">Хянагч</th>
+				<th style="width:12em">Орчуулсан</th>
+				<th style="width:10em">Хянагч</th>
 			</tr>
-			{% for s in all_history %}
+			{% for s in reversed(all_history) %}
 				<tr {{- loop.cycle(' class="dark"', "")|safe }}>
 					<td style="text-align:center" class="{{ s[0] }}">{{ s[1] }}</td>
-					<td>
-						{{ s[4] }}
-						<div style="float:right">-- {{ s[3] }}</div>
-					</td>
-					<td style="text-align:center">{{ s[2] }}</td>
+					<td>{{ s[4] }}</td>
+					<td style="text-align:center">{{ s[3] }}</td>
+					<td style="text-align:center;color:#777">{{ s[2] }}</td>
 				</tr>
 			{% endfor %}
 		</table>
