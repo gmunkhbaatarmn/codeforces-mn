@@ -17,15 +17,6 @@ def changelist(payload):#1
     return list(changes)
 
 
-def markdown2html(markdown_source):#1
-    # [todo] - remove this
-    html = markdown2.markdown(markdown_source, extras=["code-friendly"])
-    html = html.replace("\n\n<p", "\n<p")
-    html = html.replace("\n\n<h3", "\n<h3")
-    html = html.replace("<p>-- ", '<p class="credit">')
-    return html
-
-
 def parse_markdown(code):#1
     logging.info("Github parse: https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/Translation/%s.md" % code)
     data = urllib.urlopen("https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/Translation/%s.md" % code).read().decode("utf-8")
@@ -199,29 +190,4 @@ def tc_get_active_users():#1
 
 
 if __name__ == "__main__":
-    """
-    First time generate 000-data.txt
-    First time generate each problem
-
-    Change some problems
-
-    - rating:contribution
-      list of ["sugardorj", 128.0]
-      - add
-      - change
-      - remove
-
-    - all:contest
-      list of [contest_id, contest_name, done, total]
-      - change: done
-
-    - all:problems
-      list of [problem_code, problem_name, credit]
-    """
-    print changelist({
-        "commits": [{
-            "added":    ["001-A.md"],
-            "modified": ["001-A.md"],
-            "removed":  ["001-A.md"],
-        }]
-    })
+    pass
