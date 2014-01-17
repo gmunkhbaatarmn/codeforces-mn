@@ -1,7 +1,7 @@
 {% extends "Layout.html" %}
 
 {% set title = problem.name ~ " | Codeforces.mn" %}
-{% set menu = "contests" %}
+{% set menu = "problemset" %}
 
 {% block content %}
 	<div class="problem-statement">
@@ -44,9 +44,9 @@
 	<div class="box">
 		<h2>Бодолт илгээх?</h2>
 		<div>
-			Codeforces.com дээр бодолтоо шалгана уу.
+			Codeforces.com-руу орж бодолтоо шалгана уу.
 			<br>
-			<a href="http://codeforces.com/{{ contest }}/problem/{{ letter }}" class="external">Codeforces дээрх хаяг</a>
+			<a href="http://codeforces.com/problemset/problem/{{ contest }}/{{ letter }}" class="external">Codeforces дээрх хаяг</a>
 		</div>
 	</div>
 {% endblock %}

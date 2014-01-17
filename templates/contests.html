@@ -4,7 +4,7 @@
 {% set menu = "contests" %}
 
 {% block content %}
-	<h1 class="table-title">Тэмцээнүүд</h1>
+	<h1 class="table-title">Тэмцээнүүд ({{ all_contest|length }})</h1>
 	<div class="table-container">
 		<table>
 			<tr>
@@ -18,7 +18,7 @@
 					<td style="text-align:center"><a href="/contest/{{ nozero(c[0]) }}">{{ c[1][0] }}</a></td>
 					{# <td style="text-align:center"></td> #}
 					<td style="text-align:center{{- ";background:#e6ffdb"|safe if c[1][1] == c[1][2] }}">{{ c[1][1] }} / {{ c[1][2] }}</td>
-					<td style="text-align:center"><a href="">Эцсийн дүн</a></td>
+					<td style="text-align:center"><a href="http://codeforces.com/contest/{{ nozero(c[0]) }}/standings/friends/true" class="external">Эцсийн дүн</a></td>
 				</tr>
 			{% endfor %}
 		</table>

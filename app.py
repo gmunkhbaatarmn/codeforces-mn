@@ -1,5 +1,5 @@
 import json, webapp2, logging, urllib, magic as _
-from webapp2_extras import jinja2, sessions
+from webapp2_extras import jinja2
 from google.appengine.api import memcache, taskqueue
 from google.appengine.ext import db
 
@@ -43,26 +43,6 @@ class View(webapp2.RequestHandler):#1
     def jinja2(self):
         return jinja2.get_jinja2(app=self.app)
 
-    @webapp2.cached_property
-    def session(self):
-        return self.session_store.get_session()
-
-    @property
-    def flash(self):
-        return self.session.get_flashes()
-
-    @flash.setter
-    def flash(self, item):
-        return self.session.add_flash(item)
-
-    def dispatch(self):
-        self.session_store = sessions.get_store(request=self.request)
-
-        try:
-            webapp2.RequestHandler.dispatch(self)
-        finally:
-            self.session_store.save_sessions(self.response)
-
     def context(self):
         def nozero(x):
             while x.startswith("0"):
@@ -70,10 +50,7 @@ class View(webapp2.RequestHandler):#1
             return x
         return {
             "request":    self.request,
-            "session":    self.session,
             "debug":      self.app.debug,
-            "flash":      self.flash,
-            "url":        webapp2.uri_for,
             "top":        _.parse_top(),
             "codeforces": Data.fetch("rating:codeforces"),
             "topcoder":   Data.fetch("rating:topcoder"),
@@ -90,8 +67,6 @@ class View(webapp2.RequestHandler):#1
 
 
 class Error(View, webapp2.BaseHandlerAdapter):#1
-    context = lambda x: {}
-
     def __init__(self, error=None, request=None, response=None):
         self.handler = {404: self.handle_404}[error]
         self.initialize(request, response)
@@ -116,19 +91,6 @@ class Error(View, webapp2.BaseHandlerAdapter):#1
             for r in self.app.router.match_routes:
                 if r.regex.match(urllib.unquote(self.request.path + "/")):
                     return self.redirect(self.request.path + "/?" + self.request.query_string)
-
-        def nozero(x):
-            while x.startswith("0"):
-                x = x[1:]
-            return x
-
-        self.context = lambda: {
-            "top": _.parse_top(),
-            "codeforces": Data.fetch("rating:codeforces"),
-            "topcoder":   Data.fetch("rating:topcoder"),
-            "reversed":   reversed,
-            "nozero":     nozero,
-        }
 
         return self.render("error-404.html")
 # endfold
@@ -241,6 +203,7 @@ class Contest(View):#1
             return "%s, %s" % (problem["time-limit"], problem["memory-limit"])
 
         return self.render("contest.html",
+                           id=id,
                            limit=limit,
                            all_problem=all_problem,
                            contest_id=contest_id,
@@ -413,8 +376,8 @@ app = webapp2.WSGIApplication([
     ("/extension",                              Extension),
 
     # System routes
-    ("/migrate",                                Migrate),
     ("/github-hook",                            Hook),
+    ("/-/migrate",                              Migrate),
     ("/-/codeforces",                           Codeforces),
     ("/-/topcoder",                             Topcoder),
 ], debug=True, config={"webapp2_extras.sessions":{"secret_key":"epe9hoongi6Yeeghoo4iopein1Boh9"}})
