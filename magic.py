@@ -95,8 +95,8 @@ def parse_codeforces(code):#1
 
             item["samples"].append([inp, out])
 
-    item["memory-limit"] = item["memory-limit"].replace("megabytes", "мегабайт")
-    item["time-limit"]   = item["time-limit"].replace("seconds", "секунд").replace("second", "секунд")
+    item["memory-limit"] = item["memory-limit"].replace("megabytes", u"мегабайт")
+    item["time-limit"]   = item["time-limit"].replace("seconds", u"секунд").replace("second", u"секунд")
     return item
 # endfold
 

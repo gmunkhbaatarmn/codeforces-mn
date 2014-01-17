@@ -297,7 +297,7 @@ class Hook(View):#1
             all_problem[code][1] = item["name"]
             all_problem[code][2] = item["credit"]
 
-        Data.write("Contribution:done", len(filter(lambda x: x[1][1], all_problem)))
+        Data.write("Contribution:done", len(filter(lambda x: x[1][1], all_problem.items())))
         Data.write("Contribution:full", len(all_problem))
         Data.write("Rating:contribution", sorted(contribution.items(), key=lambda x: -x[1]))
         Data.write("All:contest", sorted(all_contest.items()))
