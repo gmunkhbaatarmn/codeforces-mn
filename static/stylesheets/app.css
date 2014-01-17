@@ -74,6 +74,7 @@ body{font-size:87.5%;font-family:Verdana,Arial,sans-serif}
 #content .problem-statement .sample{border:1px solid #888;border-bottom:0;margin-bottom:1em}
 #content .problem-statement h5{margin:0;padding:2px 6px;line-height:21px;font-size:13px;border-top:0;border-bottom:0}
 #content .problem-statement pre{color:#800;line-height:1.25em;padding:2px 6px;margin:0;background-color:#efefef;border-top:1px solid #888;border-bottom:1px solid #888}
+#content .problem-statement p{line-height:1.5}
 #footer{margin-top:1em;padding:1em 0;border-top:1px solid #ccc;text-align:center;font-size:1em;clear:both}
 #footer p{color:#777;font-size:12px}
 #footer p a{color:#777;font-weight:bold}
