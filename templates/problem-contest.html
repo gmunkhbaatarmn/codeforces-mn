@@ -5,7 +5,7 @@
 
 {% block content %}
 	<div class="problem-statement">
-		<h1>{{ problem.code.split("-")[1] }}. {{ problem.name }}</h1>
+		<h1>{{ letter }}. {{ problem.name }}</h1>
 		<h3><strong>хугацааны хязгаарлалт</strong> {{ problem["time-limit"] }}</h3>
 		<h3><strong>санах ойн хязгаарлалт</strong> {{ problem["memory-limit"] }}</h3>
 		<h3><strong>оролт</strong> {{ problem["input-file"].replace("standard input", "стандарт оролт") }}</h3>

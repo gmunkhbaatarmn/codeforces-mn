@@ -131,6 +131,7 @@ class Error(View, webapp2.BaseHandlerAdapter):#1
         }
 
         return self.render("error-404.html")
+# endfold
 
 
 class Home(View):#1
@@ -232,7 +233,6 @@ class Contest(View):#1
             return self.abort(404)
 
         def limit(letter):
-            return u'1 \u0441\u0435\u043a, 256 \u041c\u0411'
             problem = Data.fetch("problem:%s-%s" % (contest_id, letter))
             return "%s, %s" % (problem["time-limit"], problem["memory-limit"])
 
@@ -245,15 +245,19 @@ class Contest(View):#1
 
 class ContestProblem(View):#1
     def get(self, contest, letter, embed):
-        problem = Data.fetch("problem:%03d-%s" % (int(contest), letter))
+        all_similar = Data.fetch("All:similar")
+        code = "%03d-%s" % (int(contest), letter)
+        for k, v in all_similar.items():
+            if code == v:
+                code = k
+
+        problem = Data.fetch("problem:%03d-%s" % code)
         if not problem:
             self.abort(404)
 
         if embed == ".html":
             return self.render("problem-embed.html", problem=problem, contest=contest, letter=letter)
-
-        return self.render("problem-contest.html",
-                           problem=problem, contest=contest, letter=letter)
+        return self.render("problem-contest.html", problem=problem, contest=contest, letter=letter)
 
 
 class Ratings(View):#1
