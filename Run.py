@@ -65,6 +65,7 @@ def main():#1
 
     "All:similar"
     SIMILAR = similar()
+    REVERSE = {v: k for k, v in SIMILAR.items()}
     open("migrate.py", "a+").write("ALL_SIMILAR = %s\n" % SIMILAR)
 
     "All:contest => list of [contest name, done, full]"
@@ -77,8 +78,8 @@ def main():#1
         value[line[:3]][2] += 1
     # fill done
     for line in open("problem-contest.txt").read().decode("utf-8").strip().split("\n"):
-        code = SIMILAR.get(line[:5]) or line[:5]
-        value[line[:3]][1] += code in ALL_PROBLEM
+        code = REVERSE.get(line[:5]) or line[:5]
+        value[line[:3]][1] += (ALL_PROBLEM[code][1] != "")
     open("migrate.py", "a+").write("ALL_CONTEST = %s\n" % sorted(value.items()))
 
 
