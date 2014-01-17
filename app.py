@@ -176,16 +176,16 @@ class ProblemsetProblem(View):#1
                 continue
 
             if state == "content":
-                content += line
+                content += " " + line
                 continue
             if state == "inputs":
-                inputs += line
+                inputs += " " + line
                 continue
             if state == "outputs":
-                outputs += line
+                outputs += " " + line
                 continue
             if state == "notes":
-                notes += line
+                notes += " " + line
                 continue
 
         if embed == ".html":
@@ -244,8 +244,69 @@ class Contest(View):#1
 
 
 class ContestProblem(View):#1
-    def get(self, contest, problem):
-        return self.render("contest-problem.html")
+    def get(self, contest, problem, embed):
+        try:
+            source = _.markdown2html(open("markdown/%03d-%s.md" % (int(contest), problem)).read().decode("utf-8"))
+            # source = open("templates/translations/%03d-%s.html" % (int(contest), problem)).read().decode("utf-8")
+        except IOError:
+            if problem.islower():
+                return self.redirect("/problemset/problem/%s/%s" % (contest, problem.upper()))
+            return self.abort(404)
+
+        state = ""
+        name, content, inputs, outputs, notes, credit = tuple([""] * 6)
+        for line in source.split("\n"):
+            if line.startswith("<h1"):
+                name = line[4:-5]
+                state = "content"
+                continue
+            if line.startswith("<h3") and state == "content":
+                state = "inputs"
+                continue
+            if line.startswith("<h3") and state == "inputs":
+                state = "outputs"
+                continue
+            if line.startswith("<h3") and state == "outputs":
+                state = "notes"
+                continue
+            if line.startswith('<p class="credit"'):
+                credit = line
+                continue
+
+            if state == "content":
+                content += " " + line
+                continue
+            if state == "inputs":
+                inputs += " " + line
+                continue
+            if state == "outputs":
+                outputs += " " + line
+                continue
+            if state == "notes":
+                notes += " " + line
+                continue
+
+        if embed == ".html":
+            return self.render("problemset-problem-embed.html",
+                               contest=contest,
+                               problem=problem,
+                               name=name,
+                               content=content,
+                               inputs=inputs,
+                               outputs=outputs,
+                               notes=notes,
+                               credit=credit,
+                              )
+        return self.render("problemset-problem.html",
+                           contest=contest,
+                           problem=problem,
+                           name=name,
+                           content=content,
+                           inputs=inputs,
+                           outputs=outputs,
+                           notes=notes,
+                           credit=credit,
+                          )
 
 
 class Ratings(View):#1
@@ -386,7 +447,7 @@ app = webapp2.WSGIApplication([
     ("/contests/page/(\d+)",                    Contests),
 
     ("/contest/(\d+)",                          Contest),
-    ("/contest/(\d+)/problem/(\w+)",            ContestProblem),
+    ("/contest/(\d+)/problem/(\w+)(.html)?",    ContestProblem),
 
     ("/problemset",                             Problemset),
     ("/problemset/page/(\d+)",                  Problemset),
