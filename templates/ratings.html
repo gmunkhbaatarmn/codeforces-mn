@@ -22,7 +22,7 @@
 						<td style="text-align:center">{{ loop.index }}</td>
 						<td>{{ cf_user(u.handle, u.rating)|safe }}</td>
 						<td style="text-align:center">{{ u.rating }}</td>
-						<td style="text-align:center">{{ cf_rating(u.change, u.last_contest_id, "center") }}</td>
+						<td style="text-align:center">{{ cf_rating(u.change, u.contest_id, "center") }}</td>
 					</tr>
 				{% endfor %}
 			</table>
