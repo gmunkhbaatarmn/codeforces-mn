@@ -50,8 +50,8 @@ class View(webapp2.RequestHandler):#1
         return {
             "request":    self.request,
             "debug":      self.app.debug,
-            "top_done":   Data.fetch("Contribution:done"),
-            "top_full":   Data.fetch("Contribution:full"),
+            "top_done":   Data.fetch("Contribution:done") or 0,
+            "top_full":   Data.fetch("Contribution:full") or 0,
             "top":        Data.fetch("Rating:contribution") or [],
             "codeforces": Data.fetch("Rating:codeforces") or [],
             "topcoder":   Data.fetch("Rating:topcoder") or [],
