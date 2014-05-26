@@ -6,9 +6,7 @@ from google.appengine.ext import db
 
 
 class Data(db.Model):#1
-    """
-        Data.write
-        Data.fetch
+    """ Data.write, Data.fetch
     """
     name  = db.StringProperty()
     value = db.TextProperty()
@@ -54,9 +52,9 @@ class View(webapp2.RequestHandler):#1
             "debug":      self.app.debug,
             "top_done":   Data.fetch("Contribution:done"),
             "top_full":   Data.fetch("Contribution:full"),
-            "top":        Data.fetch("Rating:contribution"),
-            "codeforces": Data.fetch("Rating:codeforces"),
-            "topcoder":   Data.fetch("Rating:topcoder"),
+            "top":        Data.fetch("Rating:contribution") or [],
+            "codeforces": Data.fetch("Rating:codeforces") or [],
+            "topcoder":   Data.fetch("Rating:topcoder") or [],
             "nozero":     nozero,
             "reversed":   reversed,
         }
@@ -98,6 +96,7 @@ class Error(View, webapp2.BaseHandlerAdapter):#1
         return self.render("error-404.html")
 # endfold
 
+# Views
 
 class Home(View):#1
     def get(self):
