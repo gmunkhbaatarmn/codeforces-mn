@@ -13,7 +13,7 @@
 	<meta property="og:title" content="{{ title }} · Codeforces.mn">
 	<meta property="og:type" content="website">
 	<meta property="og:url" content="{{ request.url }}">
-	<meta property="og:image" content="http://www.codeforces.mn/static/images/codeforces-logo.png">
+	<meta property="og:image" content="http://www.codeforces.mn/images/codeforces-logo.png">
 </head>
 <body>
 <div id="container">
@@ -138,9 +138,24 @@
 		</p>
 	</div>
 
-	<script src="/static/javascripts/jquery.js"></script>
-	<script src="/static/javascripts/app.js"></script>
-	<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+	<script src="/static/jquery.min.js"></script>
+	<script>
+		$(function() {
+			MathJax.Hub.Config({
+				tex2jax: {
+					inlineMath: [["$", "$"]],
+					displayMath: [["$$", "$$"]]
+				},
+				showMathMenu: false
+			});
+
+			$(".js-more").on("click", function() {
+				$(this).closest("table").find("tr.hidden").removeClass("hidden");
+				$(this).closest("tr").fadeOut().remove();
+			});
+		});
+	</script>
+	<script src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
 </div>
 {# analytics #}
 </body>
