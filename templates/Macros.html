@@ -1,65 +1,62 @@
 {% macro user(handle, point) %}
-	{%   if point >= 100 %}
-		{% set color = "red" %}
-	{% elif point >=  75 %}
-		{% set color = "orange" %}
-	{% elif point >=  50 %}
-		{% set color = "blue" %}
-	{% elif point >=  25 %}
-		{% set color = "green" %}
-	{% else %}
-		{% set color = "gray" %}
-	{% endif %}
-	<span class="user-{{ color }}">{{ handle }}</span>
+  {%   if point >= 100 %}
+    {% set color = "red" %}
+  {% elif point >=  75 %}
+    {% set color = "orange" %}
+  {% elif point >=  50 %}
+    {% set color = "blue" %}
+  {% elif point >=  25 %}
+    {% set color = "green" %}
+  {% else %}
+    {% set color = "gray" %}
+  {% endif %}
+  <span class="user-{{ color }}">{{ handle }}</span>
 {% endmacro %}
 
 {%- macro cf_user(handle, rating) -%}
-	{%   if rating >= 2200 %}
-		{% set color = "red" %}
-	{% elif rating >= 1900 %}
-		{% set color = "orange" %}
-	{% elif rating >= 1700 %}
-		{% set color = "purple" %}
-	{% elif rating >= 1500 %}
-		{% set color = "blue" %}
-	{% elif rating >= 1200 %}
-		{% set color = "green" %}
-	{% else %}
-		{% set color = "gray" %}
-	{% endif %}
-	<a class="cf-user-{{ color }}" href="http://codeforces.com/profile/{{ handle }}">{{ handle }}</a>
+  {%   if rating >= 2200 %}
+    {% set color = "red" %}
+  {% elif rating >= 1900 %}
+    {% set color = "orange" %}
+  {% elif rating >= 1700 %}
+    {% set color = "purple" %}
+  {% elif rating >= 1500 %}
+    {% set color = "blue" %}
+  {% elif rating >= 1200 %}
+    {% set color = "green" %}
+  {% else %}
+    {% set color = "gray" %}
+  {% endif %}
+  <a class="cf-user-{{ color }}" href="http://codeforces.com/profile/{{ handle }}">{{ handle }}</a>
 {%- endmacro -%}
-
 
 {%- macro cf_rating(change, contest_id, align="left") -%}
-	{% if change >= 0 %}
-		<a href="http://codeforces.com/contest/{{ contest_id }}" class="rating-up" style="text-align:{{ align }}">+{{ change }}</a>
-	{% else %}
-		<a href="http://codeforces.com/contest/{{ contest_id }}" class="rating-down" style="text-align:{{ align }}">{{ change }}</a>
-	{% endif %}
+  {% if change >= 0 %}
+    <a href="http://codeforces.com/contest/{{ contest_id }}" class="rating-up" style="text-align:{{ align }}">+{{ change }}</a>
+  {% else %}
+    <a href="http://codeforces.com/contest/{{ contest_id }}" class="rating-down" style="text-align:{{ align }}">{{ change }}</a>
+  {% endif %}
 {%- endmacro -%}
-
 
 {%- macro tc_user(handle, rating, id) -%}
-	{%   if rating >= 2200 %}
-		{% set color = "red" %}
-	{% elif rating >= 1500 %}
-		{% set color = "yellow" %}
-	{% elif rating >= 1200 %}
-		{% set color = "blue" %}
-	{% elif rating >= 900 %}
-		{% set color = "green" %}
-	{% else %}
-		{% set color = "gray" %}
-	{% endif %}
-	<a class="tc-user-{{ color }}" href="http://community.topcoder.com/tc?module=MemberProfile&tab=alg&cr={{ id }}">{{ handle }}</a>
+  {%   if rating >= 2200 %}
+    {% set color = "red" %}
+  {% elif rating >= 1500 %}
+    {% set color = "yellow" %}
+  {% elif rating >= 1200 %}
+    {% set color = "blue" %}
+  {% elif rating >= 900 %}
+    {% set color = "green" %}
+  {% else %}
+    {% set color = "gray" %}
+  {% endif %}
+  <a class="tc-user-{{ color }}" href="http://community.topcoder.com/tc?module=MemberProfile&tab=alg&cr={{ id }}">{{ handle }}</a>
 {%- endmacro -%}
 
-
 {%- macro tc_rating(change, contest_id, coder_id, align="left") -%}
-	{% if change >= 0 %}
-		<a href="http://community.topcoder.com/stat?c=coder_room_stats&cr={{ coder_id }}&rd={{ contest_id }}" class="rating-up" style="text-align:{{ align }}">+{{ change }}</a>
-	{% else %}
-		<a href="http://community.topcoder.com/stat?c=coder_room_stats&cr={{ coder_id }}&rd={{ contest_id }}" class="rating-down" style="text-align:{{ align }}">{{ change }}</a>
-	{% endif %}
+  {% if change >= 0 %}
+    <a href="http://community.topcoder.com/stat?c=coder_room_stats&cr={{ coder_id }}&rd={{ contest_id }}" class="rating-up" style="text-align:{{ align }}">+{{ change }}</a>
+  {% else %}
+    <a href="http://community.topcoder.com/stat?c=coder_room_stats&cr={{ coder_id }}&rd={{ contest_id }}" class="rating-down" style="text-align:{{ align }}">{{ change }}</a>
+  {% endif %}
 {%- endmacro -%}

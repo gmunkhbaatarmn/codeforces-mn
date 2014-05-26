@@ -4,49 +4,49 @@
 {% set menu = "contests" %}
 
 {% block content %}
-	<div class="problem-statement">
-		<h1>{{ letter }}. {{ problem.name }}</h1>
-		<h3><strong>хугацааны хязгаарлалт</strong> {{ problem["time-limit"] }}</h3>
-		<h3><strong>санах ойн хязгаарлалт</strong> {{ problem["memory-limit"] }}</h3>
-		<h3><strong>оролт</strong> {{ problem["input-file"].replace("standard input", "стандарт оролт") }}</h3>
-		<h3><strong>гаралт</strong> {{ problem["output-file"].replace("standard output", "стандарт гаралт") }}</h3>
+  <div class="problem-statement">
+    <h1>{{ letter }}. {{ problem.name }}</h1>
+    <h3><strong>хугацааны хязгаарлалт</strong> {{ problem["time-limit"] }}</h3>
+    <h3><strong>санах ойн хязгаарлалт</strong> {{ problem["memory-limit"] }}</h3>
+    <h3><strong>оролт</strong> {{ problem["input-file"].replace("standard input", "стандарт оролт") }}</h3>
+    <h3><strong>гаралт</strong> {{ problem["output-file"].replace("standard output", "стандарт гаралт") }}</h3>
 
-		<div>
-			{{ problem.content|safe }}
-		</div>
+    <div>
+      {{ problem.content|safe }}
+    </div>
 
-		<h2>Оролт</h2>
-		{{ problem.inputs|safe }}
+    <h2>Оролт</h2>
+    {{ problem.inputs|safe }}
 
-		<h2>Гаралт</h2>
-		{{ problem.outputs|safe }}
+    <h2>Гаралт</h2>
+    {{ problem.outputs|safe }}
 
-		<p class="credit">Орчуулсан: {{ problem.credit }}</p>
+    <p class="credit">Орчуулсан: {{ problem.credit }}</p>
 
-		<h4>Жишээ тэстүүд</h4>
-		{% for sample in problem.samples %}
-			<div class="sample">
-				<h5>Оролт</h5>
-				<pre>{{ sample[0] }}</pre>
-				<h5>Гаралт</h5>
-				<pre>{{ sample[1] }}</pre>
-			</div>
-		{% endfor %}
+    <h4>Жишээ тэстүүд</h4>
+    {% for sample in problem.samples %}
+      <div class="sample">
+        <h5>Оролт</h5>
+        <pre>{{ sample[0] }}</pre>
+        <h5>Гаралт</h5>
+        <pre>{{ sample[1] }}</pre>
+      </div>
+    {% endfor %}
 
-		{% if problem.notes %}
-			<h2>Тэмдэглэл</h2>
-			{{ problem.notes|safe }}
-		{% endif %}
-	</div>
+    {% if problem.notes %}
+      <h2>Тэмдэглэл</h2>
+      {{ problem.notes|safe }}
+    {% endif %}
+  </div>
 {% endblock %}
 
 {% block sidebar %}
-	<div class="box">
-		<h2>Бодолт илгээх?</h2>
-		<div style="text-align:center">
-			Codeforces.com дээр бодолтоо шалгана уу.
-			<br>
-			<a href="http://codeforces.com/{{ contest }}/problem/{{ letter }}" class="external">Codeforces дээрх хаяг</a>
-		</div>
-	</div>
+  <div class="box">
+    <h2>Бодолт илгээх?</h2>
+    <div style="text-align:center">
+      Codeforces.com дээр бодолтоо шалгана уу.
+      <br>
+      <a href="http://codeforces.com/{{ contest }}/problem/{{ letter }}" class="external">Codeforces дээрх хаяг</a>
+    </div>
+  </div>
 {% endblock %}

@@ -4,45 +4,44 @@
 {% set menu = "contests" %}
 
 {% block content %}
-	<h1 class="table-title">Бодлогууд</h1>
-	<div class="table-container">
-		<table>
-			<tr>
-				<th style="width:3em">#</th>
-				<th>Нэр</th>
-				<th style="width:12em">Орчуулсан</th>
-			</tr>
-			{% for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:contest[2]] %}
-				<tr {{- loop.cycle(' class="dark"', "")|safe }}>
-					{% set code = contest_id ~ "-" ~ letter %}
-					{% if all_problem[code][1] %}
-						<td style="text-align:center"><a href="/contest/{{ contest_id }}/problem/{{ letter }}">{{ letter }}</a></td>
-						<td>
-							<a href="/contest/{{ contest_id }}/problem/{{ letter }}">{{ all_problem[code][1] }}</a>
-							<div style="float:right;font-size:11px;color:#888">{{ limit(letter) }}</div>
-						</td>
-						<td style="text-align:center;color:#666">{{ all_problem[code][2] }}</td>
-					{% else %}
-						<td style="text-align:center">{{ letter }}</td>
-						<td>
-							{{ all_problem[code][0] }}
-						</td>
-						<td style="text-align:center;color:#666"></td>
-					{% endif %}
-				</tr>
-			{% endfor %}
-		</table>
-	</div>
+  <h1 class="table-title">Бодлогууд</h1>
+  <div class="table-container">
+    <table>
+      <tr>
+        <th style="width:3em">#</th>
+        <th>Нэр</th>
+        <th style="width:12em">Орчуулсан</th>
+      </tr>
+      {% for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:contest[2]] %}
+        <tr {{- loop.cycle(' class="dark"', "")|safe }}>
+          {% set code = contest_id ~ "-" ~ letter %}
+          {% if all_problem[code][1] %}
+            <td style="text-align:center"><a href="/contest/{{ contest_id }}/problem/{{ letter }}">{{ letter }}</a></td>
+            <td>
+              <a href="/contest/{{ contest_id }}/problem/{{ letter }}">{{ all_problem[code][1] }}</a>
+              <div style="float:right;font-size:11px;color:#888">{{ limit(letter) }}</div>
+            </td>
+            <td style="text-align:center;color:#666">{{ all_problem[code][2] }}</td>
+          {% else %}
+            <td style="text-align:center">{{ letter }}</td>
+            <td>
+              {{ all_problem[code][0] }}
+            </td>
+            <td style="text-align:center;color:#666"></td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
 {% endblock %}
 
-
 {% block sidebar %}
-	<div class="box">
-		<div style="text-align:center">
-			<span style="color:#000;font-weight:bold">{{ contest[0].replace("(", "<br>(")|safe }}</span>
-			<br>
-			<br>
-			<a href="http://codeforces.com/contest/{{ id }}" class="external">Codeforces.com дээрх хаяг</a>
-		</div>
-	</div>
+  <div class="box">
+    <div style="text-align:center">
+      <span style="color:#000;font-weight:bold">{{ contest[0].replace("(", "<br>(")|safe }}</span>
+      <br>
+      <br>
+      <a href="http://codeforces.com/contest/{{ id }}" class="external">Codeforces.com дээрх хаяг</a>
+    </div>
+  </div>
 {% endblock %}
