@@ -94,148 +94,155 @@ class Error(View, webapp2.BaseHandlerAdapter):#1
                     return self.redirect(self.request.path + "/?" + self.request.query_string)
 
         return self.render("error-404.html")
-# endfold
+
+
+def handler(func):
+    class view(View):
+        get = func
+
+    return view
+
 
 # Views
 
-class Home(View):#1
-    def get(self):
-        return self.render("home.html")
+def home(self):
+    return self.render("home.html")
 
 
-class Status(View):#1
-    def get(self):
-        all_history=Data.fetch("All:history")
-
-        return self.render("status.html", all_history=all_history)
-
-
-class Problemset(View):#1
-    def get(self, page="1"):
-        return self.render("problemset.html",
-                           page=int(page),
-                           data=Data.fetch("All:problem"))
+def contests(self, page="1"):#1
+    return self.render("contests.html",
+                       page=int(page),
+                       all_contest=Data.fetch("All:contest") or [])
 
 
-class ProblemsetProblem(View):#1
-    def get(self, contest, letter, embed):
-        all_similar = Data.fetch("All:similar")
-        code = "%03d-%s" % (int(contest), letter)
+def contest(self, id):
+    all_contest = dict(Data.fetch("All:contest"))
+    all_problem = dict(Data.fetch("All:problem"))
+    all_similar = Data.fetch("All:similar")
+
+    for k, v in all_similar.items():
+        all_problem[v] = all_problem[k]
+
+    contest_id = "%03d" % int(id)
+    if not all_contest.get(contest_id):
+        return self.abort(404)
+
+    def limit(letter):
+        code = "%03d-%s" % (int(id), letter)
         for k, v in all_similar.items():
             if code == v:
                 code = k
-
         problem = Data.fetch("problem:%s" % code)
-        if not problem:
-            self.abort(404)
+        return "%s, %s" % (problem["time-limit"], problem["memory-limit"])
 
-        if embed == ".html":
-            return self.render("problem-embed.html", problem=problem, contest=contest, letter=letter)
-        return self.render("problem-problemset.html", problem=problem, contest=contest, letter=letter)
-
-
-class Contests(View):#1
-    def get(self, page="1"):
-        return self.render("contests.html",
-                           page=int(page),
-                           all_contest=Data.fetch("All:contest"))
+    return self.render("contest.html",
+                       id=id,
+                       limit=limit,
+                       all_problem=all_problem,
+                       contest_id=contest_id,
+                       contest=all_contest[contest_id])
 
 
-class Contest(View):#1
-    def get(self, id):
-        all_contest = dict(Data.fetch("All:contest"))
-        all_problem = dict(Data.fetch("All:problem"))
-        all_similar = Data.fetch("All:similar")
+def contest_problem(self, contest, letter, embed):
+    all_similar = Data.fetch("All:similar")
+    code = "%03d-%s" % (int(contest), letter)
+    for k, v in all_similar.items():
+        if code == v:
+            code = k
 
-        for k, v in all_similar.items():
-            all_problem[v] = all_problem[k]
+    problem = Data.fetch("problem:%s" % code)
+    if not problem:
+        self.abort(404)
 
-        contest_id = "%03d" % int(id)
-        if not all_contest.get(contest_id):
-            return self.abort(404)
-
-        def limit(letter):
-            code = "%03d-%s" % (int(id), letter)
-            for k, v in all_similar.items():
-                if code == v:
-                    code = k
-            problem = Data.fetch("problem:%s" % code)
-            return "%s, %s" % (problem["time-limit"], problem["memory-limit"])
-
-        return self.render("contest.html",
-                           id=id,
-                           limit=limit,
-                           all_problem=all_problem,
-                           contest_id=contest_id,
-                           contest=all_contest[contest_id])
+    if embed == ".html":
+        return self.render("problem-embed.html", problem=problem, contest=contest, letter=letter)
+    return self.render("problem-contest.html", problem=problem, contest=contest, letter=letter)
 
 
-class ContestProblem(View):#1
-    def get(self, contest, letter, embed):
-        all_similar = Data.fetch("All:similar")
-        code = "%03d-%s" % (int(contest), letter)
-        for k, v in all_similar.items():
-            if code == v:
-                code = k
+def status(self):
+    all_history=Data.fetch("All:history")
 
-        problem = Data.fetch("problem:%s" % code)
-        if not problem:
-            self.abort(404)
-
-        if embed == ".html":
-            return self.render("problem-embed.html", problem=problem, contest=contest, letter=letter)
-        return self.render("problem-contest.html", problem=problem, contest=contest, letter=letter)
+    return self.render("status.html", all_history=all_history)
 
 
-class Ratings(View):#1
-    def get(self):
-        return self.render("ratings.html")
+def problem_set(self, page="1"):
+    return self.render("problemset.html",
+                       page=int(page),
+                       data=Data.fetch("All:problem") or [])
 
 
-class Extension(View):#1
-    def get(self):
-        self.response.headers["Content-Type"] = "text/plain"
+def problemset_problem(self, contest, letter, embed):
+    all_similar = Data.fetch("All:similar")
+    code = "%03d-%s" % (int(contest), letter)
+    for k, v in all_similar.items():
+        if code == v:
+            code = k
 
-        all_problem = dict(Data.fetch("All:problem"))
-        all_similar = Data.fetch("All:similar")
-        all_contest = Data.fetch("All:contest")
-        contribution = Data.fetch("Rating:contribution")
+    problem = Data.fetch("problem:%s" % code)
+    if not problem:
+        self.abort(404)
 
-        for k, v in all_similar.items():
-            all_problem[v] = all_problem[k]
-
-        def nozero(x):
-            while x.startswith("0"):
-                x = x[1:]
-            return x
-
-        all_problem = sorted(filter(lambda x: x[1][1], all_problem.items()), key=lambda x: x[0])
-        self.response.write("|".join([nozero(i[0]) for i in all_problem]) + "\n")
-        self.response.write("|".join(["%s:%s/%s" % (i[0], i[1][1], i[1][2]) for i in all_contest]) + "\n")
-        self.response.write("|".join(["%s:%s" % (k, v) for k, v in contribution]) + "\n")
-        self.response.write("%s\n" % Data.fetch("Contribution:full"))
-# endfold1
+    if embed == ".html":
+        return self.render("problem-embed.html", problem=problem, contest=contest, letter=letter)
+    return self.render("problem-problemset.html", problem=problem, contest=contest, letter=letter)
 
 
-class Migrate(View):#1
-    def get(self):
-        try:
-            import migrate
-            Data.write("Rating:contribution", migrate.CONTRIBUTION)
-            Data.write("Contribution:done", len(filter(lambda x: x[1][1], migrate.ALL_PROBLEM)))
-            Data.write("Contribution:full", len(migrate.ALL_PROBLEM))
+def ratings(self):
+    return self.render("ratings.html")
 
-            Data.write("All:problem", migrate.ALL_PROBLEM)
-            Data.write("All:contest", migrate.ALL_CONTEST)
-            Data.write("All:similar", migrate.ALL_SIMILAR)
-            self.response.write("OK")
-        except ImportError:
-            logging.warning("No migrate.py file")
-            self.response.write("No migrate.py file")
+
+def extension(self):
+    self.response.headers["Content-Type"] = "text/plain"
+
+    all_problem = dict(Data.fetch("All:problem"))
+    all_similar = Data.fetch("All:similar")
+    all_contest = Data.fetch("All:contest")
+    contribution = Data.fetch("Rating:contribution")
+
+    for k, v in all_similar.items():
+        all_problem[v] = all_problem[k]
+
+    def nozero(x):
+        while x.startswith("0"):
+            x = x[1:]
+        return x
+
+    all_problem = sorted(filter(lambda x: x[1][1], all_problem.items()), key=lambda x: x[0])
+    self.response.write("|".join([nozero(i[0]) for i in all_problem]) + "\n")
+    self.response.write("|".join(["%s:%s/%s" % (i[0], i[1][1], i[1][2]) for i in all_contest]) + "\n")
+    self.response.write("|".join(["%s:%s" % (k, v) for k, v in contribution]) + "\n")
+    self.response.write("%s\n" % Data.fetch("Contribution:full"))
+
+# System views
+
+def migrate(self):
+    try:
+        import migrate
+        Data.write("Rating:contribution", migrate.CONTRIBUTION)
+        Data.write("Contribution:done", len(filter(lambda x: x[1][1], migrate.ALL_PROBLEM)))
+        Data.write("Contribution:full", len(migrate.ALL_PROBLEM))
+
+        Data.write("All:problem", migrate.ALL_PROBLEM)
+        Data.write("All:contest", migrate.ALL_CONTEST)
+        Data.write("All:similar", migrate.ALL_SIMILAR)
+        self.response.write("OK")
+    except ImportError:
+        logging.warning("No migrate.py file")
+        self.response.write("No migrate.py file")
+
+
+def codeforces(self):
+    Data.write("Rating:codeforces", _.cf_get_active_users())
+    self.response.write("OK")
+
+
+def topcoder(self):
+    Data.write("Ratings:topcoder", _.tc_get_active_users())
+    self.response.write("OK")
 
 
 class Hook(View):#1
-    """
+    """ Hook from github
     - Route /github-hook?key=[:KEY] => Github hook
     - Route /github-hook?run=[:KEY] => Taskqueue run (10 minute deadline)
 
@@ -342,41 +349,25 @@ class Hook(View):#1
         Data.write("All:history", all_history[-50:])
 
 
-class Codeforces(View):#1
-    def get(self):
-        Data.write("Rating:codeforces", _.cf_get_active_users())
-        self.response.write("OK")
-
-
-class Topcoder(View):#1
-    def get(self):
-        Data.write("Rating:topcoder", _.tc_get_active_users())
-        self.response.write("OK")
-# endfold
-
 
 app = webapp2.WSGIApplication([
-    ("/",                                       Home),
-    ("/status",                                 Status),
-    ("/contests",                               Contests),
-    ("/contests/page/(\d+)",                    Contests),
-
-    ("/contest/(\d+)",                          Contest),
-    ("/contest/(\d+)/problem/(\w+)(.html)?",    ContestProblem),
-
-    ("/problemset",                             Problemset),
-    ("/problemset/page/(\d+)",                  Problemset),
-
-    ("/problemset/problem/(\d+)/(\w+)(.html)?", ProblemsetProblem),
-    ("/ratings",                                Ratings),
-
-    ("/extension",                              Extension),
-
+    # Menu
+    ("/",                                       handler(home)),
+    ("/contests",                               handler(contests)),
+    ("/contests/page/(\d+)",                    handler(contests)),
+    ("/contest/(\d+)",                          handler(contest)),
+    ("/contest/(\d+)/problem/(\w+)(.html)?",    handler(contest_problem)),
+    ("/problemset",                             handler(problem_set)),
+    ("/problemset/page/(\d+)",                  handler(problem_set)),
+    ("/problemset/problem/(\d+)/(\w+)(.html)?", handler(problemset_problem)),
+    ("/ratings",                                handler(ratings)),
+    ("/status",                                 handler(status)),
+    ("/extension",                              handler(extension)),
     # System routes
+    ("/-/migrate",                              handler(migrate)),
+    ("/-/codeforces",                           handler(codeforces)),
+    ("/-/topcoder",                             handler(topcoder)),
     ("/github-hook",                            Hook),
-    ("/-/migrate",                              Migrate),
-    ("/-/codeforces",                           Codeforces),
-    ("/-/topcoder",                             Topcoder),
 ], debug=True, config={"webapp2_extras.sessions":{"secret_key":"epe9hoongi6Yeeghoo4iopein1Boh9"}})
 
 
