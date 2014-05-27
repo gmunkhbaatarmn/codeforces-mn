@@ -159,13 +159,7 @@ def contest_problem(self, contest, letter, embed):
     return self.render("problem-contest.html", problem=problem, contest=contest, letter=letter)
 
 
-def status(self):
-    all_history=Data.fetch("All:history")
-
-    return self.render("status.html", all_history=all_history)
-
-
-def problem_set(self, page="1"):
+def problemset(self, page="1"):
     return self.render("problemset.html",
                        page=int(page),
                        data=Data.fetch("All:problem") or [])
@@ -191,6 +185,15 @@ def ratings(self):
     return self.render("ratings.html")
 
 
+
+# System views
+
+def status(self):
+    all_history=Data.fetch("All:history")
+
+    return self.render("status.html", all_history=all_history)
+
+
 def extension(self):
     self.response.headers["Content-Type"] = "text/plain"
 
@@ -212,9 +215,6 @@ def extension(self):
     self.response.write("|".join(["%s:%s/%s" % (i[0], i[1][1], i[1][2]) for i in all_contest]) + "\n")
     self.response.write("|".join(["%s:%s" % (k, v) for k, v in contribution]) + "\n")
     self.response.write("%s\n" % Data.fetch("Contribution:full"))
-
-# System views
-
 def migrate(self):
     try:
         import migrate
@@ -351,22 +351,25 @@ class Hook(View):#1
 
 
 app = webapp2.WSGIApplication([
-    # Menu
+    # Home
     ("/",                                       handler(home)),
+    # Contests
     ("/contests",                               handler(contests)),
     ("/contests/page/(\d+)",                    handler(contests)),
     ("/contest/(\d+)",                          handler(contest)),
     ("/contest/(\d+)/problem/(\w+)(.html)?",    handler(contest_problem)),
-    ("/problemset",                             handler(problem_set)),
-    ("/problemset/page/(\d+)",                  handler(problem_set)),
+    # Problemset
+    ("/problemset",                             handler(problemset)),
+    ("/problemset/page/(\d+)",                  handler(problemset)),
     ("/problemset/problem/(\d+)/(\w+)(.html)?", handler(problemset_problem)),
+    # Rating
     ("/ratings",                                handler(ratings)),
-    ("/status",                                 handler(status)),
-    ("/extension",                              handler(extension)),
     # System routes
     ("/-/migrate",                              handler(migrate)),
     ("/-/codeforces",                           handler(codeforces)),
     ("/-/topcoder",                             handler(topcoder)),
+    ("/status",                                 handler(status)),
+    ("/extension",                              handler(extension)),
     ("/github-hook",                            Hook),
 ], debug=True, config={"webapp2_extras.sessions":{"secret_key":"epe9hoongi6Yeeghoo4iopein1Boh9"}})
 
