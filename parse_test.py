@@ -18,5 +18,9 @@ def test_contest():
     eq(_.contest(0), None)
 
 
+def test_problemset():
+    eq(_.problemset(19)[-1], ["1A", "Theatre Square"])
+
+
 if __name__ == "__main__":
     nose.main(defaultTest=__file__)
