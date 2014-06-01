@@ -33,11 +33,10 @@ def problemset(page=1):
     assert r.code == 200
 
     tree = lxml.html.fromstring(r.read())
+    rows = tree.xpath("//table[@class='problems']/tr")[1:]
 
-    codes = map(lambda x: x.text.strip(),
-                tree.xpath("//table[@class='problems']/tr/td[1]/a"))
-    names = map(lambda x: x.text.strip(),
-                tree.xpath("//table[@class='problems']/tr/td[2]/div[1]/a"))
+    codes = map(lambda x: x.xpath("./td[1]/a")[0].text.strip(), rows)
+    names = map(lambda x: x.xpath("./td[2]/div[1]/a")[0].text.strip(), rows)
 
     return map(lambda a, b: [a] + [b], codes, names)
 
