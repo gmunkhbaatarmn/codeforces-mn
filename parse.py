@@ -32,19 +32,39 @@ def problemset(page=1):
     r = urllib.urlopen("http://codeforces.com/problemset/page/%s" % page)
     assert r.code == 200
 
-    data = r.read()
-
-    tree = lxml.html.fromstring(data)
+    tree = lxml.html.fromstring(r.read())
 
     codes = map(lambda x: x.text.strip(),
                 tree.xpath("//table[@class='problems']/tr/td[1]/a"))
     names = map(lambda x: x.text.strip(),
                 tree.xpath("//table[@class='problems']/tr/td[2]/div[1]/a"))
 
-    problems = map(lambda a, b: [a] + [b], codes, names)
+    return map(lambda a, b: [a] + [b], codes, names)
 
-    return problems
+
+def contest_history(page=1):
+    " Past contests "
+    r = urllib.urlopen("http://codeforces.com/contests/page/%s" % page)
+    if r.url != "http://codeforces.com/contests/page/%s" % page:
+        # Active contest running
+        return
+
+    assert r.code == 200
+    assert r.url == "http://codeforces.com/contests/page/%s" % page
+
+    tree = lxml.html.fromstring(r.read())
+    rows = tree.xpath("//div[@class='contests-table']//table/tr")[1:]
+
+    index = map(lambda x: x.attrib["data-contestid"], rows)
+    names = map(lambda x: x.xpath("./td[1]")[0].text.strip(), rows)
+    start = map(lambda x: x.xpath("./td[2]")[0].text.strip(), rows)
+
+    return map(lambda a, b, c: [a] + [b] + [c], index, names, start)
+
+
+def contest_active(page=1):
+    pass
 
 
 if __name__ == "__main__":
-    print problemset(30)[-1]
+    print contest_history(2)
