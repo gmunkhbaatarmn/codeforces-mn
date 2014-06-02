@@ -237,7 +237,7 @@ def codeforces(self):
 
 
 def topcoder(self):
-    Data.write("Ratings:topcoder", _.tc_get_active_users())
+    Data.write("Rating:topcoder", _.tc_get_active_users())
     self.response.write("OK")
 
 
