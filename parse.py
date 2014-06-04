@@ -61,9 +61,5 @@ def contest_history(page=1):
     return map(lambda a, b, c: [a] + [b] + [c], index, names, start)
 
 
-def contest_active(page=1):
-    pass
-
-
 if __name__ == "__main__":
     print contest_history(2)
