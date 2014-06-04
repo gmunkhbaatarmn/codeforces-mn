@@ -9,22 +9,11 @@ body
   font-size 87.5%
   font-family Verdana, Arial, sans-serif;
 
-.hidden
-  display none
-
 #container
   margin 0 auto
   width 1200px
 
-.rating-up
-  color #008000
-  font-weight 600
-  text-decoration none
-.rating-down
-  color gray
-  font-weight 600
-  text-decoration none
-
+//:1 others
 .button
   color #fff
   background-color #5cb85c
@@ -42,43 +31,11 @@ body
 .button:hover
   background-color #47a447
   border-color #398439
-
-.recent
-  background #edfaff
-
 .external
   background url("../images/external.png") no-repeat 100% 1px
   padding-right 18px
-
-//:1 user color
-.user-red, .cf-user-red, .tc-user-red
-  color red !important
-  font-weight bold
-  text-decoration none
-.user-orange, .cf-user-orange
-  color #ff8c00 !important
-  font-weight bold
-  text-decoration none
-.cf-user-purple
-  color #a0a !important;
-  font-weight bold
-  text-decoration none
-.tc-user-yellow
-  color #ddcc00 !important
-  font-weight bold
-  text-decoration none
-.user-blue, .cf-user-blue, .tc-user-blue
-  color blue !important
-  font-weight bold
-  text-decoration none
-.user-green, .cf-user-green, .tc-user-green
-  color green !important
-  font-weight bold
-  text-decoration none
-.user-gray, .cf-user-gray, .tc-user-gray
-  color gray !important
-  font-weight bold
-  text-decoration none
+.hidden
+  display none
 
 //:1 header
 #header
@@ -352,6 +309,68 @@ body
   border-bottom 1px solid #888
 #content .problem-statement p
   line-height 1.5
+//:1 rating
+.rating-up
+  color #008000
+  font-weight 600
+  text-decoration none
+.rating-down
+  color gray
+  font-weight 600
+  text-decoration none
+.recent
+  background #edfaff
+//:1 user-{color}
+.user-red
+  color red !important
+  font-weight bold
+  text-decoration none
+.user-orange
+  color #ff8c00 !important
+  font-weight bold
+  text-decoration none
+.user-blue
+  color blue !important
+  font-weight bold
+  text-decoration none
+.user-green
+  color green !important
+  font-weight bold
+  text-decoration none
+.user-gray
+  color gray !important
+  font-weight bold
+  text-decoration none
+
+// colors - codeforces
+.cf-user-red
+  @extends .user-red
+.cf-user-orange
+  @extends .user-orange
+.cf-user-purple
+  color #a0a !important;
+  font-weight bold
+  text-decoration none
+.cf-user-blue
+  @extends .user-blue
+.cf-user-green
+  @extends .user-green
+.cf-user-gray
+  @extends .user-gray
+
+// color - topcoder
+.tc-user-red
+  @extends .user-red
+.tc-user-yellow
+  color #ddcc00 !important
+  font-weight bold
+  text-decoration none
+.tc-user-blue
+  @extends .user-blue
+.tc-user-green
+  @extends .user-green
+.tc-user-gray
+  @extends .user-gray
 
 //:1 footer
 #footer
