@@ -4,7 +4,7 @@
 {% set menu = "problemset" %}
 
 {% block content %}
-  <h1 class="table-title">Бүх бодлогууд ({{ data|length }})</h1>
+  <h1 class="table-title">Бүх бодлогууд ({{ count }})</h1>
   <div class="table-container">
     <table>
       <tr>
@@ -12,7 +12,14 @@
         <th style="border-right:0">Бодлогын нэр</th>
         <th style="width:16em"></th>
       </tr>
-      {% for t in reversed(data[(17-page) * 100:(18-page) * 100]) %}
+      {% for t in problems %}
+      {# for t in reversed(data[(17-page) * 100:(18-page) * 100]) #}
+        <tr {{- loop.cycle(' class="dark"', "")|safe }}>
+          <td style="text-align:center"><a href="{{ t.link }}">{{ t.code() }}</a></td>
+          <td style="border-right:0"><a href="{{ t.link }}">{{ t.title }}</a></td>
+          <td style="text-align:right;color:#666;font-size:11px">credits</td>
+        </tr>
+        {#
         <tr {{- loop.cycle(' class="dark"', "")|safe }}>
           {% if t[1][1] %}
             <td style="text-align:center"><a href="/problemset/problem/{{ nozero(t[0].replace("-", "/")) }}">{{ nozero(t[0].replace("-", "")) }}</a></td>
@@ -24,6 +31,7 @@
             <td style="text-align:center;color:#666"></td>
           {% endif %}
         </tr>
+        #}
       {% endfor %}
     </table>
   </div>
