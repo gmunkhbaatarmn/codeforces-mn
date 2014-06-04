@@ -1,81 +1,38 @@
-import json
-from natrix import wsgi_app, db, memcache
-import magic as _
+from natrix import app, route, data, _
 
 
-class Data(db.Model):
-    " Data.write, Data.fetch "
-    name = db.StringProperty()
-    value = db.TextProperty()
-
-    @classmethod
-    def fetch(cls, name, default=None):
-        value = memcache.get(name)
-        if value:
-            return json.loads(value)
-        c = cls.all().filter("name =", name).get()
-        if c:
-            memcache.set(name, c.value)
-            return json.loads(c.value)
-        return default
-
-    @classmethod
-    def write(cls, name, value):
-        data = json.dumps(value)
-        memcache.set(name, data)
-
-        c = cls.all().filter("name =", name).get() or cls(name=name)
-        c.value = data
-        c.save()
-
-    @classmethod
-    def erase(cls, name):
-        memcache.delete(name)
-        cls.all().filter("name =", name).delete()
+app.config["context"] = lambda x: {
+    "codeforces": data.fetch("Rating:codeforces", []),
+    "topcoder": data.fetch("Rating:topcoder", []),
+}
 
 
-# Handlers
+# --- Todo ---
 
-def home(x):
-    x.render("home.html")
-
-
-# --- Problemset ---
-
+@route("/problemset")
 def problemset(x, id="1"):
     x.response("OK")
 
 
-# === Problemset ===
+@route("/problemset/page/(\d+)")
+def problemset_paged(x, id="1"):
+    x.response("OK")
 
+
+# === Done ===
+
+@route("/")
+def home(x):
+    x.render("home.html")
+
+
+@route("/ratings")
 def ratings(x):
-    if x.request.path == "/-/ratings":
-        Data.write("Rating:codeforces", _.cf_get_active_users())
-        Data.write("Rating:topcoder", _.tc_get_active_users())
-        x.response("OK")
-
     x.render("ratings.html")
 
 
-routes = [
-    # Home
-    ("/",        home),
-    # Contests
-    # Problems
-    ("/problemset", problemset),
-    ("/problemset/page/(\d+)", problemset),
-    # ("/problemset/problem/(\d+)/(\w+)(.html)?", problemset_problem),
-    ("/-/problemset", problemset),
-    # Rating
-    ("/ratings", ratings),
-    ("/-/ratings", ratings),  # cron
-]
-
-config = {
-    "context": lambda self: {
-        "codeforces": Data.fetch("Rating:codeforces", []),
-        "topcoder": Data.fetch("Rating:topcoder", []),
-    }
-}
-
-app = wsgi_app(routes, config)
+@route("/-/ratings")
+def cron_ratings(x):
+    data.write("Rating:codeforces", _.cf_get_active_users())
+    data.write("Rating:topcoder", _.tc_get_active_users())
+    x.response("OK")
