@@ -14,9 +14,7 @@ def context(self):
 
 @route("/problemset")
 def problemset_index(x, id="1"):
-    problems = Problem.all().order("-contest_id").\
-        order("-problem_id").fetch(100)
-
+    problems = Problem.all().order("-code").fetch(100)
     count = Problem.all().count()
 
     x.render("problemset-index.html", problems=problems,
@@ -25,9 +23,7 @@ def problemset_index(x, id="1"):
 
 @route("/problemset/page/(\d+)")
 def problemset(x, id="1"):
-    problems = Problem.all().order("-contest_id").\
-        order("-problem_id").fetch(100)
-
+    problems = Problem.all().order("-code").fetch(100)
     count = Problem.all().count()
 
     x.render("problemset-index.html", problems=problems,
@@ -39,12 +35,11 @@ def migrate(x):
     d = json.loads(open("data.json").read())
 
     for p in d:
-        pr = Problem(contest_id=int(p[0]),
-                     problem_id=p[1],
-                     title=p[2],
-                     content=p[5],
-                     markdown=p[3],
-                     credits=p[4])
+        pr = Problem(code=p[0],
+                     title=p[1],
+                     content=p[4],
+                     markdown=p[2],
+                     credits=p[3])
         pr.save()
 
     x.response("OK")

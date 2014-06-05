@@ -15,7 +15,7 @@
       {% for t in problems %}
       {# for t in reversed(data[(17-page) * 100:(18-page) * 100]) #}
         <tr {{- loop.cycle(' class="dark"', "")|safe }}>
-          <td style="text-align:center"><a href="{{ t.link }}">{{ t.code() }}</a></td>
+          <td style="text-align:center"><a href="{{ t.link }}">{{ t.code }}</a></td>
           <td style="border-right:0"><a href="{{ t.link }}">{{ t.title }}</a></td>
           <td style="text-align:right;color:#666;font-size:11px">{{ t.credits }}</td>
         </tr>
