@@ -5,6 +5,7 @@ from models import Problem
 
 def context(self):
     return {
+        "int": int,
         "top": data.fetch("Rating:contribution", []),
         "codeforces": data.fetch("Rating:codeforces", []),
         "topcoder": data.fetch("Rating:topcoder", []),
@@ -14,8 +15,8 @@ def context(self):
 # --- Todo ---
 
 @route("/problemset")
-def problemset_index(x, id="1"):
-    offset = 100 * (int(id) - 1)
+def problemset_index(x, page="1"):
+    offset = 100 * (int(page) - 1)
 
     problems = Problem.all().order("-code").fetch(100, offset=offset)
     count = Problem.all().count(10000)
@@ -24,8 +25,8 @@ def problemset_index(x, id="1"):
 
 
 @route("/problemset/page/(\d+)")
-def problemset(x, id):
-    offset = 100 * (int(id) - 1)
+def problemset(x, page):
+    offset = 100 * (int(page) - 1)
 
     problems = Problem.all().order("-code").fetch(100, offset=offset)
     count = Problem.all().count(10000)
