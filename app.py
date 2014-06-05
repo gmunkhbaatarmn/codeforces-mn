@@ -15,20 +15,45 @@ def context(self):
 
 @route("/problemset")
 def problemset_index(x, id="1"):
-    problems = Problem.all().order("-code").fetch(100)
-    count = Problem.all().count()
+    offset = 100 * (int(id) - 1)
 
-    x.render("problemset-index.html", problems=problems,
-             count=count)
+    problems = Problem.all().order("-code").fetch(100, offset=offset)
+    count = Problem.all().count(10000)
+
+    x.render("problemset-index.html", locals())
 
 
 @route("/problemset/page/(\d+)")
-def problemset(x, id="1"):
-    problems = Problem.all().order("-code").fetch(100)
-    count = Problem.all().count()
+def problemset(x, id):
+    offset = 100 * (int(id) - 1)
 
-    x.render("problemset-index.html", problems=problems,
-             count=count)
+    problems = Problem.all().order("-code").fetch(100, offset=offset)
+    count = Problem.all().count(10000)
+
+    x.render("problemset-index.html", locals())
+
+
+@route("/problemset/update")
+def problemset_update(x):
+    from parse import problemset
+    from logging import warning
+
+    for page in range(1, 21)[::-1]:
+        warning("page: %s" % page)
+
+        for attempt in range(10):
+            try:
+                data = problemset(page)
+                break
+            except:
+                print "Attempt: %s" % attempt
+                pass
+
+        for p in data:
+            Problem(
+                code="%3s-%s" % (p[0][:-1], p[0][-1]),
+                title=p[1],
+            ).save()
 
 
 @route("/migrate")
@@ -43,7 +68,8 @@ def migrate(x):
         for t in translators:
             datas[t] = datas.get(t, 0.0) + 1.0 / len(translators)
 
-    data.write("Rating:contribution", sorted(datas.items(), key=lambda t: -t[1]))
+    contribution = sorted(datas.items(), key=lambda t: -t[1])
+    data.write("Rating:contribution", contribution)
 
     for p in d:
         pr = Problem(code=p[0],
