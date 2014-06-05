@@ -5,6 +5,7 @@ from models import Problem
 
 def context(self):
     return {
+        "top": data.fetch("Rating:contribution", []),
         "codeforces": data.fetch("Rating:codeforces", []),
         "topcoder": data.fetch("Rating:topcoder", []),
     }
@@ -33,6 +34,16 @@ def problemset(x, id="1"):
 @route("/migrate")
 def migrate(x):
     d = json.loads(open("data.json").read())
+
+    datas = {}
+
+    for p in d:
+        translators = p[3].split(", ")
+
+        for t in translators:
+            datas[t] = datas.get(t, 0.0) + 1.0 / len(translators)
+
+    data.write("Rating:contribution", sorted(datas.items(), key=lambda t: -t[1]))
 
     for p in d:
         pr = Problem(code=p[0],
