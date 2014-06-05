@@ -62,8 +62,8 @@ def ratings(x):
     x.render("ratings.html")
 
 
-@route("/-/ratings")
-def cron_ratings(x):
+@route("/ratings/update")
+def ratings_update(x):
     data.write("Rating:codeforces", cf_get_active_users())
     data.write("Rating:topcoder", tc_get_active_users())
     x.response("OK")
