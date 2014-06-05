@@ -42,12 +42,12 @@ def migrate(x):
         pr = Problem(contest_id=int(p[0]),
                      problem_id=p[1],
                      title=p[2],
-                     content=p[4],
-                     markdown=p[3])
+                     content=p[5],
+                     markdown=p[3],
+                     credits=p[4])
         pr.save()
 
     x.response("OK")
-
 
 
 # === Done ===
