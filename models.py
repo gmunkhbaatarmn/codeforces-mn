@@ -11,3 +11,11 @@ class Problem(db.Model):
     @property
     def link(self):
         return "/problemset/problem/%s" % self.code.replace("-", "/")
+
+    @classmethod
+    def find(cls, **kwargs):
+        q = cls.all()
+        for k, v in kwargs.items():
+            q.filter("%s =" % k, v)
+
+        return q.get()

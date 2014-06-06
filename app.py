@@ -1,6 +1,7 @@
 from natrix import app, route, data, json
 from magics import cf_get_active_users, tc_get_active_users
 from models import Problem
+from logging import warning; warning
 
 
 def context(self):
@@ -57,7 +58,7 @@ def problemset_update(x):
             ).save()
 
 
-@route("/migrate")
+@route("/problemset/migrate")
 def migrate(x):
     d = json.loads(open("data.json").read())
 
@@ -72,12 +73,22 @@ def migrate(x):
     contribution = sorted(datas.items(), key=lambda t: -t[1])
     data.write("Rating:contribution", contribution)
 
+    def correct(code):
+        r = ""
+        while code.startswith("0"):
+            r += " "
+            code = code[1:]
+
+        return r + code
+
     for p in d:
-        pr = Problem(code=p[0],
-                     title=p[1],
-                     content=p[4],
-                     markdown=p[2],
-                     credits=p[3])
+        code = correct(p[0])
+
+        pr = Problem.find(code=code) or Problem(code=code)
+        pr.title = p[1]
+        pr.content = p[4]
+        pr.markdown = p[2]
+        pr.credits = p[3]
         pr.save()
 
     x.response("OK")
