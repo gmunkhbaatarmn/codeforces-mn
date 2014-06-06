@@ -15,23 +15,18 @@
       {% for t in problems %}
       {# for t in reversed(data[(17-page) * 100:(18-page) * 100]) #}
         <tr {{- loop.cycle(' class="dark"', "")|safe }}>
-          <td style="text-align:center"><a href="{{ t.link }}">{{ t.code.replace("-", "") }}</a></td>
-          <td style="border-right:0"><a href="{{ t.link }}">{{ t.title }}</a></td>
-          <td style="text-align:right;color:#666;font-size:11px">{{ t.credits }}</td>
-        </tr>
-        {#
-        <tr {{- loop.cycle(' class="dark"', "")|safe }}>
-          {% if t[1][1] %}
-            <td style="text-align:center"><a href="/problemset/problem/{{ nozero(t[0].replace("-", "/")) }}">{{ nozero(t[0].replace("-", "")) }}</a></td>
-            <td style="border-right:0"><a href="/problemset/problem/{{ nozero(t[0].replace("-", "/")) }}">{{ nozero(t[1][1]) }}</a></td>
-            <td style="text-align:right;color:#666;font-size:11px">{{ t[1][2] }}</td>
+          {% if t.credits %}
+            {# translated #}
+            <td style="text-align:center"><a href="{{ t.link }}">{{ t.code.replace("-", "") }}</a></td>
+            <td style="border-right:0"><a href="{{ t.link }}">{{ t.title }}</a></td>
+            <td style="text-align:right;color:#666;font-size:11px">{{ t.credits }}</td>
           {% else %}
-            <td style="text-align:center"><a href="http://codeforces.com/problemset/problem/{{ nozero(t[0].replace("-", "/")) }}">{{ nozero(t[0].replace("-", "")) }}</a></td>
-            <td style="border-right:0">{{ t[1][0] }}</td>
+            {# not yet translated #}
+            <td style="text-align:center"><a href="{{ t.link }}">{{ t.code.replace("-", "") }}</a></td>
+            <td style="border-right:0">{{ t.title }}</td>
             <td style="text-align:center;color:#666"></td>
           {% endif %}
         </tr>
-        #}
       {% endfor %}
     </table>
   </div>
