@@ -1,7 +1,9 @@
 from natrix import app, route, data, json
 from magics import cf_get_active_users, tc_get_active_users
 from models import Problem
-from logging import warning; warning
+from logging import warning
+
+warning
 
 
 def context(self):
@@ -14,6 +16,18 @@ def context(self):
 
 
 # --- Todo ---
+
+@route("/contests")
+def contests_index(x):
+    x.render("contest-index.html")#, locals())
+
+
+# === Done ===
+
+@route("/")
+def home(x):
+    x.render("home.html")
+
 
 @route("/problemset")
 def problemset_index(x, page="1"):
@@ -52,10 +66,10 @@ def problemset_update(x):
                 pass
 
         for p in data:
-            Problem(
-                code="%3s-%s" % (p[0][:-1], p[0][-1]),
-                title=p[1],
-            ).save()
+            pr = Problem()
+            pr.code = "%3s-%s" % (p[0][:-1], p[0][-1])
+            pr.title = p[1]
+            pr.save()
 
 
 @route("/problemset/migrate")
@@ -92,14 +106,6 @@ def migrate(x):
         pr.save()
 
     x.response("OK")
-
-
-# === Done ===
-
-@route("/")
-def home(x):
-    x.render("home.html")
-
 
 @route("/ratings")
 def ratings(x):
