@@ -5,7 +5,6 @@ from logging import warning
 
 warning
 
-
 def context(self):
     return {
         "int": int,
@@ -16,81 +15,31 @@ def context(self):
 
 
 # --- Todo ---
-
-@route("/contests")
-def contests_index(x, page="1"):
-    offset = 100 * (int(page) - 1)
-
-    contests = Contest.all().order("-id").fetch(100, offset=offset)
-    count = Contest.all().count(1000)
-
-    x.render("contest-index.html", locals())
-
-
-@route("/contests/page/(\d+)")
-def contests_paged(x, page):
-    offset = 100 * (int(page) - 1)
-
-    contests = Contest.all().order("-id").fetch(100, offset=offset)
-    count = Contest.all().count(1000)
-
-    x.render("contest-index.html", locals())
-
-
-@route("/contests/update")
-def contests_update(x):
+@route("/setup")
+def setup(x):
+    # Contests
     from parse import contest_history
     from logging import warning
-    # from natrix import db;db.delete(Contest.all())
 
     for page in range(1, 6)[::-1]:
         warning("page: %s" % page)
 
         for attempt in range(10):
             try:
-                data = contest_history(page)
+                datas = contest_history(page)
                 break
             except:
                 print "Attempt: %s" % attempt
                 pass
 
-        for i in data:
+        for i in datas:
             c = Contest()
             c.id = int(i[0])
             c.name = i[1]
             c.start = i[2]
             c.save()
 
-
-# === Done ===
-
-@route("/")
-def home(x):
-    x.render("home.html")
-
-
-@route("/problemset")
-def problemset_index(x, page="1"):
-    offset = 100 * (int(page) - 1)
-
-    problems = Problem.all().order("-code").fetch(100, offset=offset)
-    count = Problem.all().count(10000)
-
-    x.render("problemset-index.html", locals())
-
-
-@route("/problemset/page/(\d+)")
-def problemset_paged(x, page):
-    offset = 100 * (int(page) - 1)
-
-    problems = Problem.all().order("-code").fetch(100, offset=offset)
-    count = Problem.all().count(10000)
-
-    x.render("problemset-index.html", locals())
-
-
-@route("/problemset/update")
-def problemset_update(x):
+    # Problems
     from parse import problemset
     from logging import warning
 
@@ -99,21 +48,19 @@ def problemset_update(x):
 
         for attempt in range(10):
             try:
-                data = problemset(page)
+                datas = problemset(page)
                 break
             except:
                 print "Attempt: %s" % attempt
                 pass
 
-        for p in data:
+        for p in datas:
             pr = Problem()
             pr.code = "%3s-%s" % (p[0][:-1], p[0][-1])
             pr.title = p[1]
             pr.save()
 
-
-@route("/problemset/migrate")
-def migrate(x):
+    # Problems migrate
     d = json.loads(open("data-problems.json").read())
 
     datas = {}
@@ -145,7 +92,58 @@ def migrate(x):
         pr.credits = p[3]
         pr.save()
 
+    # Ratings
+    data.write("Rating:codeforces", cf_get_active_users())
+    data.write("Rating:topcoder", tc_get_active_users())
+
     x.response("OK")
+
+
+# === Done ===
+
+@route("/")
+def home(x):
+    x.render("home.html")
+
+
+@route("/contests")
+def contests_index(x, page="1"):
+    offset = 100 * (int(page) - 1)
+
+    contests = Contest.all().order("-id").fetch(100, offset=offset)
+    count = Contest.all().count(1000)
+
+    x.render("contest-index.html", locals())
+
+
+@route("/contests/page/(\d+)")
+def contests_paged(x, page):
+    offset = 100 * (int(page) - 1)
+
+    contests = Contest.all().order("-id").fetch(100, offset=offset)
+    count = Contest.all().count(1000)
+
+    x.render("contest-index.html", locals())
+
+
+@route("/problemset")
+def problemset_index(x, page="1"):
+    offset = 100 * (int(page) - 1)
+
+    problems = Problem.all().order("-code").fetch(100, offset=offset)
+    count = Problem.all().count(10000)
+
+    x.render("problemset-index.html", locals())
+
+
+@route("/problemset/page/(\d+)")
+def problemset_paged(x, page):
+    offset = 100 * (int(page) - 1)
+
+    problems = Problem.all().order("-code").fetch(100, offset=offset)
+    count = Problem.all().count(10000)
+
+    x.render("problemset-index.html", locals())
 
 
 @route("/ratings")
