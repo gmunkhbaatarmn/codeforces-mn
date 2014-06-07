@@ -18,9 +18,22 @@ def context(self):
 # --- Todo ---
 
 @route("/contests")
-def contests_index(x):
-    all_count = Contest.all().count()
-    contests = Contest.all().order("-id").fetch(100)
+def contests_index(x, page="1"):
+    offset = 100 * (int(page) - 1)
+
+    contests = Contest.all().order("-id").fetch(100, offset=offset)
+    count = Contest.all().count(1000)
+
+    x.render("contest-index.html", locals())
+
+
+@route("/contests/page/(\d+)")
+def contests_paged(x, page):
+    offset = 100 * (int(page) - 1)
+
+    contests = Contest.all().order("-id").fetch(100, offset=offset)
+    count = Contest.all().count(1000)
+
     x.render("contest-index.html", locals())
 
 
@@ -67,7 +80,7 @@ def problemset_index(x, page="1"):
 
 
 @route("/problemset/page/(\d+)")
-def problemset(x, page):
+def problemset_paged(x, page):
     offset = 100 * (int(page) - 1)
 
     problems = Problem.all().order("-code").fetch(100, offset=offset)
@@ -133,6 +146,7 @@ def migrate(x):
         pr.save()
 
     x.response("OK")
+
 
 @route("/ratings")
 def ratings(x):
