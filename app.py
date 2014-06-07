@@ -5,6 +5,7 @@ from logging import warning
 
 warning
 
+
 def context(self):
     return {
         "int": int,
@@ -15,6 +16,66 @@ def context(self):
 
 
 # --- Todo ---
+
+# === Done ===
+
+@route("/")
+def home(x):
+    x.render("home.html")
+
+
+@route("/contests")
+def contests_index(x, page="1"):
+    offset = 100 * (int(page) - 1)
+
+    contests = Contest.all().order("-id").fetch(100, offset=offset)
+    count = Contest.all().count(1000)
+
+    x.render("contest-index.html", locals())
+
+
+@route("/contests/page/(\d+)")
+def contests_paged(x, page):
+    offset = 100 * (int(page) - 1)
+
+    contests = Contest.all().order("-id").fetch(100, offset=offset)
+    count = Contest.all().count(1000)
+
+    x.render("contest-index.html", locals())
+
+
+@route("/problemset")
+def problemset_index(x, page="1"):
+    offset = 100 * (int(page) - 1)
+
+    problems = Problem.all().order("-code").fetch(100, offset=offset)
+    count = Problem.all().count(10000)
+
+    x.render("problemset-index.html", locals())
+
+
+@route("/problemset/page/(\d+)")
+def problemset_paged(x, page):
+    offset = 100 * (int(page) - 1)
+
+    problems = Problem.all().order("-code").fetch(100, offset=offset)
+    count = Problem.all().count(10000)
+
+    x.render("problemset-index.html", locals())
+
+
+@route("/ratings")
+def ratings(x):
+    x.render("ratings.html")
+
+
+@route("/ratings/update")
+def ratings_update(x):
+    data.write("Rating:codeforces", cf_get_active_users())
+    data.write("Rating:topcoder", tc_get_active_users())
+    x.response("OK")
+
+
 @route("/setup")
 def setup(x):
     # Contests
@@ -96,65 +157,6 @@ def setup(x):
     data.write("Rating:codeforces", cf_get_active_users())
     data.write("Rating:topcoder", tc_get_active_users())
 
-    x.response("OK")
-
-
-# === Done ===
-
-@route("/")
-def home(x):
-    x.render("home.html")
-
-
-@route("/contests")
-def contests_index(x, page="1"):
-    offset = 100 * (int(page) - 1)
-
-    contests = Contest.all().order("-id").fetch(100, offset=offset)
-    count = Contest.all().count(1000)
-
-    x.render("contest-index.html", locals())
-
-
-@route("/contests/page/(\d+)")
-def contests_paged(x, page):
-    offset = 100 * (int(page) - 1)
-
-    contests = Contest.all().order("-id").fetch(100, offset=offset)
-    count = Contest.all().count(1000)
-
-    x.render("contest-index.html", locals())
-
-
-@route("/problemset")
-def problemset_index(x, page="1"):
-    offset = 100 * (int(page) - 1)
-
-    problems = Problem.all().order("-code").fetch(100, offset=offset)
-    count = Problem.all().count(10000)
-
-    x.render("problemset-index.html", locals())
-
-
-@route("/problemset/page/(\d+)")
-def problemset_paged(x, page):
-    offset = 100 * (int(page) - 1)
-
-    problems = Problem.all().order("-code").fetch(100, offset=offset)
-    count = Problem.all().count(10000)
-
-    x.render("problemset-index.html", locals())
-
-
-@route("/ratings")
-def ratings(x):
-    x.render("ratings.html")
-
-
-@route("/ratings/update")
-def ratings_update(x):
-    data.write("Rating:codeforces", cf_get_active_users())
-    data.write("Rating:topcoder", tc_get_active_users())
     x.response("OK")
 
 
