@@ -4,25 +4,26 @@
 {% set menu = "contests" %}
 
 {% block content %}
-  {#
-  <h1 class="table-title">Тэмцээнүүд ({{ all_contest|length }})</h1>
+  <h1 class="table-title">Тэмцээнүүд ({{ all_count }})</h1>
   <div class="table-container">
     <table>
       <tr>
         <th>Нэр</th>
-        <th style="width:5em">Огноо</th>
+        <th style="width:5em">Орчуулагдсан</th>
         <th style="width:9em"></th>
       </tr>
-      {% for c in reversed(all_contest[(4-page) * 100:(5-page) * 100]) %}
+      {% for c in contests %}
         <tr {{- loop.cycle(' class="dark"', "")|safe }}>
-          <td style="text-align:center"><a href="/contest/{{ nozero(c[0]) }}">{{ c[1][0] }}</a></td>
-          <td style="text-align:center{{- ";background:#e6ffdb"|safe if c[1][1] == c[1][2] }}">{{ c[1][1] }} / {{ c[1][2] }}</td>
-          <td style="text-align:center"><a href="http://codeforces.com/contest/{{ nozero(c[0]) }}/standings/friends/true" class="external">Эцсийн дүн</a></td>
+          <td style="text-align:center"><a href="/contest/{{ c.id }}">{{ c.name.replace("<br>", " ") }}</a></td>
+          <td></td>
+          {# <td style="text-align:center{{- ";background:#e6ffdb"|safe if c[1][1] == c[1][2] }}">{{ c[1][1] }} / {{ c[1][2] }}</td> #}
+          <td style="text-align:center"><a href="http://codeforces.com/contest/{{ c.id }}/standings/friends/true" class="external">Эцсийн дүн</a></td>
         </tr>
       {% endfor %}
     </table>
   </div>
 
+  {#
   <div class="pagination">
     <ul>
       {% for p in range(1, 5) %}

@@ -1,6 +1,6 @@
 from natrix import app, route, data, json
 from magics import cf_get_active_users, tc_get_active_users
-from models import Problem
+from models import Problem, Contest
 from logging import warning
 
 warning
@@ -19,7 +19,34 @@ def context(self):
 
 @route("/contests")
 def contests_index(x):
-    x.render("contest-index.html")#, locals())
+    all_count = Contest.all().count()
+    contests = Contest.all().order("-id").fetch(100)
+    x.render("contest-index.html", locals())
+
+
+@route("/contests/update")
+def contests_update(x):
+    from parse import contest_history
+    from logging import warning
+    # from natrix import db;db.delete(Contest.all())
+
+    for page in range(1, 6)[::-1]:
+        warning("page: %s" % page)
+
+        for attempt in range(10):
+            try:
+                data = contest_history(page)
+                break
+            except:
+                print "Attempt: %s" % attempt
+                pass
+
+        for i in data:
+            c = Contest()
+            c.id = int(i[0])
+            c.name = i[1]
+            c.start = i[2]
+            c.save()
 
 
 # === Done ===
@@ -74,7 +101,7 @@ def problemset_update(x):
 
 @route("/problemset/migrate")
 def migrate(x):
-    d = json.loads(open("data.json").read())
+    d = json.loads(open("data-problems.json").read())
 
     datas = {}
 

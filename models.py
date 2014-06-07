@@ -19,3 +19,10 @@ class Problem(db.Model):
             q.filter("%s =" % k, v)
 
         return q.get()
+
+
+class Contest(db.Model):
+    id = db.IntegerProperty()
+    name = db.StringProperty()
+    start = db.StringProperty()
+    # duration = db.IntegerProperty()
