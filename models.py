@@ -1,16 +1,24 @@
 from natrix import db
+from markdown2 import markdown
 
 
 class Problem(db.Model):
     code = db.StringProperty()
     title = db.StringProperty()
-    content = db.TextProperty()
     markdown = db.TextProperty()
     credits = db.StringProperty()
 
     @property
     def link(self):
         return "/problemset/problem/%s" % self.code.replace("-", "/")
+
+    @property
+    def content(self):
+        return markdown(self.markdown, extras=["code-friendly"])
+
+    @property
+    def index(self):
+        return self.code.split("-")[1]
 
     @classmethod
     def find(cls, **kwargs):

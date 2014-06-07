@@ -1,9 +1,7 @@
 from natrix import app, route, data, json
 from magics import cf_get_active_users, tc_get_active_users
 from models import Problem, Contest
-from logging import warning
-
-warning
+from logging import warning;warning
 
 
 def context(self):
@@ -62,6 +60,27 @@ def problemset_paged(x, page):
     count = Problem.all().count(10000)
 
     x.render("problemset-index.html", locals())
+
+
+@route("/problemset/problem/(\d+)/(\w+)")
+def problemset_problem(x, contest_id, index):
+    problem = Problem.find(code="%s-%s" % (contest_id, index))
+
+    # if not problem:
+    #     x.abort(404)
+
+    x.render("problemset-problem.html", locals())
+    # all_similar = Data.fetch("All:similar")
+    # code = "%03d-%s" % (int(contest), letter)
+    # for k, v in all_similar.items():
+    #     if code == v:
+    #         code = k
+    #
+    # problem = Data.fetch("problem:%s" % code)
+    # if not problem:
+    #     self.abort(404)
+    # x.render("problemset-problem.html")
+    # problem=problem, contest=contest, letter=letter)
 
 
 @route("/ratings")
