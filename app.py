@@ -77,7 +77,7 @@ def problemset_paged(x, page):
 
 @route("/problemset/problem/(\d+)/(\w+)")
 def problemset_problem(x, contest_id, index):
-    problem = Problem.find(code="%s-%s" % (contest_id, index))
+    problem = Problem.find(code="%3s-%s" % (contest_id, index))
 
     # if not problem:
     #     x.abort(404)

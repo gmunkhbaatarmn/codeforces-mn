@@ -11,7 +11,7 @@ class Problem(db.Model):
 
     @property
     def link(self):
-        return "/problemset/problem/%s" % self.code.replace("-", "/")
+        return "/problemset/problem/%s" % self.code.replace("-", "/").strip()
 
     @property
     def link_contest(self):
