@@ -23,29 +23,36 @@ def home(x):
 
 
 @route("/contests")
-def contests_index(x, page="1"):
+def contest_list(x, page="1"):
     offset = 100 * (int(page) - 1)
 
     contests = Contest.all().order("-id").fetch(100, offset=offset)
     count = Contest.all().count(1000)
 
-    x.render("contest-index.html", locals())
+    x.render("contest-list.html", locals())
 
 
 @route("/contests/page/(\d+)")
-def contests_paged(x, page):
+def contest_list_paged(x, page):
     offset = 100 * (int(page) - 1)
 
     contests = Contest.all().order("-id").fetch(100, offset=offset)
     count = Contest.all().count(1000)
 
-    x.render("contest-index.html", locals())
+    x.render("contest-list.html", locals())
 
 
 @route("/contest/(\d+)")
 def contest_dashboard(x, id):
     contest = Contest.find(id=int(id))
     x.render("contest-dashboard.html", locals())
+
+
+@route("/contest/(\d+)/problem/(\w+)")
+def contest_problem(x, contest_id, index):
+    problem = Problem.find(code="%3s-%s" % (contest_id, index))
+
+    x.render("contest-problem.html", locals())
 
 
 @route("/problemset")
