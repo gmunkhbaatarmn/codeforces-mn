@@ -12,7 +12,23 @@
         <th>Нэр</th>
         <th style="width:12em">Орчуулсан</th>
       </tr>
-      {% for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:contest[2]] %}
+      {% for p in contest.problems %}
+        <tr {{- loop.cycle(' class="dark"', "")|safe }}>
+          {% if p.credits %}
+            {# translated #}
+            <td style="text-align:center"><a href="{{ p.link_contest }}">{{ p.index }}</a></td>
+            <td><a href="{{ p.link_contest }}">{{ p.title }}</a></td>
+            <td style="text-align:center;color:#666">{{ p.credits }}</td>
+          {% else %}
+            {# not yet translated #}
+            <td style="text-align:center">{{ p.index }}</td>
+            <td>{{ p.title }}</td>
+            <td></td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+
+      {# for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:contest[2]] %}
         <tr {{- loop.cycle(' class="dark"', "")|safe }}>
           {% set code = contest_id ~ "-" ~ letter %}
           {% if all_problem[code][1] %}
@@ -30,7 +46,7 @@
             <td style="text-align:center;color:#666"></td>
           {% endif %}
         </tr>
-      {% endfor %}
+      {% endfor #}
     </table>
   </div>
 {% endblock %}
@@ -38,7 +54,7 @@
 {% block sidebar %}
   <div class="box">
     <div style="text-align:center">
-      <span style="color:#000;font-weight:bold">{{ contest[0].replace("(", "<br>(")|safe }}</span>
+      <span style="color:#000;font-weight:bold">{{ contest.name.replace("(", "<br>(")|safe }}</span>
       <br>
       <br>
       <a href="http://codeforces.com/contest/{{ id }}" class="external">Codeforces.com дээрх хаяг</a>

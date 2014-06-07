@@ -42,6 +42,12 @@ def contests_paged(x, page):
     x.render("contest-index.html", locals())
 
 
+@route("/contest/(\d+)")
+def contest_dashboard(x, id):
+    contest = Contest.find(id=int(id))
+    x.render("contest-dashboard.html", locals())
+
+
 @route("/problemset")
 def problemset_index(x, page="1"):
     offset = 100 * (int(page) - 1)
