@@ -12,14 +12,8 @@
     <h3><strong>гаралт</strong> {{ problem.meta.output.replace("standard output", "стандарт гаралт") }}</h3>
 
     <div>
-      {{ problem.content|safe }}
+      {{ problem.content.replace("<h3>Оролт</h3>", "<h2>Оролт</h2>").replace("<h3>Гаралт</h3>", "<h2>Гаралт</h2>")|safe }}
     </div>
-
-    <h2>Оролт</h2>
-    {# problem.inputs|safe #}
-
-    <h2>Гаралт</h2>
-    {# problem.outputs|safe #}
 
     <p class="credit">Орчуулсан: {{ problem.credits }}</p>
 
@@ -46,7 +40,7 @@
     <div style="text-align:center">
       Codeforces.com-руу орж бодолтоо шалгана уу.
       <br>
-      <a href="http://codeforces.com/problemset/problem/{{ problem.code.replace("-", "/") }}" class="external">Codeforces дээрх хаяг</a>
+      <a href="http://codeforces.com/problemset/problem/{{ problem.code.replace("-", "/").strip() }}" class="external">Codeforces дээрх хаяг</a>
     </div>
   </div>
 {% endblock %}
