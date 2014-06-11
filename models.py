@@ -1,4 +1,4 @@
-from natrix import db
+from natrix import db, json
 from markdown2 import markdown
 
 
@@ -8,6 +8,7 @@ class Problem(db.Model):
     markdown = db.TextProperty()
     credits = db.StringProperty()
     # in_problemset = db.BooleanProperty()
+    meta_json = db.TextProperty(default="{}")
 
     @property
     def link(self):
@@ -36,6 +37,10 @@ class Problem(db.Model):
             q.filter("%s =" % k, v)
 
         return q.get()
+
+    @property
+    def meta(self):
+        return json.loads(self.meta_json)
 
 
 class Contest(db.Model):

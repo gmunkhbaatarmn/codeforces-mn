@@ -15,6 +15,12 @@ def context(self):
 
 # --- Todo ---
 
+@route("/problemset/data")
+def problemset_data(x):
+    problems = Problem.all().order("-code")
+
+    x.response([p.code for p in problems], encode="json")
+
 # === Done ===
 
 @route("/")
@@ -115,14 +121,14 @@ def setup(x):
     from logging import warning
 
     for page in range(1, 6)[::-1]:
-        warning("page: %s" % page)
+        warning("Contests page: %s" % page)
 
         for attempt in range(10):
             try:
                 datas = contest_history(page)
                 break
             except:
-                print "Attempt: %s" % attempt
+                warning("Attempt: %s" % attempt)
                 pass
 
         for i in datas:
@@ -134,10 +140,9 @@ def setup(x):
 
     # Problems
     from parse import problemset
-    from logging import warning
 
     for page in range(1, 21)[::-1]:
-        warning("page: %s" % page)
+        warning("Problemset page: %s" % page)
 
         for attempt in range(10):
             try:
@@ -188,8 +193,19 @@ def setup(x):
     data.write("Rating:codeforces", cf_get_active_users())
     data.write("Rating:topcoder", tc_get_active_users())
 
-    x.redirect("/")
+    # x.redirect("/")
     x.response("OK")
+
+
+@route("/migrate")
+def migrate(x):
+    r = []
+    for code, meta in sorted(json.loads(open("problems-meta.json").read()).items()):
+        p = Problem.find(code=code)
+        p.meta_json = json.dumps(meta)
+        p.save()
+
+    x.response("\n".join(r))
 
 
 app.config["context"] = context
