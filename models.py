@@ -49,6 +49,12 @@ class Contest(db.Model):
     start = db.StringProperty()
     # duration = db.IntegerProperty()
 
+    translated_count = db.IntegerProperty(default=0)
+
+    @property
+    def problems_count(self):
+        return self.problems.count()
+
     @property
     def problems(self):
         query = Problem.all()

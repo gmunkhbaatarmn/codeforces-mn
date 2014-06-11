@@ -15,8 +15,7 @@
       {% for c in contests %}
         <tr {{- loop.cycle(' class="dark"', "")|safe }}>
           <td style="text-align:center"><a href="/contest/{{ c.id }}">{{ c.name.replace("<br>", " ") }}</a></td>
-          <td></td>
-          {# <td style="text-align:center{{- ";background:#e6ffdb"|safe if c[1][1] == c[1][2] }}">{{ c[1][1] }} / {{ c[1][2] }}</td> #}
+          <td style="text-align:center{{- ";background:#e6ffdb"|safe if c.translated_count == c.problems_count }}">{{ c.translated_count }} / {{ c.problems_count }}</td>
           <td style="text-align:center"><a href="http://codeforces.com/contest/{{ c.id }}/standings/friends/true" class="external">Эцсийн дүн</a></td>
         </tr>
       {% endfor %}
