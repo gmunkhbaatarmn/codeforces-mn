@@ -6,6 +6,10 @@ class Problem(db.Model):
     code = db.StringProperty()
     title = db.StringProperty()
     markdown = db.TextProperty()
+    # statement
+    # input
+    # output
+    # note
     credits = db.StringProperty()
     # in_problemset = db.BooleanProperty()
     meta_json = db.TextProperty(default="{}")

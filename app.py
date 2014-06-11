@@ -85,21 +85,14 @@ def problemset_paged(x, page):
 def problemset_problem(x, contest_id, index):
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
 
-    # if not problem:
-    #     x.abort(404)
-
     x.render("problemset-problem.html", locals())
-    # all_similar = Data.fetch("All:similar")
-    # code = "%03d-%s" % (int(contest), letter)
-    # for k, v in all_similar.items():
-    #     if code == v:
-    #         code = k
-    #
-    # problem = Data.fetch("problem:%s" % code)
-    # if not problem:
-    #     self.abort(404)
-    # x.render("problemset-problem.html")
-    # problem=problem, contest=contest, letter=letter)
+
+
+@route("/problemset/problem/(\d+)/(\w+)/edit")
+def problemset_translate(x, contest_id, index):
+    problem = Problem.find(code="%3s-%s" % (contest_id, index))
+
+    x.render("problemset-translate.html", locals())
 
 
 @route("/ratings")
