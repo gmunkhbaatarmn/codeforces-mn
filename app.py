@@ -180,7 +180,6 @@ def setup(x):
 
         pr = Problem.find(code=code) or Problem(code=code)
         pr.title = p[1]
-        pr.content = p[4]
         pr.markdown = p[2]
         pr.credits = p[3]
         pr.save()
@@ -189,6 +188,7 @@ def setup(x):
     data.write("Rating:codeforces", cf_get_active_users())
     data.write("Rating:topcoder", tc_get_active_users())
 
+    x.redirect("/")
     x.response("OK")
 
 
