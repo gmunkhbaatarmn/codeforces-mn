@@ -41,6 +41,24 @@ def problemset(page=1):
     return map(lambda a, b: [a] + [b], codes, names)
 
 
+def problem(code):
+    r = urllib.urlopen("http://codeforces.com/problemset/problem/%s" %
+                       code.replace("-", "/"))
+    tree = lxml.html.fromstring(r.read())
+
+    inputs = tree.xpath("//div[@class='input']/pre")
+    outputs = tree.xpath("//div[@class='output']/pre")
+
+    return {
+        "time": tree.xpath("//div[@class='time-limit']/text()")[0],
+        "memory": tree.xpath("//div[@class='memory-limit']/text()")[0],
+        "input": tree.xpath("//div[@class='input-file']/text()")[0],
+        "output": tree.xpath("//div[@class='output-file']/text()")[0],
+        "tests": zip(map(lambda e: "\n".join(e.xpath("./text()")), inputs),
+                     map(lambda e: "\n".join(e.xpath("./text()")), outputs)),
+    }
+
+
 def contest_history(page=1):
     " Past contests "
     r = urllib.urlopen("http://codeforces.com/contests/page/%s" % page)
@@ -62,4 +80,4 @@ def contest_history(page=1):
 
 
 if __name__ == "__main__":
-    print contest_history(2)
+    print problem("10-A")
