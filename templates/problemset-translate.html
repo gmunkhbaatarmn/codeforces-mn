@@ -6,15 +6,16 @@
 
 {% block content %}
   <div style="border:3px solid #e1e1e1; width:49%; float:left; border-radius:7px">
-    <div style="background:#e1e1e1; border-radius:4px 4px 0 0; height:30px; line-height:30px; padding:0 5px">
+    <div style="background:#e1e1e1; border-radius:4px 4px 0 0; height:30px; line-height:30px; padding:0 5px 8px 5px" id="toolbar">
       <a href="javascript:;">insert link</a>
       <a href="javascript:;">insert image</a>
+      <a href="javascript:;" onclick="javascript:focus_toggle(this);">focus mode</a>
       <div class="" style="float:right">
         <a href="">save</a>
       </div>
     </div>
 
-    <textarea style="font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:564px; resize:vertical; height:420px; border:0; outline:none; border-radius:7px; padding:5px">{{ problem.title }}
+    <textarea style="font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:100%; box-sizing:border-box; resize:vertical; border:0; outline:none; border-radius:7px; padding:5px; margin-top:-5px">{{ problem.title }}
 {{ "-" * (problem.title|length) }}
 
 ## Оролт
@@ -53,4 +54,38 @@
 
     <div style="clear:both"></div>
   </div>
+{% endblock %}
+
+
+{% block bottom %}
+  <style>
+    #toolbar a {
+      border: 1px solid #bbb;
+      color: #666;
+      text-decoration: none;
+      font-size: 12px;
+      padding: 3px 5px;
+      background: #eee;
+      border-radius: 3px;
+    }
+  </style>
+
+  <script src="/static/jquery.autosize.js"></script>
+  <script>
+    $("textarea").autosize();
+    focus_toggle = function(el) {
+      if ($("#header").is(":visible")) {
+        $('#header,#menu,#footer').toggle();
+        $("#container").css("width", "100%");
+        $("#content").css("margin-top", "1em");
+        $(el).css("background", "#e7ffe8").css("color", "#558555");
+      } else {
+        $('#header,#menu,#footer').toggle();
+        $("#container").css("width", "1200px");
+        $("#content").css("margin-top", "2em");
+        $(el).css("background", "#eee").css("color", "#666");
+      }
+      return false;
+    }
+  </script>
 {% endblock %}
