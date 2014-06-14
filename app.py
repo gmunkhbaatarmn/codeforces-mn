@@ -1,3 +1,5 @@
+from markdown2 import markdown
+from html2text import html2text
 from natrix import app, route, data, json
 from magics import cf_get_active_users, tc_get_active_users
 from models import Problem, Contest
@@ -10,6 +12,9 @@ def context(self):
         "top": data.fetch("Rating:contribution", []),
         "codeforces": data.fetch("Rating:codeforces", []),
         "topcoder": data.fetch("Rating:topcoder", []),
+        "markdown": lambda x: markdown(x, extras=["code-friendly"]),
+        "html2text": lambda x: html2text(x).replace("\n\n", "\0")\
+                .replace("\n", "").replace("\0", "\n\n"),
     }
 
 
@@ -20,6 +25,8 @@ def problemset_data(x):
     problems = Problem.all().order("-code")
 
     x.response([p.code for p in problems], encode="json")
+
+
 
 # === Done ===
 
@@ -134,7 +141,7 @@ def setup(x):
     # Problems
     from parse import problemset
 
-    for page in range(1, 21)[::-1]:
+    for page in range(20, 0, -1):
         warning("Problemset page: %s" % page)
 
         for attempt in range(10):
