@@ -1,3 +1,4 @@
+# coding: utf-8
 import re
 import lxml.html
 import urllib
@@ -46,16 +47,39 @@ def problem(code):
                        code.replace("-", "/"))
     tree = lxml.html.fromstring(r.read())
 
+    def html(e):
+        from lxml import etree
+        return "".join([etree.tostring(c) for c in e.iterdescendants()])
+
     inputs = tree.xpath("//div[@class='input']/pre")
     outputs = tree.xpath("//div[@class='output']/pre")
 
+    statement = html(tree.xpath("//div[@class='problem-statement']/div")[1])
+    input_text = html(tree.xpath("//div[@class='input-specification']")[0])
+    input_text = input_text.replace('<div class="section-title">Input</div>',
+                                    "<h2>Оролт</h2>")
+    statement += input_text
+
+    output_text = html(tree.xpath("//div[@class='output-specification']")[0])
+    output_text = input_text.replace('<div class="section-title">Output</div>',
+                                     "<h2>Гаралт</h2>")
+    statement += output_text
+
+    note = html(tree.xpath("//div[@class='note']")[0])
+    note = note.replace('<div class="section-title">Note</div>',
+                        "<h2>Тэмдэглэл</h2>"),
+
     return {
+        # meta fields
         "time": tree.xpath("//div[@class='time-limit']/text()")[0],
         "memory": tree.xpath("//div[@class='memory-limit']/text()")[0],
         "input": tree.xpath("//div[@class='input-file']/text()")[0],
         "output": tree.xpath("//div[@class='output-file']/text()")[0],
         "tests": zip(map(lambda e: "\n".join(e.xpath("./text()")), inputs),
                      map(lambda e: "\n".join(e.xpath("./text()")), outputs)),
+        # statement fields
+        "statement": statement,
+        "note": note,
     }
 
 
@@ -80,4 +104,4 @@ def contest_history(page=1):
 
 
 if __name__ == "__main__":
-    print problem("10-A")
+    print problem("413-D")
