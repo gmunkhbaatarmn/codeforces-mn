@@ -4,11 +4,12 @@ from natrix import db, json
 class Problem(db.Model):
     code = db.StringProperty()
     title = db.StringProperty()
-    statement = db.TextProperty(default="")
+
+    content = db.TextProperty(default="")
     note = db.TextProperty(default="")
     credits = db.StringProperty(default="")
 
-    # in_problemset = db.BooleanProperty()
+    # time, memory, input, output, tests
     meta_json = db.TextProperty(default="{}")
 
     @property
@@ -27,6 +28,10 @@ class Problem(db.Model):
     def contest_id(self):
         return self.code.split("-")[0].strip()
 
+    @property
+    def meta(self):
+        return json.loads(self.meta_json)
+
     @classmethod
     def find(cls, **kwargs):
         q = cls.all()
@@ -34,10 +39,6 @@ class Problem(db.Model):
             q.filter("%s =" % k, v)
 
         return q.get()
-
-    @property
-    def meta(self):
-        return json.loads(self.meta_json)
 
 
 class Contest(db.Model):
