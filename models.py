@@ -4,7 +4,6 @@ from natrix import db, json
 class Problem(db.Model):
     code = db.StringProperty()
     title = db.StringProperty()
-
     statement = db.TextProperty(default="")
     note = db.TextProperty(default="")
     credits = db.StringProperty(default="")
@@ -45,13 +44,6 @@ class Contest(db.Model):
     id = db.IntegerProperty()
     name = db.StringProperty()
     start = db.StringProperty()
-    # duration = db.IntegerProperty()
-
-    translated_count = db.IntegerProperty(default=0)
-
-    @property
-    def problems_count(self):
-        return self.problems.count()
 
     @property
     def problems(self):
