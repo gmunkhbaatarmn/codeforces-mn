@@ -1,16 +1,14 @@
 from natrix import db, json
-from markdown2 import markdown
 
 
 class Problem(db.Model):
     code = db.StringProperty()
     title = db.StringProperty()
-    markdown = db.TextProperty()
-    # statement
-    # input
-    # output
-    # note
-    credits = db.StringProperty()
+
+    statement = db.TextProperty(default="")
+    note = db.TextProperty(default="")
+    credits = db.StringProperty(default="")
+
     # in_problemset = db.BooleanProperty()
     meta_json = db.TextProperty(default="{}")
 
@@ -21,10 +19,6 @@ class Problem(db.Model):
     @property
     def link_contest(self):
         return "/contest/%s/problem/%s" % (self.contest_id, self.index)
-
-    @property
-    def content(self):
-        return markdown(self.markdown, extras=["code-friendly"])
 
     @property
     def index(self):
