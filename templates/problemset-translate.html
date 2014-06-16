@@ -16,34 +16,16 @@
     <textarea id="source" style="font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:100%; height: 520px; box-sizing:border-box; resize:vertical; border:0; outline:none; border-radius:7px; padding:5px; margin-top:-5px">
 {{- "# " ~ problem.title }}
 
-{{ html2text(problem.statement) }}
-## Оролт
-{{ html2text(problem.input) }}
-## Гаралт
-{{ html2text(problem.output) }}
+{{ problem.content }}
 
-{%- if problem.note -%}
-## Тэмдэглэл
-{{ html2text(problem.note) }}
-{% endif %}
+{{- "## Тэмдэглэл\n" ~ problem.note if problem.note else "" -}}
 
 -- {{ problem.credits or "Орчуулагчийн нэр" }}</textarea>
   </div>
 
+
   <div style="border:0px solid #ddd; width: 49%; float:right; min-height: 420px; border-radius:7px" class="problem-statement">
     <div id="preview"></div>
-    <h1>Valera and number</h1>
-
-    <div>
-      <p>Valera is a coder. Recently he wrote a funny program. The pseudo code for this program is given below:</p>
-    </div>
-
-    <h2>Оролт</h2>
-
-    <h2>Гаралт</h2>
-
-    <p class="credit">Орчуулсан: Sugardorj</p>
-
     <h4>Жишээ тэстүүд</h4>
     {% for sample in problem.meta.tests %}
       <div class="sample">
@@ -53,6 +35,8 @@
         <pre>{{ sample[1] }}</pre>
       </div>
     {% endfor %}
+
+    <p class="credit">Орчуулсан: Sugardorj</p>
 
     <div style="clear:both"></div>
   </div>
@@ -73,10 +57,8 @@
     #footer { display: none }
   </style>
 
-  <script src="/static/jquery.autosize.js"></script>
   <script src="/static/markdown.js"></script>
   <script>
-    // $("textarea").autosize();
     focus_toggle = function(el) {
       if ($("#header").is(":visible")) {
         $('#header,#menu').toggle();
@@ -94,13 +76,6 @@
       return false;
     }
 
-    update = function() {
-      $.post("/render", {"source": $("#source").val()}, function(data) {
-        $("#preview").html(data);
-        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-      })
-    }
-
     var source = "";
 
     $("#source").on("change keyup paste", function() {
@@ -113,7 +88,9 @@
     });
 
     $(function() {
-        update();
+        source = $("#source").val();
+        $("#preview").html(markdown.toHTML(source));
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
     })
   </script>
 {% endblock %}
