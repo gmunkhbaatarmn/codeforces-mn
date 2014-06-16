@@ -12,7 +12,7 @@
     <h3><strong>гаралт</strong> {{ problem.meta.output.replace("standard output", "стандарт гаралт") }}</h3>
 
     <div>
-      {{ problem.content.replace("<h3>Оролт</h3>", "<h2>Оролт</h2>").replace("<h3>Гаралт</h3>", "<h2>Гаралт</h2>")|safe }}
+      {{ markdown(problem.content).replace("<h3>Оролт</h3>", "<h2>Оролт</h2>").replace("<h3>Гаралт</h3>", "<h2>Гаралт</h2>")|safe }}
     </div>
 
     <p class="credit">Орчуулсан: {{ problem.credits }}</p>
@@ -27,10 +27,10 @@
       </div>
     {% endfor %}
 
-    {# if problem.notes %}
+    {% if problem.note %}
       <h2>Тэмдэглэл</h2>
-      {{ problem.notes|safe }}
-    {% endif #}
+      {{ markdown(problem.note)|safe }}
+    {% endif %}
   </div>
 {% endblock %}
 
