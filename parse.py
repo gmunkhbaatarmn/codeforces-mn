@@ -3,6 +3,17 @@ import re
 import lxml.html
 import urllib
 from logging import warning
+from html2text import html2text as h2t
+from lxml import etree
+
+
+def html2text(string):
+    string = string.decode("utf-8")
+
+    result = h2t(string).replace("\n\n", "\0")
+    result = result.replace("\n", "").replace("\0", "\n\n")
+
+    return result
 
 
 def contest(id):
@@ -45,29 +56,30 @@ def problemset(page=1):
 def problem(code):
     r = urllib.urlopen("http://codeforces.com/problemset/problem/%s" %
                        code.replace("-", "/"))
+
     tree = lxml.html.fromstring(r.read())
 
     def html(e):
-        from lxml import etree
         return "".join([etree.tostring(c) for c in e.iterdescendants()])
 
     inputs = tree.xpath("//div[@class='input']/pre")
     outputs = tree.xpath("//div[@class='output']/pre")
 
-    statement = html(tree.xpath("//div[@class='problem-statement']/div")[1])
+    content = html(tree.xpath("//div[@class='problem-statement']/div")[1])
     input_text = html(tree.xpath("//div[@class='input-specification']")[0])
     input_text = input_text.replace('<div class="section-title">Input</div>',
                                     "<h2>Оролт</h2>")
-    statement += input_text
+    content += input_text
 
     output_text = html(tree.xpath("//div[@class='output-specification']")[0])
     output_text = input_text.replace('<div class="section-title">Output</div>',
                                      "<h2>Гаралт</h2>")
-    statement += output_text
+    content += output_text
 
-    note = html(tree.xpath("//div[@class='note']")[0])
-    note = note.replace('<div class="section-title">Note</div>',
-                        "<h2>Тэмдэглэл</h2>"),
+    note = ""
+    if tree.xpath("//div[@class='note']"):
+        note = html(tree.xpath("//div[@class='note']")[0])
+        note = note.replace('<div class="section-title">Note</div>', "")
 
     return {
         # meta fields
@@ -78,8 +90,8 @@ def problem(code):
         "tests": zip(map(lambda e: "\n".join(e.xpath("./text()")), inputs),
                      map(lambda e: "\n".join(e.xpath("./text()")), outputs)),
         # statement fields
-        "statement": statement,
-        "note": note,
+        "content": html2text(content),
+        "note": html2text(note),
     }
 
 
@@ -104,4 +116,4 @@ def contest_history(page=1):
 
 
 if __name__ == "__main__":
-    print problem("413-D")
+    print problem("413-C")

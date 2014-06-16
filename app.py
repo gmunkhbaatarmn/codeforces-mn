@@ -1,10 +1,10 @@
-import parse
 from markdown2 import markdown
 from html2text import html2text
-from natrix import app, route, data, json
+from natrix import app, route, data, json, log
 from magics import cf_get_active_users, tc_get_active_users
 from models import Problem, Contest
-from logging import warning
+import parse
+
 
 def context(self):
     return {
@@ -27,7 +27,6 @@ def problemset_data(x):
     x.response([p.code for p in problems], encode="json")
 
 
-
 # === Done ===
 
 @route("/")
@@ -37,7 +36,7 @@ def home(x):
 
 @route("/contests")
 def contest_list(x, page="1"):
-    # contest
+    # todo: translated problem count
     offset = 100 * (int(page) - 1)
 
     contests = Contest.all().order("-id").fetch(100, offset=offset)
@@ -66,6 +65,7 @@ def contest_problem(x, contest_id, index):
 
 @route("/problemset")
 def problemset_index(x, page="1"):
+    # todo: link of non translated problem
     offset = 100 * (int(page) - 1)
 
     problems = Problem.all().order("-code").fetch(100, offset=offset)
@@ -81,6 +81,7 @@ def problemset_paged(x, page):
 
 @route("/problemset/problem/(\d+)/(\w+)")
 def problemset_problem(x, contest_id, index):
+    # todo: display extra note
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
 
     x.render("problemset-problem.html", locals())
@@ -108,17 +109,17 @@ def ratings_update(x):
 @route("/setup")
 def setup(x):
     #{ Ratings
-    # data.write("Rating:codeforces", cf_get_active_users())
-    # data.write("Rating:topcoder", tc_get_active_users())
+    data.write("Rating:codeforces", cf_get_active_users())
+    data.write("Rating:topcoder", tc_get_active_users())
     #{ Contests
     for page in range(5, 0, -1):
-        warning("Contests page: %s" % page)
+        log("Contests page: %s" % page)
         for attempt in xrange(10):
             try:
                 datas = parse.contest_history(page)
                 break
             except:
-                warning("Attempt: %s" % attempt)
+                log("Attempt: %s" % attempt)
 
         for i in datas:
             c = Contest.find(id=int(i[0])) or Contest(id=int(i[0]))
@@ -127,7 +128,7 @@ def setup(x):
             c.save()
     #{ Problemset
     for page in range(20, 0, -1):
-        warning("Problemset page: %s" % page)
+        log("Problemset page: %s" % page)
         for attempt in xrange(10):
             try:
                 datas = parse.problemset(page)
@@ -140,21 +141,24 @@ def setup(x):
             p = Problem.find(code=code) or Problem(code=code)
             p.title = title
             p.save()
-    x.response("OK")
-    #{ (incomplete) Problem meta fields
-    for code, meta in sorted(json.loads(open("problems-meta.json").read()).items()):
+    #{ Problem meta fields
+    meta_data = json.loads(open("problems-meta.json").read())
+    for code, meta in sorted(meta_data.items()):
         p = Problem.find(code=code)
+        p.content = meta.pop("content")
+        p.note = meta.pop("note")
         p.meta_json = json.dumps(meta)
         p.save()
-    #{ (incomplete) Problems translated
-    for code, title, content, note, credits in json.loads(open("data-translated.json").read()):
-        p = Problem.find(code=code)
-        p.title = title
-        p.content = content
-        p.note = note
-        p.credits = credits
-        p.save()
-    #{ (easy) Contribution point from datastore
+    x.response("OK")
+    #{ (todo:incomplete) Problems translated
+    # for code, title, content, note, credits in json.loads(open("data-translated.json").read()):
+    #     p = Problem.find(code=code)
+    #     p.title = title
+    #     p.content = content
+    #     p.note = note
+    #     p.credits = credits
+    #     p.save()
+    #{ (todo:easy) Contribution point from datastore
     # for p in Problem.all().filter("credits !=", ""):
     #     translators = p[3].split(", ")
     #     for t in translators:
