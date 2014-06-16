@@ -11,19 +11,7 @@
     <h3><strong>оролт</strong> {{ problem.meta.input.replace("standard input", "стандарт оролт") }}</h3>
     <h3><strong>гаралт</strong> {{ problem.meta.output.replace("standard output", "стандарт гаралт") }}</h3>
 
-    {% for sample in problem.meta.tests %}
-      <div class="sample">
-        <h5>Оролт</h5>
-        <pre>{{ sample[0] }}</pre>
-        <h5>Гаралт</h5>
-        <pre>{{ sample[1] }}</pre>
-      </div>
-    {% endfor %}
-
-    {# if problem.notes %}
-      <h2>Тэмдэглэл</h2>
-      {{ problem.notes|safe }}
-    {% endif #}
+    <div>{{ markdown(problem.content)|safe }}</div>
 
     <p class="credit">Орчуулсан: {{ problem.credits }}</p>
 
@@ -37,10 +25,10 @@
       </div>
     {% endfor %}
 
-    {# if problem.notes %}
+    {% if problem.note %}
       <h2>Тэмдэглэл</h2>
-      {{ problem.notes|safe }}
-    {% endif #}
+      {{ markdown(problem.note)|safe }}
+    {% endif %}
   </div>
 {% endblock %}
 

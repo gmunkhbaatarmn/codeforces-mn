@@ -11,9 +11,7 @@
     <h3><strong>оролт</strong> {{ problem.meta.input.replace("standard input", "стандарт оролт") }}</h3>
     <h3><strong>гаралт</strong> {{ problem.meta.output.replace("standard output", "стандарт гаралт") }}</h3>
 
-    <div>
-      {{ markdown(problem.content).replace("<h3>Оролт</h3>", "<h2>Оролт</h2>").replace("<h3>Гаралт</h3>", "<h2>Гаралт</h2>")|safe }}
-    </div>
+    <div>{{ markdown(problem.content)|safe }}</div>
 
     <p class="credit">Орчуулсан: {{ problem.credits }}</p>
 
