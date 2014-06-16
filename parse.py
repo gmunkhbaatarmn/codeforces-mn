@@ -3,7 +3,7 @@ import re
 import lxml.html
 import urllib
 from logging import warning
-from html2text import html2text as h2t
+import html2text as h2t
 from lxml import etree
 
 
@@ -21,7 +21,9 @@ def html2text(string):
     string = string.replace('<span class="tex-span">', "$")
     string = string.replace('</span>', "$")
 
-    result = h2t(string)
+    h = h2t.HTML2Text()
+    h.body_width = 0
+    result = h.handle(string)
 
     return result
 
@@ -127,4 +129,4 @@ def contest_history(page=1):
 
 
 if __name__ == "__main__":
-    print problem("441-E")["content"]
+    print problem("441-D")["content"]
