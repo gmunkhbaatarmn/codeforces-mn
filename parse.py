@@ -10,8 +10,18 @@ from lxml import etree
 def html2text(string):
     string = string.decode("utf-8")
 
-    result = h2t(string).replace("\n\n", "\0")
-    result = result.replace("\n", "").replace("\0", "\n\n")
+    string = string.replace("<i>", "")
+    string = string.replace("</i>", "")
+    string = string.replace('<sup class="upper-index">', "^{")
+    string = string.replace('</sup>', "}")
+
+    string = string.replace('<sub class="lower-index">', "_{")
+    string = string.replace('</sub>', "}")
+
+    string = string.replace('<span class="tex-span">', "$")
+    string = string.replace('</span>', "$")
+
+    result = h2t(string)
 
     return result
 
@@ -60,7 +70,8 @@ def problem(code):
     tree = lxml.html.fromstring(r.read())
 
     def html(e):
-        return "".join([etree.tostring(c) for c in e.iterdescendants()])
+        " inner html "
+        return etree.tostring(e).split(">", 1)[1].rsplit("</", 1)[0]
 
     inputs = tree.xpath("//div[@class='input']/pre")
     outputs = tree.xpath("//div[@class='output']/pre")
@@ -72,7 +83,7 @@ def problem(code):
     content += input_text
 
     output_text = html(tree.xpath("//div[@class='output-specification']")[0])
-    output_text = input_text.replace('<div class="section-title">Output</div>',
+    output_text = output_text.replace('<div class="section-title">Output</div>',
                                      "<h2>Гаралт</h2>")
     content += output_text
 
@@ -116,4 +127,4 @@ def contest_history(page=1):
 
 
 if __name__ == "__main__":
-    print problem("413-C")
+    print problem("441-E")["content"]
