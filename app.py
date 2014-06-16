@@ -1,10 +1,12 @@
 from markdown2 import markdown
 from html2text import html2text
-from natrix import app, route, data, json, log
+from natrix import Application, data, json, log
 from magics import cf_get_active_users, tc_get_active_users
 from models import Problem, Contest
 import parse
 
+app = Application()
+route = app.route
 
 def context(self):
     return {
@@ -108,24 +110,6 @@ def ratings_update(x):
 
 @route("/setup")
 def setup(x):
-    #{ Ratings
-    data.write("Rating:codeforces", cf_get_active_users())
-    data.write("Rating:topcoder", tc_get_active_users())
-    #{ Contests
-    for page in range(5, 0, -1):
-        log("Contests page: %s" % page)
-        for attempt in xrange(10):
-            try:
-                datas = parse.contest_history(page)
-                break
-            except:
-                log("Attempt: %s" % attempt)
-
-        for i in datas:
-            c = Contest.find(id=int(i[0])) or Contest(id=int(i[0]))
-            c.name = i[1]
-            c.start = i[2]
-            c.save()
     #{ Problemset
     for page in range(20, 0, -1):
         log("Problemset page: %s" % page)
@@ -142,7 +126,7 @@ def setup(x):
             p.title = title
             p.save()
     #{ Problem meta fields
-    meta_data = json.loads(open("problems-meta.json").read())
+    meta_data = json.load(open("problems-meta.json"))
     for code, meta in sorted(meta_data.items()):
         p = Problem.find(code=code)
         p.content = meta.pop("content")
@@ -165,6 +149,24 @@ def setup(x):
     #         datas[t] = datas.get(t, 0.0) + 1.0 / len(translators)
     # contribution = sorted(datas.items(), key=lambda t: -t[1])
     # data.write("Rating:contribution", contribution)
+    #{ Contests
+    for page in range(5, 0, -1):
+        log("Contests page: %s" % page)
+        for attempt in xrange(10):
+            try:
+                datas = parse.contest_history(page)
+                break
+            except:
+                log("Attempt: %s" % attempt)
+
+        for i in datas:
+            c = Contest.find(id=int(i[0])) or Contest(id=int(i[0]))
+            c.name = i[1]
+            c.start = i[2]
+            c.save()
+    #{ Ratings
+    data.write("Rating:codeforces", cf_get_active_users())
+    data.write("Rating:topcoder", tc_get_active_users())
     #}
 
 

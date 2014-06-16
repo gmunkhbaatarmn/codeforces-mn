@@ -25,6 +25,9 @@ def html2text(string):
     h.body_width = 0
     result = h.handle(string)
 
+    result = result.replace("## Оролт\n\n", "## Оролт\n")
+    result = result.replace("## Гаралт\n\n", "## Гаралт\n")
+
     return result
 
 

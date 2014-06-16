@@ -18,11 +18,10 @@
 
 {{ problem.content }}
 
-{{- "## Тэмдэглэл\n" ~ problem.note if problem.note else "" -}}
+{{ "## Тэмдэглэл\n" ~ problem.note if problem.note else "" }}
 
 -- {{ problem.credits or "Орчуулагчийн нэр" }}</textarea>
   </div>
-
 
   <div style="border:0px solid #ddd; width: 49%; float:right; min-height: 420px; border-radius:7px" class="problem-statement">
     <div id="preview"></div>
