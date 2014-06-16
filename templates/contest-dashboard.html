@@ -27,26 +27,6 @@
           {% endif %}
         </tr>
       {% endfor %}
-
-      {# for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:contest[2]] %}
-        <tr {{- loop.cycle(' class="dark"', "")|safe }}>
-          {% set code = contest_id ~ "-" ~ letter %}
-          {% if all_problem[code][1] %}
-            <td style="text-align:center"><a href="/contest/{{ contest_id }}/problem/{{ letter }}">{{ letter }}</a></td>
-            <td>
-              <a href="/contest/{{ contest_id }}/problem/{{ letter }}">{{ all_problem[code][1] }}</a>
-              <div style="float:right;font-size:11px;color:#888">{{ limit(letter) }}</div>
-            </td>
-            <td style="text-align:center;color:#666">{{ all_problem[code][2] }}</td>
-          {% else %}
-            <td style="text-align:center">{{ letter }}</td>
-            <td>
-              {{ all_problem[code][0] }}
-            </td>
-            <td style="text-align:center;color:#666"></td>
-          {% endif %}
-        </tr>
-      {% endfor #}
     </table>
   </div>
 {% endblock %}
