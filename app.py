@@ -107,10 +107,10 @@ def ratings_update(x):
 
 @route("/setup")
 def setup(x):
-    #{ Ratings
+    # - Ratings
     data.write("Rating:codeforces", cf_get_active_users())
     data.write("Rating:topcoder", tc_get_active_users())
-    #{ Contests
+    # - Contests
     for page in range(5, 0, -1):
         log("Contests page: %s" % page)
         for attempt in xrange(10):
@@ -125,7 +125,7 @@ def setup(x):
             c.name = i[1]
             c.start = i[2]
             c.save()
-    #{ Problems
+    # - Problems
     problems = json.loads(open("problems-meta.json").read())
     for page in range(20, 0, -1):
         log("Problemset page: %s" % page)
@@ -150,19 +150,23 @@ def setup(x):
             p.meta_json = json.dumps(meta)
             p.save()
     x.response("OK")
-    #{ (todo:incomplete) Problems translated
-    # for code, title, content, note, credits in json.loads(open("data-translated.json").read()):
+    # - (todo:incomplete) Problems translated
+    # fields: title, content, note, credits
+    # delay 1 seconds
+    # translated = json.loads(open("problems-translated.json").read())
+    # for code, (title, content, note, credits) in translated.items():
     #     p = Problem.find(code=code)
     #     p.title = title
     #     p.content = content
     #     p.note = note
     #     p.credits = credits
     #     p.save()
-    #{ (todo:easy) Contribution point from datastore
+    # - (todo:easy) Contribution point from datastore
     # for p in Problem.all().filter("credits !=", ""):
     #     translators = p[3].split(", ")
     #     for t in translators:
-    #         datas[t] = datas.get(t, 0.0) + 1.0 / len(translators)
+    #         credit_point = problem.meta.credit_point or 1.0
+    #         datas[t] = datas.get(t, 0.0) + credit_point / len(translators)
     # contribution = sorted(datas.items(), key=lambda t: -t[1])
     # data.write("Rating:contribution", contribution)
 
