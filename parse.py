@@ -23,7 +23,7 @@ def html2text(string):
 
     h = h2t.HTML2Text()
     h.body_width = 0
-    result = h.handle(string)
+    result = h.handle(string).strip()
 
     result = result.replace(u"## Оролт\n\n", u"## Оролт\n")
     result = result.replace(u"## Гаралт\n\n", u"## Гаралт\n")
@@ -132,4 +132,5 @@ def contest_history(page=1):
 
 
 if __name__ == "__main__":
-    print problem("441-D")["content"]
+    print repr(problem("12-C")["note"])
+    print repr(html2text(""))
