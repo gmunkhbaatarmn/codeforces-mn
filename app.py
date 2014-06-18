@@ -107,7 +107,6 @@ def ratings_update(x):
 
 @route("/setup")
 def setup(x):
-    '''
     # - Ratings
     data.write("Rating:codeforces", cf_get_active_users())
     data.write("Rating:topcoder", tc_get_active_users())
@@ -158,16 +157,17 @@ def setup(x):
                 p.note = translated[code]["note"] or p.note
                 p.credits = translated[code]["credits"]
             p.save()
-    x.response("OK")
-    '''
     # - Contribution point from datastore
-    # for p in Problem.all().filter("credits !=", ""):
-    #     translators = p[3].split(", ")
-    #     for t in translators:
-    #         credit_point = problem.meta.credit_point or 1.0
-    #         datas[t] = datas.get(t, 0.0) + credit_point / len(translators)
-    # contribution = sorted(datas.items(), key=lambda t: -t[1])
-    # data.write("Rating:contribution", contribution)
+    contribution = {}
+    for p in Problem.all().filter("credits !=", ""):
+        translators = p.credits.split(", ")
+        for t in translators:
+            point = (p.meta.get("credit_point") or 1.0) / len(translators)
+            contribution[t] = contribution.get(t, 0.0) + point
+    contribution = sorted(contribution.items(), key=lambda t: -t[1])
+    data.write("Rating:contribution", contribution)
+
+    x.response("OK")
 
 
 app.config["context"] = context
