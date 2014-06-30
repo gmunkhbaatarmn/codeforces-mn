@@ -4,6 +4,7 @@ import json, datetime
 import urllib, re
 import markdown2
 import logging
+from utils import url_open
 
 
 def changelist(payload):#1
@@ -19,7 +20,7 @@ def changelist(payload):#1
 
 def parse_markdown(code):#1
     logging.info("Github parse: https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/Translation/%s.md" % code)
-    data = urllib.urlopen("https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/Translation/%s.md" % code).read().decode("utf-8")
+    data = url_open("https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/Translation/%s.md" % code).read().decode("utf-8")
     html = markdown2.markdown(data, extras=["code-friendly"])
     html = html.replace("\n\n<p", "\n<p")
     html = html.replace("\n\n<h3", "\n<h3")
@@ -69,11 +70,11 @@ def parse_markdown(code):#1
 
 def parse_codeforces(code):#1
     logging.info("Codeforces parse: http://codeforces.com/problemset/problem/%s/%s" % (int(code.split("-")[0]), code.split("-")[1]))
-    r = urllib.urlopen("http://codeforces.com/problemset/problem/%s/%s" % (int(code.split("-")[0]), code.split("-")[1]))
+    r = url_open("http://codeforces.com/problemset/problem/%s/%s" % (int(code.split("-")[0]), code.split("-")[1]))
 
     if r.url == "http://codeforces.com/":
         logging.info("Codeforces parse: http://codeforces.com/problemset/problem/%s/%s1" % (int(code.split("-")[0]), code.split("-")[1]))
-        r = urllib.urlopen("http://codeforces.com/problemset/problem/%s/%s1" % (int(code.split("-")[0]), code.split("-")[1]))
+        r = url_open("http://codeforces.com/problemset/problem/%s/%s1" % (int(code.split("-")[0]), code.split("-")[1]))
     data = r.read().decode("utf-8")
 
     item = {
@@ -102,7 +103,7 @@ def parse_codeforces(code):#1
 
 
 def cf_get_all_users():#1
-    data = urllib.urlopen("http://codeforces.com/ratings/country/Mongolia").read()
+    data = url_open("http://codeforces.com/ratings/country/Mongolia").read()
     tree = lxml.html.document_fromstring(data)
 
     users = []
@@ -112,7 +113,7 @@ def cf_get_all_users():#1
 
 
 def cf_get_user(handle):#1
-    content = urllib.urlopen("http://codeforces.com/profile/%s" % handle).read()
+    content = url_open("http://codeforces.com/profile/%s" % handle).read()
     data = content.split("data.push(")[1].split(");")[0]
 
     log = json.loads(data)[-1]
@@ -187,7 +188,6 @@ def tc_get_active_users():#1
 
     return r
 # endfold
-
 
 
 if __name__ == "__main__":
