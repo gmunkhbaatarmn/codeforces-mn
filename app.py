@@ -142,13 +142,16 @@ def setup(x):
                 log("SKIPPED: %s" % code)
                 continue
             code = "%3s-%s" % (code[:-1], code[-1])
-            meta = problems[code]
 
             p = Problem.find(code=code) or Problem(code=code)
             p.title = title
-            p.content = meta.pop("content")
-            p.note = meta.pop("note")
-            p.meta_json = json.dumps(meta)
+            if code in problems:
+                meta = problems[code]
+                p.content = meta.pop("content")
+                p.note = meta.pop("note")
+                p.meta_json = json.dumps(meta)
+            else:
+                log("PROBLEM NOT FOUND: %s" % code)
 
             # translated fields
             if code in translated:

@@ -82,7 +82,7 @@ def problemset(page=1):
 
 def problem(code):
     r = url_open("http://codeforces.com/problemset/problem/%s" %
-                code.replace("-", "/"))
+                code.strip().replace("-", "/"))
 
     tree = lxml.html.fromstring(r.read())
 

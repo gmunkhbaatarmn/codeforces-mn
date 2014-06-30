@@ -1,13 +1,15 @@
 # coding: utf-8
-import lxml.html, lxml.etree
-import json, datetime
-import urllib, re
+import re
+import json
+import datetime
+import lxml.html
+import lxml.etree
 import markdown2
 import logging
 from parse import url_open
 
 
-def changelist(payload):#1
+def changelist(payload):
     changes = set([])
 
     for commit in payload["commits"]:
@@ -18,7 +20,7 @@ def changelist(payload):#1
     return list(changes)
 
 
-def parse_markdown(code):#1
+def parse_markdown(code):
     logging.info("Github parse: https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/Translation/%s.md" % code)
     data = url_open("https://raw.github.com/gmunkhbaatarmn/codeforces-mn/master/Translation/%s.md" % code).read().decode("utf-8")
     html = markdown2.markdown(data, extras=["code-friendly"])
@@ -57,18 +59,18 @@ def parse_markdown(code):#1
             item["content"] += "\n" + line
             continue
         if state == "inputs":
-            item["inputs"]  += "\n" + line
+            item["inputs"] += "\n" + line
             continue
         if state == "outputs":
             item["outputs"] += "\n" + line
             continue
         if state == "notes":
-            item["notes"]   += "\n" + line
+            item["notes"] += "\n" + line
             continue
     return item
 
 
-def parse_codeforces(code):#1
+def parse_codeforces(code):
     logging.info("Codeforces parse: http://codeforces.com/problemset/problem/%s/%s" % (int(code.split("-")[0]), code.split("-")[1]))
     r = url_open("http://codeforces.com/problemset/problem/%s/%s" % (int(code.split("-")[0]), code.split("-")[1]))
 
@@ -97,12 +99,11 @@ def parse_codeforces(code):#1
             item["samples"].append([inp, out])
 
     item["memory-limit"] = item["memory-limit"].replace("megabytes", u"мегабайт")
-    item["time-limit"]   = item["time-limit"].replace("seconds", u"секунд").replace("second", u"секунд")
+    item["time-limit"] = item["time-limit"].replace("seconds", u"секунд").replace("second", u"секунд")
     return item
-# endfold
 
 
-def cf_get_all_users():#1
+def cf_get_all_users():
     data = url_open("http://codeforces.com/ratings/country/Mongolia").read()
     tree = lxml.html.document_fromstring(data)
 
@@ -112,7 +113,7 @@ def cf_get_all_users():#1
     return users
 
 
-def cf_get_user(handle):#1
+def cf_get_user(handle):
     content = url_open("http://codeforces.com/profile/%s" % handle).read()
     data = content.split("data.push(")[1].split(");")[0]
 
@@ -129,7 +130,7 @@ def cf_get_user(handle):#1
     }
 
 
-def cf_get_active_users():#1
+def cf_get_active_users():
     r = []
     for u in cf_get_all_users():
         d = cf_get_user(u)
@@ -141,11 +142,10 @@ def cf_get_active_users():#1
         r[i]["recent"] = (recent["contest_at"] == r[i]["contest_at"])
 
     return r
-# endfold
 
 
-def tc_get_all_users():#1
-    data = urllib.urlopen("http://community.topcoder.com/tc?module=AlgoRank&cc=496").read()
+def tc_get_all_users():
+    data = url_open("http://community.topcoder.com/tc?module=AlgoRank&cc=496").read()
     tree = lxml.html.document_fromstring(data)
 
     users = []
@@ -157,8 +157,8 @@ def tc_get_all_users():#1
     return users
 
 
-def tc_get_user(handle, id):#1
-    data = urllib.urlopen("http://community.topcoder.com/tc?module=BasicData&c=dd_rating_history&cr=%s" % id).read()
+def tc_get_user(handle, id):
+    data = url_open("http://community.topcoder.com/tc?module=BasicData&c=dd_rating_history&cr=%s" % id).read()
 
     row_list = lxml.etree.fromstring(data).xpath("//dd_rating_history/row")
 
@@ -175,7 +175,7 @@ def tc_get_user(handle, id):#1
     }
 
 
-def tc_get_active_users():#1
+def tc_get_active_users():
     r = []
     for handle, id in tc_get_all_users():
         d = tc_get_user(handle, id)
@@ -187,8 +187,3 @@ def tc_get_active_users():#1
         r[i]["recent"] = (recent["contest_id"] == r[i]["contest_id"])
 
     return r
-# endfold
-
-
-if __name__ == "__main__":
-    pass
