@@ -3,8 +3,20 @@ import re
 import lxml.html
 import urllib
 from logging import warning
+from httplib import HTTPException
 import html2text as h2t
 from lxml import etree
+
+
+def url_open(url):
+    for attempt in range(10):
+        try:
+            return urllib.urlopen(url)
+        except IOError:
+            print "Delayed: '%s'" % url
+        except HTTPException:
+            print "Delayed: '%s'" % url
+    raise Exception("Network Error")
 
 
 def html2text(string):
@@ -35,7 +47,7 @@ def contest(id):
     """ Get contest by contest id
         Returns dict. Keys: name, problems
     """
-    r = urllib.urlopen("http://codeforces.com/contest/%s" % id)
+    r = url_open("http://codeforces.com/contest/%s" % id)
 
     if r.code != 200 or r.url == "http://codeforces.com/":
         warning("Contest '%s' not reachable" % id)
@@ -56,7 +68,7 @@ def problemset(page=1):
     """ Entire problemset
         Returns list of tuple. Example tuple: (001-A, Theatre Square)
     """
-    r = urllib.urlopen("http://codeforces.com/problemset/page/%s" % page)
+    r = url_open("http://codeforces.com/problemset/page/%s" % page)
     assert r.code == 200
 
     tree = lxml.html.fromstring(r.read())
@@ -69,8 +81,8 @@ def problemset(page=1):
 
 
 def problem(code):
-    r = urllib.urlopen("http://codeforces.com/problemset/problem/%s" %
-                       code.replace("-", "/"))
+    r = url_open("http://codeforces.com/problemset/problem/%s" %
+                code.replace("-", "/"))
 
     tree = lxml.html.fromstring(r.read())
 
@@ -87,10 +99,10 @@ def problem(code):
                                     "<h2>Оролт</h2>")
     content += input_text
 
-    output_text = html(tree.xpath("//div[@class='output-specification']")[0])
-    output_text = output_text.replace('<div class="section-title">Output</div>',
-                                     "<h2>Гаралт</h2>")
-    content += output_text
+    output_t = html(tree.xpath("//div[@class='output-specification']")[0])
+    output_t = output_t.replace('<div class="section-title">Output</div>',
+                                "<h2>Гаралт</h2>")
+    content += output_t
 
     note = ""
     if tree.xpath("//div[@class='note']"):
@@ -113,7 +125,7 @@ def problem(code):
 
 def contest_history(page=1):
     " Past contests "
-    r = urllib.urlopen("http://codeforces.com/contests/page/%s" % page)
+    r = url_open("http://codeforces.com/contests/page/%s" % page)
     if r.url != "http://codeforces.com/contests/page/%s" % page:
         # Active contest running
         return
