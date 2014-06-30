@@ -4,7 +4,7 @@ import json, datetime
 import urllib, re
 import markdown2
 import logging
-from utils import url_open
+from parse import url_open
 
 
 def changelist(payload):#1
