@@ -7,10 +7,11 @@
 {% block content %}
   <div style="border:3px solid #e1e1e1; width:49%; float:left; border-radius:7px">
     <div style="background:#e1e1e1; border-radius:4px 4px 0 0; height:30px; line-height:30px; padding:0 5px 8px 5px" id="toolbar">
-      <a href="javascript:;" onclick="javascript:focus_toggle(this);">focus mode</a>
+      <a href="javascript:;" onclick="javascript:focus_toggle(this);">Төвлөрөх</a>
       <div class="" style="float:right">
-        <a href="">save</a>
+        <a href="">Хадгалах</a>
       </div>
+      <a href="{# todo: url #}">URL</a>
     </div>
 
     <textarea id="source" style="font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:100%; height: 520px; box-sizing:border-box; resize:vertical; border:0; outline:none; border-radius:7px; padding:5px; margin-top:-5px">
@@ -18,13 +19,14 @@
 
 {{ problem.content }}
 
-{{ "## Тэмдэглэл\n" ~ problem.note if problem.note else "" }}
+{{- "\n## Тэмдэглэл\n" ~ problem.note if problem.note else "" }}
 
 -- {{ problem.credits or "Орчуулагчийн нэр" }}</textarea>
   </div>
 
   <div style="border:0px solid #ddd; width: 49%; float:right; min-height: 420px; border-radius:7px" class="problem-statement">
-    <div id="preview"></div>
+    <div id="preview" class="mathjax"></div>
+
     <h4>Жишээ тэстүүд</h4>
     {% for sample in problem.meta.tests %}
       <div class="sample">
@@ -35,7 +37,7 @@
       </div>
     {% endfor %}
 
-    <p class="credit">Орчуулсан: Sugardorj</p>
+    <div id="note"></div>
 
     <div style="clear:both"></div>
   </div>
@@ -64,32 +66,38 @@
         $("#container").css("width", "100%");
         $("#content").css("margin-top", "1em");
         $(el).css("background", "#e7ffe8").css("color", "#558555");
-        // $("textarea").trigger('autosize.resize');
       } else {
         $('#header,#menu').toggle();
         $("#container").css("width", "1200px");
         $("#content").css("margin-top", "2em");
         $(el).css("background", "#eee").css("color", "#666");
-        // $("textarea").trigger('autosize.resize');
       }
       return false;
     }
 
     var source = "";
+    var render = function() {
+      if ($("#source").val() != source) {
+        source = $("#source").val().trim();
+        credit = source.substr(source.lastIndexOf("\n") + 1).slice(3);
+        source = source.substring(0, source.lastIndexOf("\n"));
 
-    $("#source").on("change keyup paste", function() {
-        if ($("#source").val() != source) {
-          source = $("#source").val();
-          $("#preview").html(markdown.toHTML(source));
-          MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-          // update();
-        }
-    });
+        preview = source.split("## Тэмдэглэл\n")[0]
+        note = "## Тэмдэглэл\n" + source.split("## Тэмдэглэл\n")[1]
+
+        $("#preview").html(markdown.toHTML(preview));
+        $("#preview").append('<p class="credit">Орчуулсан: '+ credit +'</p>');
+        if (! note)
+          $("#note").html(markdown.toHTML(note));
+
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+      }
+    }
+
+    $("#source").on("change keyup paste", render);
 
     $(function() {
-        source = $("#source").val();
-        $("#preview").html(markdown.toHTML(source));
-        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+      render();
     })
   </script>
 {% endblock %}

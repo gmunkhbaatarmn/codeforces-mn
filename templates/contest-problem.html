@@ -11,7 +11,7 @@
     <h3><strong>оролт</strong> {{ problem.meta.input.replace("standard input", "стандарт оролт") }}</h3>
     <h3><strong>гаралт</strong> {{ problem.meta.output.replace("standard output", "стандарт гаралт") }}</h3>
 
-    <div>{{ markdown(problem.content)|safe }}</div>
+    <div class="mathjax">{{ markdown(problem.content)|safe }}</div>
 
     <p class="credit">Орчуулсан: {{ problem.credits }}</p>
 
@@ -27,7 +27,7 @@
 
     {% if problem.note %}
       <h2>Тэмдэглэл</h2>
-      {{ markdown(problem.note)|safe }}
+      <div class="mathjax">{{ markdown(problem.note)|safe }}</div>
     {% endif %}
   </div>
 {% endblock %}
