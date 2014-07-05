@@ -6,3 +6,15 @@ cron:
 - description: Topcoder rating update
   url: /-/topcoder
   schedule: every 3 hours from 00:20 to 23:59
+
+# - description: Update problems
+#   url: /-/problems
+#   schedule: every 30 minutes from 00:10 to 23:59
+#
+# - description: Update contests
+#   url: /-/contests
+#   schedule: every 30 minutes from 00:20 to 23:59
+#
+# - description: Update ratings
+#   url: /-/ratings
+#   schedule: every 30 minutes from 00:30 to 23:59
