@@ -3,7 +3,7 @@ import json
 import parse
 from markdown2 import markdown
 from natrix import app, route, data, log
-from magics import cf_get_active_users, tc_get_active_users
+from parse import cf_get_active_users, tc_get_active_users
 from models import Problem, Contest
 
 
@@ -80,7 +80,6 @@ def problemset_paged(x, page):
 
 @route("/problemset/problem/(\d+)/(\w+)")
 def problemset_problem(x, contest_id, index):
-    # todo: display extra note
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
 
     x.render("problemset-problem.html", locals())

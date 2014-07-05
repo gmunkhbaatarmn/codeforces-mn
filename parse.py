@@ -1,7 +1,9 @@
 # coding: utf-8
 import re
-import lxml.html
+import json
 import urllib
+import datetime
+import lxml.html
 from logging import warning
 from httplib import HTTPException
 import html2text as h2t
@@ -141,6 +143,93 @@ def contest_history(page=1):
     start = map(lambda x: x.xpath("./td[2]")[0].text.strip(), rows)
 
     return map(lambda a, b, c: [a] + [b] + [c], index, names, start)
+
+
+# magic
+def cf_get_all_users():
+    data = url_open("http://codeforces.com/ratings/country/Mongolia").read()
+    tree = lxml.html.document_fromstring(data)
+
+    users = []
+    for a in tree.xpath("//*[@class='datatable']//table//tr//td[2]/a[2]"):
+        users.append(a.text.strip())
+    return users
+
+
+def cf_get_user(handle):
+    content = url_open("http://codeforces.com/profile/%s" % handle).read()
+    data = content.split("data.push(")[1].split(");")[0]
+
+    log = json.loads(data)[-1]
+    now = int(datetime.datetime.now().strftime("%s"))
+
+    return {
+        "handle": handle,
+        "rating": log[1],
+        "change": log[5],
+        "active": (now < log[0] / 1000 + 180 * 24 * 3600),
+        "contest_at": log[0],
+        "contest_id": log[2],
+    }
+
+
+def cf_get_active_users():
+    r = []
+    for u in cf_get_all_users():
+        d = cf_get_user(u)
+        if d["active"]:
+            r.append(d)
+
+    recent = max(r, key=lambda user: user["contest_at"])
+    for i in range(len(r)):
+        r[i]["recent"] = (recent["contest_at"] == r[i]["contest_at"])
+
+    return r
+
+
+def tc_get_all_users():
+    data = url_open("http://community.topcoder.com/tc?module=AlgoRank&cc=496").read()
+    tree = lxml.html.document_fromstring(data)
+
+    users = []
+    for a in tree.xpath("//*[@class='stat']//tr/td[2]/a"):
+        id = a.attrib["href"].split("cr=")[1].split("&tab=")[0]
+        handle = a.text.strip()
+
+        users.append([handle, id])
+    return users
+
+
+def tc_get_user(handle, id):
+    data = url_open("http://community.topcoder.com/tc?module=BasicData&c=dd_rating_history&cr=%s" % id).read()
+
+    row_list = lxml.etree.fromstring(data).xpath("//dd_rating_history/row")
+
+    # find most recent round
+    recent = max(row_list, key=lambda row: row.find("date").text)
+
+    return {
+        "handle": handle,
+        "id": id,
+        "rating": int(recent.find("new_rating").text),
+        "change": int(recent.find("new_rating").text) - int(recent.find("old_rating").text),
+        "active": True,
+        "contest_id": int(recent.find("round_id").text),
+    }
+
+
+def tc_get_active_users():
+    r = []
+    for handle, id in tc_get_all_users():
+        d = tc_get_user(handle, id)
+        if d["active"]:
+            r.append(d)
+
+    recent = max(r, key=lambda user: user["contest_id"])
+    for i in range(len(r)):
+        r[i]["recent"] = (recent["contest_id"] == r[i]["contest_id"])
+
+    return r
 
 
 if __name__ == "__main__":
