@@ -1,5 +1,6 @@
 # coding: utf-8
 import re
+import glob
 import json
 import urllib
 import datetime
@@ -83,8 +84,8 @@ def problemset(page=1):
 
 
 def problem(code):
-    r = url_open("http://codeforces.com/problemset/problem/%s" %
-                code.strip().replace("-", "/"))
+    r = url_open("http://codeforces.com/problemset/problem/" +
+                 code.strip().replace("-", "/"))
 
     tree = lxml.html.fromstring(r.read())
 
@@ -230,6 +231,58 @@ def tc_get_active_users():
         r[i]["recent"] = (recent["contest_id"] == r[i]["contest_id"])
 
     return r
+
+
+# cli
+def problems_translated():
+    " Generate file: problems-translated.json "
+    def correct(code):
+        r = ""
+        while code.startswith("0"):
+            r += " "
+            code = code[1:]
+
+        return r + code
+
+    data = {}
+
+    # code, title, content, note, credits
+    for item in glob.glob("Codeforces-mn/Translation/*.md"):
+        lines = open(item).read().strip().replace("\r\n", "\n").replace("\r", "\n").split("\n")
+        code = correct(re.search("Translation/(\d{3}-\w).md", item).groups()[0])
+
+        # title
+        title = lines[0]
+        assert lines[1].replace("=", "") == "", repr(lines[1])
+
+        # content
+        content = "\n".join(lines[2:-1]).strip()
+        if content.startswith("### "):
+            content = "\n" + content
+
+        assert content.count("\n### Оролт\n") == 1, "input: " + code + "\n" + content
+        assert content.count("\n### Гаралт\n") == 1
+        content = content.replace("\n### Оролт\n", "\n## Оролт\n")
+        content = content.replace("\n### Гаралт\n", "\n## Гаралт\n")
+
+        # note
+        note = ""
+        if "# Тэмдэглэл" in content:
+            assert content.count("\n### Тэмдэглэл\n") == 1, code
+            content, note = content.split("\n### Тэмдэглэл\n", 1)
+
+        # credits
+        credits = lines[-1][3:]
+        assert lines[-1].startswith("-- "), code + ":" + credits
+
+        data[code] = {
+            "title": title,
+            "content": content,
+            "note": note,
+            "credits": credits,
+        }
+
+    open("problems-translated.json", "w+").write(json.dumps(data))
 
 
 if __name__ == "__main__":
