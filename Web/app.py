@@ -59,7 +59,10 @@ def contest_dashboard(x, id):
 def contest_problem(x, contest_id, index):
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
 
-    x.render("contest-problem.html", locals())
+    if problem.credits:
+        x.render("contest-problem.html", locals())
+    else:
+        x.render("contest-problem-en.html", locals())
 
 
 @route("/problemset")
@@ -82,7 +85,10 @@ def problemset_paged(x, page):
 def problemset_problem(x, contest_id, index):
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
 
-    x.render("problemset-problem.html", locals())
+    if problem.credits:
+        x.render("problemset-problem.html", locals())
+    else:
+        x.render("problemset-problem-en.html", locals())
 
 
 @route("/problemset/problem/(\d+)/(\w+)/edit")
