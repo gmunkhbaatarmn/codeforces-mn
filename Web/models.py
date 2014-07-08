@@ -1,7 +1,7 @@
-from natrix import db, json
+from natrix import Model, db, json
 
 
-class Problem(db.Model):
+class Problem(Model):
     code = db.StringProperty()
     title = db.StringProperty()
 
@@ -32,16 +32,8 @@ class Problem(db.Model):
     def meta(self):
         return json.loads(self.meta_json)
 
-    @classmethod
-    def find(cls, **kwargs):
-        q = cls.all()
-        for k, v in kwargs.items():
-            q.filter("%s =" % k, v)
 
-        return q.get()
-
-
-class Contest(db.Model):
+class Contest(Model):
     id = db.IntegerProperty()
     name = db.StringProperty()
     start = db.StringProperty()
@@ -53,11 +45,3 @@ class Contest(db.Model):
         query = query.filter("code <", "%3s-Z" % self.id)
 
         return query
-
-    @classmethod
-    def find(cls, **kwargs):
-        q = cls.all()
-        for k, v in kwargs.items():
-            q.filter("%s =" % k, v)
-
-        return q.get()
