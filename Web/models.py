@@ -1,7 +1,7 @@
 from natrix import Model, db, json
 
 
-class Draft(Model):
+class Suggestion(Model):
     code = db.StringProperty()
     title = db.StringProperty()
     content = db.TextProperty(default="")

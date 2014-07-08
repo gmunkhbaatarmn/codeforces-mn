@@ -1,0 +1,41 @@
+{% extends "Layout.html" %}
+
+{% set title = "Орчуулгын саналууд" %}
+{% set menu = "suggestion" %}
+
+{% block content %}
+  <h1 class="table-title">Орчуулгын саналууд ({{ suggestions.count() }})</h1>
+
+  <div class="table-container">
+    <table>
+      <tr>
+        <th style="width:4em">#</th>
+        <th style="border-right:0">Бодлогын нэр</th>
+        <th style="border-right:0">Орчуулсан</th>
+        <th></th>
+      </tr>
+      {% for s in suggestions %}
+      <tr>
+        <td class="text-center"><a href="/suggestion/{{ s.key().id() }}">{{ s.code }}</a></td>
+        <td><a href="/suggestion/{{ s.key().id() }}">{{ s.title }}</a></td>
+        <td>{{ s.credits }}</td>
+        <td>{{ s.added.strftime("%b %d, %I:%m %p") }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="4">Хүлээгдэж байгаа санал алга</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endblock %}
+
+
+{% block sidebar %}
+  <div class="box">
+    <h2>Түр хүлээнэ үү</h2>
+    <div style="text-align:center">
+      Санал болгосон орчуулгуудыг хянагч шалгаж үзээд нийтлэх буюу татгалзаж болно.
+    </div>
+  </div>
+{% endblock %}

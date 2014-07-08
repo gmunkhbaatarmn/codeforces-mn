@@ -1,11 +1,10 @@
-# coding: utf-8
 import re
 import json
 import parse
 from markdown2 import markdown
 from natrix import app, route, data, log
 from parse import cf_get_active_users, tc_get_active_users
-from models import Problem, Contest, Draft
+from models import Problem, Contest, Suggestion
 
 
 def context(self):
@@ -111,18 +110,14 @@ def ratings_update(x):
     x.response("OK")
 
 
-@route("/drafts")
-def drafts(x):
-    pass
+@route("/suggestion")
+def suggestion_index(x):
+    suggestions = Suggestion.all().order("-added")
+    x.render("suggestion-index.html", **locals())
 
 
-@route("/drafts:POST")
-def drafts_accept(x):
-    pass
-
-
-@route("/drafts:PUT")
-def drafts_insert(x):
+@route("/suggestion:PUT")
+def suggestion_put(x):
     code = x.request.get("code")
     source = x.request.get("source").strip().decode("utf-8")
     source = source.replace("\r\n", "\n")
@@ -134,19 +129,29 @@ def drafts_insert(x):
     source = source.rsplit("\n", 1)[0].strip()
 
     note = ""
-    if u"\n## Тэмдэглэл\n" in source:
-        note = source.split(u"\n## Тэмдэглэл\n", 1)[1]
-        source = source.split(u"\n## Тэмдэглэл\n", 1)[0]
+    # '## Temdeglel'
+    heading = u"\n## \u0422\u044d\u043c\u0434\u044d\u0433\u043b\u044d\u043b\n"
+    if heading in source:
+        note = source.split(heading, 1)[1]
+        source = source.split(heading, 1)[0]
 
-    d = Draft(code=code)
-    d.title = title
-    d.content = source
-    d.note = note
-    d.credits = credits
-    d.save()
+    s = Suggestion(code=code)
+    s.title = title
+    s.content = source
+    s.note = note
+    s.credits = credits
+    s.save()
 
     # x.flash = ""
-    x.redirect("/drafts")
+    x.redirect("/suggestion")
+
+
+@route("/suggestion/(\d+)")
+def suggestion_review(x, id):
+    suggestion = Suggestion.get_by_id(int(id))
+    problem = Problem.find(code=suggestion.code)
+
+    x.render("suggestion-review.html", **locals())
 
 
 @route("/extension")
