@@ -1,10 +1,11 @@
+# coding: utf-8
 import re
 import json
 import parse
 from markdown2 import markdown
 from natrix import app, route, data, log
 from parse import cf_get_active_users, tc_get_active_users
-from models import Problem, Contest
+from models import Problem, Contest, Draft
 
 
 def context(self):
@@ -108,6 +109,44 @@ def ratings_update(x):
     data.write("Rating:codeforces", cf_get_active_users())
     data.write("Rating:topcoder", tc_get_active_users())
     x.response("OK")
+
+
+@route("/drafts")
+def drafts(x):
+    pass
+
+
+@route("/drafts:POST")
+def drafts_accept(x):
+    pass
+
+
+@route("/drafts:PUT")
+def drafts_insert(x):
+    code = x.request.get("code")
+    source = x.request.get("source").strip().decode("utf-8")
+    source = source.replace("\r\n", "\n")
+
+    title = source.split("\n", 1)[0][2:]
+    source = source.split("\n", 1)[1].strip()
+
+    credits = source.rsplit("\n", 1)[1][3:]
+    source = source.rsplit("\n", 1)[0].strip()
+
+    note = ""
+    if u"\n## Тэмдэглэл\n" in source:
+        note = source.split(u"\n## Тэмдэглэл\n", 1)[1]
+        source = source.split(u"\n## Тэмдэглэл\n", 1)[0]
+
+    d = Draft(code=code)
+    d.title = title
+    d.content = source
+    d.note = note
+    d.credits = credits
+    d.save()
+
+    # x.flash = ""
+    x.redirect("/drafts")
 
 
 @route("/extension")

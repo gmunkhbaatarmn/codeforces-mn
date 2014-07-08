@@ -42,7 +42,8 @@
     <div style="clear:both"></div>
   </div>
   <div style="display:hidden">
-    <form method="post" action="" id="js-form">
+    <form method="post" action="/drafts" id="js-form">
+      <input type="hidden" name="_method" value="put">
       <input type="hidden" name="code" value="{{ problem.code }}">
       <input type="hidden" name="source" id="js-input-source" value="">
     </form>

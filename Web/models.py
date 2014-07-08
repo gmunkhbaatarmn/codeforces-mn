@@ -1,6 +1,15 @@
 from natrix import Model, db, json
 
 
+class Draft(Model):
+    code = db.StringProperty()
+    title = db.StringProperty()
+    content = db.TextProperty(default="")
+    note = db.TextProperty(default="")
+    credits = db.StringProperty(default="")
+    added = db.DateTimeProperty(auto_now=True)
+
+
 class Problem(Model):
     code = db.StringProperty()
     title = db.StringProperty()
