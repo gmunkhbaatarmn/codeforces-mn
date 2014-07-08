@@ -116,8 +116,8 @@ def suggestion_index(x):
     x.render("suggestion-index.html", **locals())
 
 
-@route("/suggestion:PUT")
-def suggestion_put(x):
+@route("/suggestion:INSERT")
+def suggestion_insert(x):
     code = x.request.get("code")
     source = x.request.get("source").strip().decode("utf-8")
     source = source.replace("\r\n", "\n")
@@ -144,6 +144,36 @@ def suggestion_put(x):
 
     # x.flash = ""
     x.redirect("/suggestion")
+
+
+@route("/suggestion:PUBLISH")
+def suggestion_publish(x):
+    id = x.request.get("id")
+    suggestion = Suggestion.get_by_id(int(id))
+    problem = Problem.find(code=suggestion.code)
+
+    source = x.request.get("source").strip().decode("utf-8")
+    source = source.replace("\r\n", "\n")
+    title = source.split("\n", 1)[0][2:]
+    source = source.split("\n", 1)[1].strip()
+    credits = source.rsplit("\n", 1)[1][3:]
+    source = source.rsplit("\n", 1)[0].strip()
+    note = ""
+    # '## Temdeglel'
+    heading = u"\n## \u0422\u044d\u043c\u0434\u044d\u0433\u043b\u044d\u043b\n"
+    if heading in source:
+        note = source.split(heading, 1)[1]
+        source = source.split(heading, 1)[0]
+
+    problem.title = title
+    problem.content = source
+    problem.note = note
+    problem.credits = credits
+    problem.save()
+
+    suggestion.delete()
+
+    x.redirect(str(problem.link), delay=1)
 
 
 @route("/suggestion/(\d+)")
