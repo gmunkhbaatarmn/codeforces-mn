@@ -107,9 +107,10 @@
     });
 
     $("#js-delete").on("click", function() {
-      $("#js-input-source").val($("#source").val());
-      $("#js-method").val("delete");
-      $("#js-form").submit();
+      if (confirm("Та энэ үйлдлийг хийхдээ итгэлтэй байна уу?")) {
+        $("#js-method").val("delete");
+        $("#js-form").submit();
+      }
     });
 
     $("#js-diff").on("click", function() {

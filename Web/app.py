@@ -176,6 +176,15 @@ def suggestion_publish(x):
     x.redirect(str(problem.link), delay=1)
 
 
+@route("/suggestion:DELETE")
+def suggestion_delete(x):
+    id = x.request.get("id")
+    suggestion = Suggestion.get_by_id(int(id))
+    suggestion.delete()
+
+    x.redirect("/suggestion")
+
+
 @route("/suggestion/(\d+)")
 def suggestion_review(x, id):
     suggestion = Suggestion.get_by_id(int(id))
