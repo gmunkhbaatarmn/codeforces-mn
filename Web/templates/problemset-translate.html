@@ -3,15 +3,16 @@
 {# todo: set meta = "nofollow" #}
 {% set sidebar = "no" %}
 {% set title = problem.code.strip().replace("-", "") ~ " орчуулах" %}
+{% set menu = "problems" %}
 
 {% block content %}
-  <div style="border:3px solid #e1e1e1; width:49%; float:left; border-radius:7px">
+  <div style="border:3px solid #e1e1e1; width:49%; float:right; border-radius:7px">
     <div style="background:#e1e1e1; border-radius:4px 4px 0 0; height:30px; line-height:30px; padding:0 5px 8px 5px" id="toolbar">
       <div class="" style="float:right">
-        <a href="javascript:;" style="font-size:12px; margin-right:1em" onclick="javascript:focus_toggle(this);">Fullscreen</a>
-        <a class="btn" href="javascript:;" id="js-save">Хадгалах</a>
+        <a href="http://codeforces.com{{ problem.link }}" style="font-size:12px" target="_blank">codeforces.com{{ problem.link }}</a>
       </div>
-      <a href="http://codeforces.com{{ problem.link }}" style="font-size:12px" target="_blank">codeforces.com{{ problem.link }}</a>
+      <a class="btn" href="javascript:;" id="js-save">Хадгалах</a>
+      <a href="javascript:;" style="font-size:12px; margin-left:1em" onclick="javascript:focus_toggle(this);">Fullscreen</a>
     </div>
 
     <textarea id="source" style="font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:100%; height: 520px; box-sizing:border-box; resize:vertical; border:0; outline:none; border-radius:7px; padding:5px; margin-top:-5px">
@@ -19,13 +20,15 @@
 
 {{ problem.content }}
 
-{{- "\n## Тэмдэглэл\n" ~ problem.note if problem.note else "" }}
+{{- "\n\n## Тэмдэглэл\n" ~ problem.note if problem.note else "" }}
 
 -- {{ problem.credits or "Орчуулагчийн нэр" }}</textarea>
   </div>
 
-  <div style="border:0px solid #ddd; width: 49%; float:right; min-height: 420px; border-radius:7px" class="problem-statement">
-    <div id="preview" class="mathjax"></div>
+  <div style="border:0px solid #ddd; width: 49%; float:left; min-height: 420px; border-radius:7px" class="problem-statement">
+    <div id="preview" class="mathjax">
+
+    </div>
 
     <h4>Жишээ тэстүүд</h4>
     {% for sample in problem.meta.tests %}
@@ -42,7 +45,7 @@
     <div style="clear:both"></div>
   </div>
   <div style="display:hidden">
-    <form method="post" action="/drafts" id="js-form">
+    <form method="post" action="/suggestion" id="js-form">
       <input type="hidden" name="_method" value="put">
       <input type="hidden" name="code" value="{{ problem.code }}">
       <input type="hidden" name="source" id="js-input-source" value="">
@@ -62,7 +65,7 @@
     }
     #toolbar a.btn {
       text-decoration: none;
-      padding: 4px 7px 5px;
+      padding: 2px 7px 3px;
       background: #eee;
       border-radius: 3px;
       font-size: 12px;
