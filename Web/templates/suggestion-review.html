@@ -15,9 +15,10 @@
       </div>
     </div>
 
+    <div id="result" style="background:#fff; color:#777; white-space:pre-line; display:none; font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:100%; height: 520px; box-sizing:border-box; resize:vertical; border:0; outline:none; border-radius:7px; padding:5px; margin-top:-5px"></div>
     <textarea id="source" style="font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:100%; height: 520px; box-sizing:border-box; resize:vertical; border:0; outline:none; border-radius:7px; padding:5px; margin-top:-5px">
       {{- "# " ~ suggestion.title }}
-      {{- "\n\n" ~ suggestion.content }}
+      {{- "\n\n" ~ suggestion.content.strip() }}
       {{- "\n\n## Тэмдэглэл\n" ~ suggestion.note if suggestion.note else "" }}
       {{- "\n\n-- " ~ (suggestion.credits or "Орчуулагчийн нэр") -}}
     </textarea>
@@ -40,6 +41,7 @@
 
     <div style="clear:both"></div>
   </div>
+
   <div style="display:hidden">
     <form method="post" action="/suggestion" id="js-form">
       <input type="hidden" name="_method" id="js-method" value="">
@@ -61,10 +63,15 @@
     #toolbar a.btn-save          { background-color:#b9b9b9; }
     #toolbar a.btn-publish       { background-color:#f89500; }
     #toolbar a.btn-publish:hover { background-color:#e09100; }
+    #toolbar a.active            { background: #f6ffb8 }
     #footer                      { display:none }
+
+    del { text-decoration: none; color: #b30000; background: #fadad7 }
+    ins { background: #eaf2c2; color: #406619; text-decoration: none }
   </style>
 
   <script src="/static/markdown.js"></script>
+  <script src="/static/diff.js"></script>
   <script>
     var source = "";
     var render = function() {
@@ -97,7 +104,7 @@
         $("#container").css("width", "1200px");
         $("#content").css("margin-top", "2em");
       }
-      return false;
+      $("#js-fullscreen").toggleClass("active");
     });
 
     $("#js-publish").on("click", function() {
@@ -113,7 +120,37 @@
       }
     });
 
+    var oldStr = {{ json.dumps("# " ~ problem.title ~ "\n\n" ~ problem.content.strip() ~ ("\n\n## Тэмдэглэл\n" ~ problem.note if problem.note else "") ~ "\n\n -- " ~ (problem.credits or "Орчуулагчийн нэр")) }};
     $("#js-diff").on("click", function() {
+      var newStr = $("#source").val();
+      var diff = JsDiff.diffWords(oldStr, newStr);
+
+      var result = document.getElementById("result");
+      var fragment = document.createDocumentFragment();
+      for (var i = 0; i < diff.length; i++) {
+        if (diff[i].added && diff[i + 1] && diff[i + 1].removed) {
+          var swap = diff[i];
+          diff[i] = diff[i + 1];
+          diff[i + 1] = swap;
+        }
+
+        var node;
+        if (diff[i].removed) {
+          node = document.createElement('del');
+          node.appendChild(document.createTextNode(diff[i].value));
+        } else if (diff[i].added) {
+          node = document.createElement('ins');
+          node.appendChild(document.createTextNode(diff[i].value));
+        } else {
+          node = document.createTextNode(diff[i].value);
+        }
+        fragment.appendChild(node);
+      }
+      result.textContent = "";
+      result.appendChild(fragment);
+
+      $("#result,#source").toggle();
+      $("#js-diff").toggleClass("active");
     });
 
     render();

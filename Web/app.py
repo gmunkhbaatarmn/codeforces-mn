@@ -10,6 +10,7 @@ from models import Problem, Contest, Suggestion
 def context(self):
     return {
         "int": int,
+        "json": json,
         "top": data.fetch("Rating:contribution", []),
         "codeforces": data.fetch("Rating:codeforces", []),
         "topcoder": data.fetch("Rating:topcoder", []),
