@@ -12,7 +12,7 @@
         <a href="http://codeforces.com{{ problem.link }}" style="font-size:12px" target="_blank">codeforces.com{{ problem.link }}</a>
       </div>
       <a class="btn" href="javascript:;" id="js-save">Хадгалах</a>
-      <a href="javascript:;" style="font-size:12px; margin-left:1em" onclick="javascript:focus_toggle(this);">Fullscreen</a>
+      <a href="javascript:;" style="font-size:12px; margin-left:1em" id="js-fullscreen">Fullscreen</a>
     </div>
 
     <textarea id="source" style="font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:100%; height: 520px; box-sizing:border-box; resize:vertical; border:0; outline:none; border-radius:7px; padding:5px; margin-top:-5px">
@@ -56,26 +56,12 @@
 
 {% block bottom %}
   <style>
-    #toolbar a {
-      color: #5f5f5f;
-      text-decoration: none;
-    }
-    #toolbar a:hover {
-      text-decoration: underline;
-    }
-    #toolbar a.btn {
-      text-decoration: none;
-      padding: 2px 7px 3px;
-      background: #eee;
-      border-radius: 3px;
-      font-size: 12px;
-      background-color: #66c348;
-      color: #ffffff;
-    }
-    #toolbar a.btn:hover {
-      background-color: #5daf42;
-    }
-    #footer { display: none }
+    #toolbar a           { color:#5f5f5f; text-decoration:none }
+    #toolbar a:hover     { text-decoration:underline }
+    #toolbar a.btn       { text-decoration:none; padding:2px 7px 3px; background:#eee; border-radius:3px; font-size:12px; background-color:#66c348; color:#fff }
+    #toolbar a.btn:hover { background-color:#5daf42 }
+    #toolbar a.active    { background: #f6ffb8 }
+    #footer              { display: none }
   </style>
 
   <script src="/static/markdown.js"></script>
@@ -85,12 +71,10 @@
         $('#header,#menu').toggle();
         $("#container").css("width", "100%");
         $("#content").css("margin-top", "1em");
-        // $(el).css("background", "#e7ffe8").css("color", "#558555");
       } else {
         $('#header,#menu').toggle();
         $("#container").css("width", "1200px");
         $("#content").css("margin-top", "2em");
-        // $(el).css("background", "#eee").css("color", "#666");
       }
       return false;
     }
@@ -116,13 +100,24 @@
 
     $("#source").on("change keyup paste", render);
 
-    $(function() {
-      render();
+    $("#js-fullscreen").on("click", function() {
+      if ($("#header").is(":visible")) {
+        $('#header,#menu').toggle();
+        $("#container").css("width", "100%");
+        $("#content").css("margin-top", "1em");
+      } else {
+        $('#header,#menu').toggle();
+        $("#container").css("width", "1200px");
+        $("#content").css("margin-top", "2em");
+      }
+      $("#js-fullscreen").toggleClass("active");
+    });
 
-      $("#js-save").on("click", function() {
-        $("#js-input-source").val($("#source").val());
-        $("#js-form").submit();
-      });
-    })
+    $("#js-save").on("click", function() {
+      $("#js-input-source").val($("#source").val());
+      $("#js-form").submit();
+    });
+
+    render();
   </script>
 {% endblock %}
