@@ -2,7 +2,7 @@ import re
 import json
 import parse
 from markdown2 import markdown
-from natrix import app, route, data, log
+from natrix import app, route, data, info, warning
 from parse import cf_get_active_users, tc_get_active_users
 from models import Problem, Contest, Suggestion
 
@@ -117,7 +117,7 @@ def suggestion_index(x):
     x.render("suggestion-index.html", **locals())
 
 
-@route("/suggestion:INSERT")
+@route("/suggestion#insert")
 def suggestion_insert(x):
     code = x.request.get("code")
     source = x.request.get("source").strip().decode("utf-8")
@@ -147,7 +147,7 @@ def suggestion_insert(x):
     x.redirect("/suggestion")
 
 
-@route("/suggestion:PUBLISH")
+@route("/suggestion#publish")
 def suggestion_publish(x):
     id = x.request.get("id")
     suggestion = Suggestion.get_by_id(int(id))
@@ -177,7 +177,7 @@ def suggestion_publish(x):
     x.redirect(str(problem.link), delay=1)
 
 
-@route("/suggestion:DELETE")
+@route("/suggestion#delete")
 def suggestion_delete(x):
     id = x.request.get("id")
     suggestion = Suggestion.get_by_id(int(id))
@@ -227,13 +227,13 @@ def setup(x):
     data.write("Rating:topcoder", tc_get_active_users())
     # - Contests
     for page in range(5, 0, -1):
-        log("Contests page: %s" % page)
+        info("Contests page: %s" % page)
         for attempt in xrange(10):
             try:
                 datas = parse.contest_history(page)
                 break
             except:
-                log("Attempt: %s" % attempt)
+                warning("Attempt: %s" % attempt)
 
         for i in datas:
             c = Contest.find(id=int(i[0])) or Contest(id=int(i[0]))
@@ -244,7 +244,7 @@ def setup(x):
     problems = json.loads(open("problems-meta.json").read())
     translated = json.loads(open("problems-translated.json").read())
     for page in range(20, 0, -1):
-        log("Problemset page: %s" % page)
+        info("Problemset page: %s" % page)
         for attempt in xrange(10):
             try:
                 datas = parse.problemset(page)
@@ -254,7 +254,7 @@ def setup(x):
 
         for code, title in datas:
             if not re.search("^\d+[A-Z]$", code):
-                log("SKIPPED: %s" % code)
+                warning("SKIPPED: %s" % code)
                 continue
             code = "%3s-%s" % (code[:-1], code[-1])
 
@@ -266,7 +266,7 @@ def setup(x):
                 p.note = meta.pop("note")
                 p.meta_json = json.dumps(meta)
             else:
-                log("PROBLEM NOT FOUND: %s" % code)
+                warning("PROBLEM NOT FOUND: %s" % code)
 
             # translated fields
             if code in translated:
