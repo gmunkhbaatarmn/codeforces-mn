@@ -7,6 +7,9 @@ from parse import cf_get_active_users, tc_get_active_users
 from models import Problem, Contest, Suggestion
 
 
+app.config["session-key"] = "Tiy3ahhiefux2hailaiph4echidaelee3daighahdahruPhoh"
+
+
 def context(self):
     return {
         "int": int,
@@ -113,14 +116,32 @@ def ratings_update(x):
 
 @route("/suggestion")
 def suggestion_index(x):
+    if x.request.query == "logout":
+        x.session.pop("moderator", None)
+
     suggestions = Suggestion.all().order("-added")
+    login_failed = 1
+    x.render("suggestion-index.html", **locals())
+
+
+@route("/suggestion#login")
+def suggestion_login(x):
+    if x.request["password"] in data.fetch("moderators", {}):
+        x.session["moderator"] = 1
+        x.redirect("/suggestion")
+
+    suggestions = Suggestion.all().order("-added")
+    login_failed = 1
     x.render("suggestion-index.html", **locals())
 
 
 @route("/suggestion#insert")
 def suggestion_insert(x):
-    code = x.request.get("code")
-    source = x.request.get("source").strip().decode("utf-8")
+    if not x.session.get("moderator"):
+        x.redirect("/suggestion")
+
+    code = x.request["code"]
+    source = x.request["source"].strip().decode("utf-8")
     source = source.replace("\r\n", "\n")
 
     title = source.split("\n", 1)[0][2:]
@@ -149,11 +170,14 @@ def suggestion_insert(x):
 
 @route("/suggestion#publish")
 def suggestion_publish(x):
-    id = x.request.get("id")
+    if not x.session.get("moderator"):
+        x.redirect("/suggestion")
+
+    id = x.request["id"]
     suggestion = Suggestion.get_by_id(int(id))
     problem = Problem.find(code=suggestion.code)
 
-    source = x.request.get("source").strip().decode("utf-8")
+    source = x.request["source"].strip().decode("utf-8")
     source = source.replace("\r\n", "\n")
     title = source.split("\n", 1)[0][2:]
     source = source.split("\n", 1)[1].strip()
@@ -179,7 +203,10 @@ def suggestion_publish(x):
 
 @route("/suggestion#delete")
 def suggestion_delete(x):
-    id = x.request.get("id")
+    if not x.session.get("moderator"):
+        x.redirect("/suggestion")
+
+    id = x.request["id"]
     suggestion = Suggestion.get_by_id(int(id))
     suggestion.delete()
 
@@ -188,6 +215,9 @@ def suggestion_delete(x):
 
 @route("/suggestion/(\d+)")
 def suggestion_review(x, id):
+    if not x.session.get("moderator"):
+        x.redirect("/suggestion")
+
     suggestion = Suggestion.get_by_id(int(id))
     problem = Problem.find(code=suggestion.code)
 
@@ -222,6 +252,7 @@ def extension(x):
 
 @route("/setup")
 def setup(x):
+    # data.write("moderators", {"password": "name"})
     # - Ratings
     data.write("Rating:codeforces", cf_get_active_users())
     data.write("Rating:topcoder", tc_get_active_users())

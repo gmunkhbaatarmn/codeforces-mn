@@ -16,8 +16,13 @@
       </tr>
       {% for s in suggestions %}
       <tr>
-        <td class="text-center"><a href="/suggestion/{{ s.key().id() }}">{{ s.code }}</a></td>
-        <td><a href="/suggestion/{{ s.key().id() }}">{{ s.title }}</a></td>
+        {% if session.moderator %}
+          <td class="text-center"><a href="/suggestion/{{ s.key().id() }}">{{ s.code }}</a></td>
+          <td><a href="/suggestion/{{ s.key().id() }}">{{ s.title }}</a></td>
+        {% else %}
+          <td class="text-center">{{ s.code }}</td>
+          <td>{{ s.title }}</td>
+        {% endif %}
         <td>{{ s.credits }}</td>
         <td>{{ s.added.strftime("%b %d, %I:%m %p") }}</td>
       </tr>
@@ -37,5 +42,24 @@
     <div style="text-align:center">
       Санал болгосон орчуулгуудыг хянагч шалгаж үзээд нийтлэх буюу татгалзаж болно.
     </div>
+  </div>
+  <div class="box">
+    {% if session.moderator %}
+      <h2>Хянагчийн булан</h2>
+      <div style="text-align:center">
+        <a href="/suggestion?logout">Системээс гарах</a> (logout)
+      </div>
+    {% else %}
+      <h2>Хянагч нэвтрэх</h2>
+      <div style="text-align:center">
+        <form method="post" action="">
+          <input type="hidden" name=":method" value="login">
+          <input type="password" name="password" value="" placeholder="Нууц үг">
+        </form>
+        {% if login_failed %}
+          <div>Нууц үг буруу</div>
+        {% endif %}
+      </div>
+    {% endif %}
   </div>
 {% endblock %}
