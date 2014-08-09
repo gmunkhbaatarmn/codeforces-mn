@@ -8,29 +8,13 @@ from models import Problem, Contest, Suggestion
 
 
 app.config["session-key"] = "Tiy3ahhiefux2hailaiph4echidaelee3daighahdahruPhoh"
+app.config["context"] = lambda x: {
+    "top": data.fetch("Rating:contribution", []),
+    "codeforces": data.fetch("Rating:codeforces", []),
+    "topcoder": data.fetch("Rating:topcoder", []),
+    "markdown": lambda x: markdown(x, extras=["code-friendly"]),
+}
 
-
-def context(self):
-    return {
-        "int": int,
-        "json": json,
-        "top": data.fetch("Rating:contribution", []),
-        "codeforces": data.fetch("Rating:codeforces", []),
-        "topcoder": data.fetch("Rating:topcoder", []),
-        "markdown": lambda x: markdown(x, extras=["code-friendly"]),
-    }
-
-
-# --- Todo ---
-
-@route("/problemset/data")
-def problemset_data(x):
-    problems = Problem.all().order("-code")
-
-    x.response([p.code for p in problems], encode="json")
-
-
-# === Done ===
 
 @route("/")
 def home(x):
@@ -242,10 +226,13 @@ def extension(x):
             x = x[1:]
         return x
 
-    all_problem = sorted(filter(lambda x: x[1][1], all_problem.items()), key=lambda x: x[0])
+    all_problem = sorted(filter(lambda x: x[1][1], all_problem.items()),
+        key=lambda x: x[0])
     self.response.write("|".join([nozero(i[0]) for i in all_problem]) + "\n")
-    self.response.write("|".join(["%s:%s/%s" % (i[0], i[1][1], i[1][2]) for i in all_contest]) + "\n")
-    self.response.write("|".join(["%s:%s" % (k, v) for k, v in contribution]) + "\n")
+    self.response.write("|".join(["%s:%s/%s" % (i[0], i[1][1], i[1][2]) for i
+    in all_contest]) + "\n")
+    self.response.write("|".join(["%s:%s" % (k, v) for k, v in contribution]) +
+    "\n")
     self.response.write("%s\n" % Data.fetch("Contribution:full"))
     '''
 
@@ -317,6 +304,3 @@ def setup(x):
     data.write("Rating:contribution", contribution)
 
     x.response("OK")
-
-
-app.config["context"] = context
