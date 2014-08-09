@@ -1,6 +1,6 @@
 {% extends "Layout.html" %}
 
-{# todo: set meta = "nofollow" #}
+{% set head = '<meta name="robots" content="noindex, nofollow">' %}
 {% set sidebar = "no" %}
 {% set title = problem.code.strip().replace("-", "") ~ " орчуулах" %}
 {% set menu = "problems" %}
