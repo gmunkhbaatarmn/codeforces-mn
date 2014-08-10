@@ -13,6 +13,7 @@ app.config["context"] = lambda x: {
     "codeforces": data.fetch("Rating:codeforces", []),
     "topcoder": data.fetch("Rating:topcoder", []),
     "markdown": lambda x: markdown(x, extras=["code-friendly"]),
+    "suggestion_count": Suggestion.all().count(),
 }
 
 
@@ -104,7 +105,6 @@ def suggestion_index(x):
         x.session.pop("moderator", None)
 
     suggestions = Suggestion.all().order("-added")
-    login_failed = 1
     x.render("suggestion-index.html", **locals())
 
 
