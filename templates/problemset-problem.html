@@ -29,6 +29,10 @@
       <h2>Тэмдэглэл</h2>
       <div class="mathjax">{{ markdown(problem.note)|safe }}</div>
     {% endif %}
+
+    <div style="text-align:right">
+      <a href="{{ problem.link }}/edit" style="color:#999; font-size:12px; text-decoration:none">Орчуулгыг засах?</a>
+    </div>
   </div>
 {% endblock %}
 
