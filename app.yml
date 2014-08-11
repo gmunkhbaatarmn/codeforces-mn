@@ -34,6 +34,7 @@ libraries:
 
 skip_files:
 - ^(app|index)\.y(a)?ml         # appengine config files
-- ^(.*/)?.*\.(styl|coffee)      # some extensions not need to deploy
+- ^(.*/)?.*\.(styl|coffee)$     # some extensions not need to deploy
 - ^(.*/)?(#.*#)|(.*~)           # editor temp files
 - ^(.*/)?.*\.py[co]             # environment temp files
+- ^(.*/)?\..*$

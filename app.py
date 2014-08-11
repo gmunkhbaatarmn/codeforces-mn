@@ -121,9 +121,8 @@ def suggestion_login(x):
 
 @route("/suggestion#insert")
 def suggestion_insert(x):
-    if not x.session.get("moderator"):
-        x.redirect("/suggestion")
-
+    # if not x.session.get("moderator"):
+    #     x.redirect("/suggestion")
     code = x.request["code"]
     source = x.request["source"].strip().decode("utf-8")
     source = source.replace("\r\n", "\n")
@@ -148,8 +147,7 @@ def suggestion_insert(x):
     s.credits = credits
     s.save()
 
-    # x.flash = ""
-    x.redirect("/suggestion")
+    x.redirect("/suggestion", delay=1)
 
 
 @route("/suggestion#publish")
@@ -239,7 +237,9 @@ def extension(x):
 
 @route("/setup")
 def setup(x):
+    x.response("OK")
     # data.write("moderators", {"password": "name"})
+
     # - Ratings
     data.write("Rating:codeforces", cf_get_active_users())
     data.write("Rating:topcoder", tc_get_active_users())
