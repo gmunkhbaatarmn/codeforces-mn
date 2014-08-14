@@ -139,7 +139,7 @@ def contest_history(page=1):
     tree = lxml.html.fromstring(r.read())
     rows = tree.xpath("//div[@class='contests-table']//table/tr")[1:]
 
-    index = map(lambda x: x.attrib["data-contestid"], rows)
+    index = map(lambda x: int(x.attrib["data-contestid"]), rows)
     names = map(lambda x: x.xpath("./td[1]")[0].text.strip(), rows)
     start = map(lambda x: x.xpath("./td[2]")[0].text.strip(), rows)
 

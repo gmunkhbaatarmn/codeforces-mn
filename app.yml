@@ -18,6 +18,10 @@ handlers:
   static_dir: static
   expiration: "7d"
 
+- url: /update
+  script: app.app
+  login: admin
+
 - url: /ratings/update
   script: app.app
   login: admin
@@ -38,3 +42,4 @@ skip_files:
 - ^(.*/)?(#.*#)|(.*~)           # editor temp files
 - ^(.*/)?.*\.py[co]             # environment temp files
 - ^(.*/)?\..*$
+- ^.*\.db

@@ -1,5 +1,6 @@
 import re
 import json
+import time
 import parse
 from markdown2 import markdown
 from natrix import app, route, data, info, warning
@@ -17,11 +18,13 @@ app.config["context"] = lambda x: {
 }
 
 
+# Home
 @route("/")
 def home(x):
     x.render("home.html")
 
 
+# Contest
 @route("/contests")
 def contest_list(x, page="1"):
     # todo: translated problem count
@@ -54,6 +57,7 @@ def contest_problem(x, contest_id, index):
         x.render("contest-problem-en.html", locals())
 
 
+# Problemset
 @route("/problemset")
 def problemset_index(x, page="1"):
     # todo: link of non translated problem
@@ -87,6 +91,7 @@ def problemset_translate(x, contest_id, index):
     x.render("problemset-translate.html", locals())
 
 
+# Rating
 @route("/ratings")
 def ratings(x):
     x.render("ratings.html")
@@ -94,11 +99,16 @@ def ratings(x):
 
 @route("/ratings/update")
 def ratings_update(x):
+    start = time.time()
+
     data.write("Rating:codeforces", cf_get_active_users())
     data.write("Rating:topcoder", tc_get_active_users())
-    x.response("OK")
+
+    info("Executed seconds: %.1f" % (time.time() - start))
+    x.result("OK")
 
 
+# Suggestion
 @route("/suggestion")
 def suggestion_index(x):
     if x.request.query == "logout":
@@ -180,6 +190,8 @@ def suggestion_publish(x):
 
     suggestion.delete()
 
+    # todo: contribution point update
+
     x.redirect(str(problem.link), delay=1)
 
 
@@ -206,6 +218,7 @@ def suggestion_review(x, id):
     x.render("suggestion-review.html", **locals())
 
 
+# Others
 @route("/extension")
 def extension(x):
     '''
@@ -235,72 +248,41 @@ def extension(x):
     '''
 
 
-@route("/setup")
-def setup(x):
-    x.response("OK")
-    # data.write("moderators", {"password": "name"})
+@route("/update")
+def update(x):
+    " new contests, new problems "
+    # Check problemset first page
+    for code, title in parse.problemset(1):
+        if not re.search("^\d+[A-Z]$", code):
+            warning("SKIPPED: %s" % code)
+            continue
+        code = "%3s-%s" % (code[:-1], code[-1])
 
-    # - Ratings
-    data.write("Rating:codeforces", cf_get_active_users())
-    data.write("Rating:topcoder", tc_get_active_users())
-    # - Contests
-    for page in range(5, 0, -1):
-        info("Contests page: %s" % page)
-        for attempt in xrange(10):
-            try:
-                datas = parse.contest_history(page)
-                break
-            except:
-                warning("Attempt: %s" % attempt)
+        p = Problem.find(code=code) or Problem(code=code)
+        p.title = p.title or title
+        if not p.content:
+            # new problem
+            meta = parse.problem(p.code)
 
-        for i in datas:
-            c = Contest.find(id=int(i[0])) or Contest(id=int(i[0]))
-            c.name = i[1]
-            c.start = i[2]
-            c.save()
-    # - Problems
-    problems = json.loads(open("problems-meta.json").read())
-    translated = json.loads(open("problems-translated.json").read())
-    for page in range(20, 0, -1):
-        info("Problemset page: %s" % page)
-        for attempt in xrange(10):
-            try:
-                datas = parse.problemset(page)
-                break
-            except:
-                print "Attempt: %s" % attempt
-
-        for code, title in datas:
-            if not re.search("^\d+[A-Z]$", code):
-                warning("SKIPPED: %s" % code)
-                continue
-            code = "%3s-%s" % (code[:-1], code[-1])
-
-            p = Problem.find(code=code) or Problem(code=code)
-            p.title = title
-            if code in problems:
-                meta = problems[code]
-                p.content = meta.pop("content")
-                p.note = meta.pop("note")
-                p.meta_json = json.dumps(meta)
-            else:
-                warning("PROBLEM NOT FOUND: %s" % code)
-
-            # translated fields
-            if code in translated:
-                p.title = translated[code]["title"]
-                p.content = translated[code]["content"]
-                p.note = translated[code]["note"] or p.note
-                p.credits = translated[code]["credits"]
+            p.content = meta.pop("content")
+            p.note = meta.pop("note")
+            p.meta_json = json.dumps(meta)
             p.save()
-    # - Contribution point from datastore
-    contribution = {}
-    for p in Problem.all().filter("credits !=", ""):
-        translators = p.credits.split(", ")
-        for t in translators:
-            point = (p.meta.get("credit_point") or 1.0) / len(translators)
-            contribution[t] = contribution.get(t, 0.0) + point
-    contribution = sorted(contribution.items(), key=lambda t: -t[1])
-    data.write("Rating:contribution", contribution)
 
-    x.response("OK")
+    # Check contests first page
+    for id, name, start in parse.contest_history(1):
+        c = Contest.find(id=int(id)) or Contest(id=int(id))
+        if not c.name:
+            c.name = name
+            c.start = start
+            c.save()
+
+    # todo: Update contribution point
+    # contribution = {}
+    # for p in Problem.all().filter("credits !=", ""):
+    #     translators = p.credits.split(", ")
+    #     for t in translators:
+    #         point = (p.meta.get("credit_point") or 1.0) / len(translators)
+    #         contribution[t] = contribution.get(t, 0.0) + point
+    # contribution = sorted(contribution.items(), key=lambda t: -t[1])
+    # data.write("Rating:contribution", contribution)
