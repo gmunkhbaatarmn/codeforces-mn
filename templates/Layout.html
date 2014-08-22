@@ -58,7 +58,7 @@
           <tr>
             <th style="width:2.25em">#</th>
             <th>Нэр</th>
-            <th style="font-weight:normal;font-size:13px">{{ top_done }}/{{ top_full }}</th>
+            <th style="font-weight:normal;font-size:13px">{{ count_done }}/{{ count_all }}</th>
           </tr>
           {% for u in top %}
           <tr {{- ' class="hidden"'|safe if loop.index > 10 }}>
