@@ -5,7 +5,7 @@ import json
 import urllib
 import datetime
 import lxml.html
-from logging import warning
+from logging import warning, info
 from httplib import HTTPException
 import html2text as h2t
 from lxml import etree
@@ -16,9 +16,9 @@ def url_open(url):
         try:
             return urllib.urlopen(url)
         except IOError:
-            print "Delayed: '%s'" % url
+            info("Delayed: '%s'" % url)
         except HTTPException:
-            print "Delayed: '%s'" % url
+            info("Delayed: '%s'" % url)
     raise Exception("Network Error")
 
 
