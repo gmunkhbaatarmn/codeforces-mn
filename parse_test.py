@@ -19,7 +19,7 @@ def test_contest():
 
 
 def test_problemset():
-    eq(_.problemset(19)[-1], ["1A", "Theatre Square"])
+    eq(_.problemset(20)[-1], ["1A", "Theatre Square"])
 
 
 def test_problem():
@@ -30,10 +30,6 @@ def test_problem():
     eq(p["time"], "1 second")
     eq(p["tests"][0], ("1 3 2 1 5 10\n0 10", "30"))
     eq(p["tests"][1], ("2 8 4 2 5 10\n20 30\n50 100", "570"))
-
-
-def test_contest_history():
-    eq(_.contest_history(1)[1], [])
 
 
 if __name__ == "__main__":

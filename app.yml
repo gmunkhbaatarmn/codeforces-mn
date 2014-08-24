@@ -22,6 +22,10 @@ handlers:
   script: app.app
   login: admin
 
+- url: /setup
+  script: app.app
+  login: admin
+
 - url: /ratings/update
   script: app.app
   login: admin
@@ -43,3 +47,6 @@ skip_files:
 - ^(.*/)?.*\.py[co]             # environment temp files
 - ^(.*/)?\..*$
 - ^.*\.db
+
+# - todo: ignore `Chrome`
+# - todo: ignore `Firefox`
