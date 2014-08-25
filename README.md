@@ -1,20 +1,21 @@
-# Хэрэглэх
-1. Танд [Google Chrome][1] хөтөч хэрэг болно.
-2. Chrome-д зориулсан нэмэлтийг татаж суулгана уу: [Codeforces Mongolia][2]
-3. Codeforces.com-н **PROBLEMSET** цэс рүү орно.
-   (http://codeforces.com/problemset) Монголоор орчуулагдсан бодлогуудын өмнө
-   ягаан од ялгарч харагдана.
-4. Тод ногооноор ялгарч харагдсан бодлогыг нээгээд бодлогын нэрний доор байх
-   "Монголоор унших" гэсэн линк дээр дарахад бодлогын өгүүлбэр өөрөө
-   орчуулагдсан байх болно.
-5. Бодлогын өгүүлбэрийг Англиар уншихыг хүсвэл хуудсаа refresh хийхэд л
-   хангалттай.
-
-todo: usage of codeforces.mn
+Mongolian translation of [codeforces.com](http://www.codeforces.com/).
+Runs live on [codeforces.mn](http://www.codeforces.mn/)
 
 
-# Хувь нэмрээ оруулах
-todo: translation add guide
+Run on local computer
+=====================
 
-  [1]: https://www.google.com/intl/en/chrome/browser/
-  [2]: https://chrome.google.com/webstore/detail/codeforces-mongolia/fghdlncknpkheekfjgdlnahjpomhbpbj
+- `git clone git@github.com:gmunkhbaatarmn/codeforces-mn.git`
+- `cd codeforces-mn`
+- `dev_appserver.py .`
+- For first time, launch link on browser
+  [http://localhost:8080/setup](http://localhost:8080/setup)
+
+
+Contributing
+============
+
+See [Open Issues](https://github.com/gmunkhbaatarmn/codeforces-mn/issues).
+
+- If you found any problems, please report on issues page.
+- If you made any change, send me pull request.
