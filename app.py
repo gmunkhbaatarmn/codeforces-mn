@@ -21,6 +21,16 @@ app.config["context"] = lambda x: {
 
 
 # Home
+@route(":error-404")
+def not_found(x):
+    x.render("error-404.html")
+
+
+@route(":error-500")
+def internal_error(x):
+    x.response("Sorry, Something technically wrong.")
+
+
 @route("/")
 def home(x):
     x.render("home.html")
