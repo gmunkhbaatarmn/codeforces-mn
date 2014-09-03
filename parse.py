@@ -185,7 +185,7 @@ def cf_get_active_users():
     for i in range(len(r)):
         r[i]["recent"] = (recent["contest_at"] == r[i]["contest_at"])
 
-    return r
+    return sorted(r, key=lambda user: -user["rating"])
 
 
 def tc_get_all_users():
