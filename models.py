@@ -1,4 +1,4 @@
-from natrix import Model, db, json
+from natrix import Model, db, json, data
 
 
 class Suggestion(Model):
@@ -40,6 +40,15 @@ class Problem(Model):
     @property
     def meta(self):
         return json.loads(self.meta_json)
+
+    def save(self):
+        super(Model, self).save()
+
+        # cache count query
+        count_all = Problem.all().count(3000)
+        count_done = Problem.all().filter("credits >", "").count(3000)
+        data.write("count_all", count_all)
+        data.write("count_done", count_done)
 
 
 class Contest(Model):

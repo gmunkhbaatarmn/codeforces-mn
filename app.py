@@ -15,8 +15,8 @@ app.config["context"] = lambda x: {
     "topcoder": data.fetch("Rating:topcoder", []),
     "markdown": lambda x: markdown(x, extras=["code-friendly"]),
     "suggestion_count": Suggestion.all().count(),
-    "count_all": Problem.all().count(10000),
-    "count_done": Problem.all().filter("credits >", "").count(10000),
+    "count_all": data.fetch("count_all"),
+    "count_done": data.fetch("count_done"),
 }
 
 
@@ -122,7 +122,7 @@ def ratings_update_task(x):
     data.write("Rating:topcoder", tc_get_active_users())
 
     info("Executed seconds: %.1f" % (time.time() - start))
-    x.result("OK")
+    x.response("OK")
 
 
 # Suggestion
