@@ -3,7 +3,7 @@ import json
 import time
 import parse
 from markdown2 import markdown
-from natrix import app, route, data, info, warning
+from natrix import app, route, data, info, warning, taskqueue
 from parse import cf_get_active_users, tc_get_active_users
 from models import Problem, Contest, Suggestion
 
@@ -111,6 +111,11 @@ def ratings(x):
 
 @route("/ratings/update")
 def ratings_update(x):
+    taskqueue.add(url="/ratings/update")
+
+
+@route("/ratings/update#post")
+def ratings_update_task(x):
     start = time.time()
 
     data.write("Rating:codeforces", cf_get_active_users())
