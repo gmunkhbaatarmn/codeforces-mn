@@ -37,7 +37,10 @@
       </div>
     {% endfor %}
 
-    <div id="note"></div>
+    {% if problem.note %}
+      <h2>Тэмдэглэл</h2>
+      <div id="note" class="mathjax">{{ markdown(problem.note)|safe }}</div>
+    {% endif %}
 
     <div style="clear:both"></div>
   </div>
@@ -81,11 +84,11 @@
         source = source.substring(0, source.lastIndexOf("\n"));
 
         preview = source.split("## Тэмдэглэл\n")[0]
-        note = "## Тэмдэглэл\n" + source.split("## Тэмдэглэл\n")[1]
+        note = source.split("## Тэмдэглэл\n")[1]
 
         $("#preview").html(markdown.toHTML(preview));
         $("#preview").append('<p class="credit">Орчуулсан: '+ credit +'</p>');
-        if (! note)
+        if (note)
           $("#note").html(markdown.toHTML(note));
 
         MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
