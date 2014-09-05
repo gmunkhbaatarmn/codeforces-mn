@@ -50,6 +50,16 @@ class Problem(Model):
         data.write("count_all", count_all)
         data.write("count_done", count_done)
 
+        # update contribution
+        contribution = {}
+        for p in Problem.all().filter("credits !=", ""):
+            translators = p.credits.split(", ")
+            for t in translators:
+                point = (p.meta.get("credit_point") or 1.0) / len(translators)
+                contribution[t] = contribution.get(t, 0.0) + point
+        contribution = sorted(contribution.items(), key=lambda t: -t[1])
+        data.write("Rating:contribution", contribution)
+
 
 class Contest(Model):
     id = db.IntegerProperty()
