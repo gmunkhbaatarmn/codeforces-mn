@@ -95,7 +95,17 @@
       }
     }
 
-    $("#source").on("change keyup paste", render);
+    var delay = (function(){
+      var timer = 0;
+      return function(callback, ms){
+        clearTimeout (timer);
+        timer = setTimeout(callback, ms);
+      };
+    })();
+
+    $("#source").on("change keyup paste", function() {
+      delay(render, 800);
+    });
 
     $("#js-fullscreen").on("click", function() {
       if ($("#header").is(":visible")) {

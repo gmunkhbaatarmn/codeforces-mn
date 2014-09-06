@@ -101,15 +101,25 @@
       }
     }
 
-    $("#source").on("change keyup paste", render);
+    var delay = (function(){
+      var timer = 0;
+      return function(callback, ms){
+        clearTimeout (timer);
+        timer = setTimeout(callback, ms);
+      };
+    })();
+
+    $("#source").on("change keyup paste", function() {
+      delay(render, 800);
+    });
 
     $("#js-fullscreen").on("click", function() {
       if ($("#header").is(":visible")) {
-        $('#header,#menu').toggle();
+        $("#header,#menu").toggle();
         $("#container").css("width", "100%");
         $("#content").css("margin-top", "1em");
       } else {
-        $('#header,#menu').toggle();
+        $("#header,#menu").toggle();
         $("#container").css("width", "1200px");
         $("#content").css("margin-top", "2em");
       }
