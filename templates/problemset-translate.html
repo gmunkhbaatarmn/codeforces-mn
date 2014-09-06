@@ -15,7 +15,7 @@
       <a href="javascript:;" style="font-size:12px; margin-left:1em" id="js-fullscreen">Fullscreen</a>
     </div>
 
-    <textarea id="source" style="font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:100%; height: 520px; box-sizing:border-box; resize:vertical; border:0; outline:none; border-radius:7px; padding:5px; margin-top:-5px">
+    <textarea id="source" style="font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:100%; height: 520px; box-sizing:border-box; resize:vertical; border:0; outline:none; border-radius:7px; margin-top:-5px">
 {{- "# " ~ problem.title }}
 
 {{ problem.content }}
@@ -118,10 +118,16 @@
         $("#header,#menu").toggle();
         $("#container").css("width", "100%");
         $("#content").css("margin-top", "1em");
+        $("#toolbar").parent().css({
+          "position": "fixed",
+          "top": "5px",
+          "right": "5px",
+        });
       } else {
         $("#header,#menu").toggle();
         $("#container").css("width", "1200px");
         $("#content").css("margin-top", "2em");
+        $("#toolbar").parent().css("position", "static");
       }
       $("#js-fullscreen").toggleClass("active");
     });

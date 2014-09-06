@@ -183,6 +183,9 @@ body {
   margin: 0 auto;
   width: 1200px;
 }
+code {
+  color: #8b2e2e;
+}
 .button {
   color: #fff;
   background-color: #5cb85c;

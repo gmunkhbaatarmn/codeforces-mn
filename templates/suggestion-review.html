@@ -16,7 +16,7 @@
     </div>
 
     <div id="result" style="background:#fff; color:#777; white-space:pre-line; display:none; font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:100%; height: 520px; box-sizing:border-box; resize:vertical; border:0; outline:none; border-radius:7px; padding:5px; margin-top:-5px"></div>
-    <textarea id="source" style="font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:100%; height: 520px; box-sizing:border-box; resize:vertical; border:0; outline:none; border-radius:7px; padding:5px; margin-top:-5px">
+    <textarea id="source" style="font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:100%; height: 520px; box-sizing:border-box; resize:vertical; border:0; outline:none; border-radius:7px; margin-top:-5px">
       {{- "# " ~ suggestion.title }}
       {{- "\n\n" ~ suggestion.content.strip() }}
       {{- "\n\n## Тэмдэглэл\n" ~ suggestion.note if suggestion.note else "" }}
@@ -109,13 +109,19 @@
 
     $("#js-fullscreen").on("click", function() {
       if ($("#header").is(":visible")) {
-        $('#header,#menu').toggle();
+        $("#header,#menu").toggle();
         $("#container").css("width", "100%");
         $("#content").css("margin-top", "1em");
+        $("#toolbar").parent().css({
+          "position": "fixed",
+          "top": "5px",
+          "right": "5px",
+        });
       } else {
-        $('#header,#menu').toggle();
+        $("#header,#menu").toggle();
         $("#container").css("width", "1200px");
         $("#content").css("margin-top", "2em");
+        $("#toolbar").parent().css("position", "static");
       }
       $("#js-fullscreen").toggleClass("active");
     });
