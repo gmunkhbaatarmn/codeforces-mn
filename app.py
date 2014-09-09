@@ -4,12 +4,13 @@ import time
 import parse
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, taskqueue
-from parse import cf_get_active_users, tc_get_active_users
+from parse import cf_get_active_users, tc_get_active_users, date_format
 from models import Problem, Contest, Suggestion
 
 
 app.config["session-key"] = "Tiy3ahhiefux2hailaiph4echidaelee3daighahdahruPhoh"
 app.config["context"] = lambda x: {
+    "date_format": date_format,
     "top": data.fetch("Rating:contribution", []),
     "codeforces": data.fetch("Rating:codeforces", []),
     "topcoder": data.fetch("Rating:topcoder", []),

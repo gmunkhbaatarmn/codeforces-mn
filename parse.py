@@ -11,6 +11,28 @@ from httplib import HTTPException
 from lxml import etree
 
 
+def date_format(date):
+    " Sep/07/2014 -> 2014/09/07 "
+    month, day, year = date.split("/")
+
+    month = {
+        "Jan": "01",
+        "Feb": "02",
+        "Mar": "03",
+        "Apr": "04",
+        "May": "05",
+        "Jun": "06",
+        "Jul": "07",
+        "Aug": "08",
+        "Sep": "09",
+        "Oct": "10",
+        "Nov": "11",
+        "Dec": "12",
+    }[month]
+
+    return "%s/%s/%s" % (year, month, day)
+
+
 def url_open(url):
     for attempt in range(10):
         try:

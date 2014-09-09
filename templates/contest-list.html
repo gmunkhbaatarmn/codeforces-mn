@@ -9,12 +9,14 @@
     <table>
       <tr>
         <th>Нэр</th>
+        <th>Огноо</th>
         <th style="width:5em">Орчуулагдсан</th>
         <th style="width:9em"></th>
       </tr>
       {% for c in contests %}
         <tr {{- loop.cycle(' class="dark"', "")|safe }}>
-          <td style="text-align:center"><a href="/contest/{{ c.id }}">{{ c.name.replace("<br>", " ") }}</a></td>
+          <td style="text-align:center"><a href="/contest/{{ c.id }}">{{ c.name }}</a></td>
+          <td style="text-align:center">{{ date_format(c.start) }}</td>
           {# <td style="text-align:center{{- ";background:#e6ffdb"|safe if c.translated_count == c.problems_count }}">{{ c.translated_count }} / {{ c.problems_count }}</td> #}
           <td style="text-align:center">{{ c.problems|length }}</td>
           <td style="text-align:center"><a href="http://codeforces.com/contest/{{ c.id }}/standings/friends/true" class="external">Эцсийн дүн</a></td>
