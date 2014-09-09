@@ -5,7 +5,7 @@
 
 {% block content %}
   <div class="problem-statement">
-    <h1>{{ problem.index }}. {{ problem.title }}</h1>
+    <h1>{{ letter }}. {{ problem.title }}</h1>
     <h3><strong>хугацааны хязгаарлалт</strong> {{ problem.meta.time.replace("seconds", "секунд").replace("second", "секунд") }}</h3>
     <h3><strong>санах ойн хязгаарлалт</strong> {{ problem.meta.memory.replace("megabytes", "мегабайт") }}</h3>
     <h3><strong>оролт</strong> {{ problem.meta.input.replace("standard input", "стандарт оролт") }}</h3>
@@ -42,7 +42,7 @@
     <div style="text-align:center">
       Codeforces.com дээр бодолтоо шалгана уу.
       <br>
-      <a href="http://codeforces.com/{{ contest_id }}/problem/{{ index }}" class="external">Codeforces дээрх хаяг</a>
+      <a href="http://codeforces.com/{{ contest_id }}/problem/{{ letter }}" class="external">Codeforces дээрх хаяг</a>
     </div>
   </div>
 {% endblock %}

@@ -62,8 +62,10 @@ def contest_dashboard(x, id):
 
 
 @route("/contest/(\d+)/problem/(\w+)")
-def contest_problem(x, contest_id, index):
-    problem = Problem.find(code="%3s-%s" % (contest_id, index))
+def contest_problem(x, contest_id, letter):
+    contest = Contest.find(id=int(contest_id))
+    code = dict(contest.problems)[letter]
+    problem = Problem.find(code=code)
 
     if problem.credits:
         x.render("contest-problem.html", locals())
