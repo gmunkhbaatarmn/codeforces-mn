@@ -27,10 +27,6 @@ class Problem(Model):
         return "/problemset/problem/%s" % self.code.replace("-", "/").strip()
 
     @property
-    def link_contest(self):
-        return "/contest/%s/problem/%s" % (self.contest_id, self.index)
-
-    @property
     def index(self):
         return self.code.split("-")[1]
 
@@ -59,4 +55,13 @@ class Contest(Model):
 
         for letter, code in sorted(data.items()):
             result.append([letter, code])
+        return result
+
+    @property
+    def problems_object(self):
+        result = []
+
+        for letter, code in sorted(self.problems, key=lambda p: p[0]):
+            result.append([letter, Problem.find(code=code)])
+
         return result
