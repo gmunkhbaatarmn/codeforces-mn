@@ -4,7 +4,7 @@
 {% set menu = "problemset" %}
 
 {% block content %}
-  <h1 class="table-title">Бүх бодлогууд ({{ count }})</h1>
+  <h1 class="table-title">Бүх бодлогууд ({{ count_all }})</h1>
   <div class="table-container">
     <table>
       <tr>
@@ -13,7 +13,6 @@
         <th style="width:16em"></th>
       </tr>
       {% for t in problems %}
-      {# for t in reversed(data[(17-page) * 100:(18-page) * 100]) #}
         <tr {{- loop.cycle(' class="dark"', "")|safe }}>
           {% if t.credits %}
             {# translated #}

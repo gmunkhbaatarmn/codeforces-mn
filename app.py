@@ -76,9 +76,7 @@ def contest_problem(x, contest_id, index):
 def problemset_index(x, page="1"):
     # todo: link of non translated problem
     offset = 100 * (int(page) - 1)
-
     problems = Problem.all().order("-code").fetch(100, offset=offset)
-    count = Problem.all().count(10000)
 
     x.render("problemset-index.html", locals())
 
@@ -269,7 +267,8 @@ def extension(x):
     # 4. all problems count
     x.response.write("%s\n" % Problem.all().count(10000))
 
-    ''' extension old codes
+    '''
+    extension old codes
     all_problem = dict(Data.fetch("All:problem"))
     all_similar = Data.fetch("All:similar")
     all_contest = Data.fetch("All:contest")
