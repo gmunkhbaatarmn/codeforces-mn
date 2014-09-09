@@ -193,6 +193,7 @@ def suggestion_publish(x):
     credits = source.rsplit("\n", 1)[1][3:]
     source = source.rsplit("\n", 1)[0].strip()
     note = ""
+
     # '## Temdeglel'
     heading = u"\n## \u0422\u044d\u043c\u0434\u044d\u0433\u043b\u044d\u043b\n"
     if heading in source:
@@ -205,10 +206,23 @@ def suggestion_publish(x):
     problem.credits = credits
     problem.save()
 
+    # cache count query
+    count_all = Problem.all().count(3000)
+    count_done = Problem.all().filter("credits >", "").count(3000)
+    data.write("count_all", count_all)
+    data.write("count_done", count_done)
+
+    # update contribution
+    contribution = {}
+    for p in Problem.all().filter("credits !=", ""):
+        translators = p.credits.split(", ")
+        for t in translators:
+            point = (p.meta.get("credit_point") or 1.0) / len(translators)
+            contribution[t] = contribution.get(t, 0.0) + point
+    contribution = sorted(contribution.items(), key=lambda t: -t[1])
+    data.write("Rating:contribution", contribution)
+
     suggestion.delete()
-
-    # todo: contribution point update
-
     x.redirect(str(problem.link), delay=1)
 
 
