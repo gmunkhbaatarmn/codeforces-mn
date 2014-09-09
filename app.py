@@ -2,6 +2,7 @@ import re
 import json
 import time
 import parse
+from hashlib import md5
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, taskqueue
 from parse import cf_get_active_users, tc_get_active_users, date_format
@@ -297,7 +298,8 @@ def extension(x):
 @route("/update")
 def update(x):
     " new contests, new problems "
-    # Check problemset first page
+    # - Check problemset first page
+    new_problems = 0
     for code, title in parse.problemset(1):
         if not re.search("^\d+[A-Z]$", code):
             warning("SKIPPED: %s" % code)
@@ -306,32 +308,44 @@ def update(x):
 
         p = Problem.find(code=code) or Problem(code=code)
         p.title = p.title or title
-        if not p.content:
-            # new problem
-            meta = parse.problem(p.code)
+        if p.content:
+            continue
 
-            p.content = meta.pop("content")
-            p.note = meta.pop("note")
-            p.meta_json = json.dumps(meta)
-            p.save()
+        # new problem found
+        new_problems += 1
+        meta = parse.problem(p.code)
 
-    # Check contests first page
+        p.content = meta.pop("content")
+        p.note = meta.pop("note")
+        p.meta_json = json.dumps(meta)
+        p.identifier = md5(json.dumps(meta["tests"])).hexdigest()
+        p.save()
+
+    # - Check contests first page
     for id, name, start in parse.contest_history(1):
         c = Contest.find(id=int(id)) or Contest(id=int(id))
-        if not c.name:
-            c.name = name
-            c.start = start
-            c.save()
+        if c.name:
+            continue
 
-    # todo: Update contribution point
-    # contribution = {}
-    # for p in Problem.all().filter("credits !=", ""):
-    #     translators = p.credits.split(", ")
-    #     for t in translators:
-    #         point = (p.meta.get("credit_point") or 1.0) / len(translators)
-    #         contribution[t] = contribution.get(t, 0.0) + point
-    # contribution = sorted(contribution.items(), key=lambda t: -t[1])
-    # data.write("Rating:contribution", contribution)
+        # new contest found
+        c.name = name
+        c.start = start
+        problems = {}
+        for letter, _ in parse.contest(c.id)["problems"]:
+            code = "%3s-%s" % (c.id, letter)
+            i = md5(json.dumps(parse.problem(code)["tests"])).hexdigest()
+            p = Problem.find(identifier=i)
+            if not p:
+                warning("not found: %s" % code)
+                continue
+            problems[letter] = p.code
+        c.problems_json = json.dumps(problems)
+        c.save()
+
+    # - Update problems count
+    if new_problems > 0:
+        count_all = data.fetch("count_all")
+        data.write("count_all", count_all + new_problems)
 
 
 @route("/setup")
