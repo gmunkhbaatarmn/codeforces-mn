@@ -5,7 +5,7 @@ import parse
 from hashlib import md5
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, taskqueue
-from parse import cf_get_active_users, tc_get_active_users, date_format
+from parse import codeforces_ratings, topcoder_ratings, date_format
 from models import Problem, Contest, Suggestion
 
 
@@ -120,8 +120,8 @@ def ratings_update(x):
 def ratings_update_task(x):
     start = time.time()
 
-    data.write("Rating:codeforces", cf_get_active_users())
-    data.write("Rating:topcoder", tc_get_active_users())
+    data.write("Rating:codeforces", codeforces_ratings())
+    data.write("Rating:topcoder", topcoder_ratings())
 
     info("Executed seconds: %.1f" % (time.time() - start))
     x.response("OK")
@@ -269,6 +269,11 @@ def extension(x):
     # 4. all problems count
     x.response.write("%s\n" % Problem.all().count(10000))
 
+    def nozero(x):
+        while x.startswith("0"):
+            x = x[1:]
+        return x
+
     '''
     extension old codes
     all_problem = dict(Data.fetch("All:problem"))
@@ -278,11 +283,6 @@ def extension(x):
 
     for k, v in all_similar.items():
         all_problem[v] = all_problem[k]
-
-    def nozero(x):
-        while x.startswith("0"):
-            x = x[1:]
-        return x
 
     all_problem = sorted(filter(lambda x: x[1][1], all_problem.items()),
         key=lambda x: x[0])
@@ -321,7 +321,6 @@ def update(x):
         p.meta_json = json.dumps(meta)
         p.identifier = md5(json.dumps(meta["tests"])).hexdigest()
         p.save()
-
     # - Check contests first page
     for id, name, start in parse.contest_history(1):
         # read only contest
@@ -346,11 +345,12 @@ def update(x):
             problems[letter] = p.code
         c.problems_json = json.dumps(problems)
         c.save()
-
     # - Update problems count
     if new_problems > 0:
         count_all = data.fetch("count_all")
         data.write("count_all", count_all + new_problems)
+
+    x.response("OK")
 
 
 @route("/setup")
@@ -361,8 +361,8 @@ def setup(x):
     start_time = time.time()
 
     # - Ratings
-    data.write("Rating:codeforces", cf_get_active_users())
-    data.write("Rating:topcoder", tc_get_active_users())
+    data.write("Rating:codeforces", codeforces_ratings())
+    data.write("Rating:topcoder", topcoder_ratings())
     # - Contests
     for page in range(5, 0, -1):
         info("Contests page: %s" % page)
