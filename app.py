@@ -76,7 +76,6 @@ def contest_problem(x, contest_id, letter):
 # Problemset
 @route("/problemset")
 def problemset_index(x, page="1"):
-    # todo: link of non translated problem
     offset = 100 * (int(page) - 1)
     problems = Problem.all().order("-code").fetch(100, offset=offset)
 
