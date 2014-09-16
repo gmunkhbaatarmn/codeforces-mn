@@ -42,11 +42,7 @@ libraries:
 
 skip_files:
 - ^(app|index)\.y(a)?ml         # appengine config files
-- ^(.*/)?.*\.(styl|coffee)$     # some extensions not need to deploy
+- ^(.*/)?.*\.(styl|coffee)$     # stylus, coffeescript files
 - ^(.*/)?(#.*#)|(.*~)           # editor temp files
 - ^(.*/)?.*\.py[co]             # environment temp files
-- ^(.*/)?\..*$
-- ^.*\.db
-
-# - todo: ignore `Chrome`
-# - todo: ignore `Firefox`
+- ^(.*/)?\..*$                  # dot-prefixed files
