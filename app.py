@@ -324,11 +324,15 @@ def update(x):
 
     # - Check contests first page
     for id, name, start in parse.contest_history(1):
+        # read only contest
+        if id in [419]:
+            continue
+
         c = Contest.find(id=int(id)) or Contest(id=int(id))
         if c.name:
             continue
 
-        # new contest found
+        info("new contest found: %s" % id)
         c.name = name
         c.start = start
         problems = {}
