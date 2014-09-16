@@ -1,4 +1,5 @@
 import re
+import cgi
 import sys
 import json
 import hmac
@@ -16,7 +17,7 @@ from jinja2 import Environment, FileSystemLoader
 sys.path.append("./packages")
 info, taskqueue  # pyflakes fix
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 
 # Core classes
@@ -28,14 +29,27 @@ class Request(object):
         self.query = environ["QUERY_STRING"]
         self.params = parse_qs(environ["QUERY_STRING"], keep_blank_values=1)
 
+        content_type = environ.get("HTTP_CONTENT_TYPE", "")
         if "wsgi.input" in environ:
-            self.POST = parse_qs(environ["wsgi.input"].read(),
-                                 keep_blank_values=1)
-            self.params.update(self.POST)
+            if content_type.startswith("multipart/form-data"):
+                form = cgi.FieldStorage(environ["wsgi.input"])
+                for k in form.keys():
+                    if not form[k].filename:
+                        self.params[k] = form[k].value
+                    else:
+                        self.params[k] = form[k]
+            if content_type.startswith("application/x-www-form-urlencoded"):
+                self.POST = parse_qs(environ["wsgi.input"].read(),
+                                     keep_blank_values=1)
+                self.params.update(self.POST)
 
         # allow custom method
         if self.method == "POST" and ":method" in self.params:
-            self.method = self.params.get(":method")[0].upper()
+            method = self.params.get(":method")
+            if isinstance(method, list):
+                self.method = method[0].upper()
+            else:
+                self.method = method.upper()
 
         cookie = Cookie.SimpleCookie()
         cookie.load(environ.get("HTTP_COOKIE", ""))
@@ -70,6 +84,8 @@ class Request(object):
         if isinstance(value, list) and len(value) == 1:
             value = value[0]
 
+        if isinstance(value, str):
+            value = value.decode("utf-8")
         return value
 
 
@@ -214,8 +230,9 @@ class Handler(object):
         raise self.response.Sent
 
     def render_string(self, template, context=None, **kwargs):
-        env = Environment(loader=FileSystemLoader(
-            self.config.get("template-path") or "./templates"))
+        template_path = self.config.get("template-path") or "./templates"
+        env = Environment(loader=FileSystemLoader(template_path),
+                          extensions=["jinja2.ext.loopcontrols"])
 
         context_dict = {
             "json": json,
@@ -250,7 +267,10 @@ class Handler(object):
 
     def abort(self, code, *args, **kwargs):
         self.response.code = code
-        self.response.body = "Error: %s" % code
+        if code == 404:
+            self.not_found(self)
+        else:
+            self.response.body = "Error: %s" % code
 
         raise self.response.Sent
 
@@ -281,7 +301,7 @@ class Application(object):
         """
         try:
             request = Request(environ)
-            response = Response()  # todo: change
+            response = Response()
 
             try:
                 " before "
@@ -310,6 +330,7 @@ class Application(object):
 
                 " handler "
                 x = Handler(request, response, self.config)
+                x.not_found = self.get_error_404()
 
                 handler, args = self.get_handler(request.path, request.method)
                 if handler:
@@ -406,7 +427,6 @@ class Application(object):
 
     def get_error_500(self):
         def _internal_error(x):
-            # todo: internal error: debug is true or false
             lines = traceback.format_exception(*sys.exc_info())
 
             x.response.headers["Content-Type"] = "text/plain;error"
