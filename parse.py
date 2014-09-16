@@ -8,6 +8,7 @@ import random
 import html2text as h2t
 from logging import warning, info
 from httplib import HTTPException
+from google.appengine.runtime.apiproxy_errors import DeadlineExceededError
 from lxml import etree
 
 
@@ -33,15 +34,16 @@ def date_format(date):
     return "%s/%s/%s" % (year, month, day)
 
 
-def url_open(url):
-    for attempt in range(10):
-        try:
-            return urllib.urlopen(url)
-        except IOError:
-            info("Delayed: '%s'" % url)
-        except HTTPException:
-            info("Delayed: '%s'" % url)
-    raise Exception("Network Error")
+def url_open(url, retry=0):
+    try:
+        return urllib.urlopen(url)
+    except (DeadlineExceededError, IOError, HTTPException):
+        info("Delayed (%s): %s" % (retry, url))
+
+    if retry < 10:
+        return url_open(url, retry + 1)
+
+    raise Exception("Network Error: %s" % url)
 
 
 def html2text(string):
@@ -169,16 +171,6 @@ def contest_history(page=1):
 
 
 # rating update
-def cf_get_all_users():
-    data = url_open("http://codeforces.com/ratings/country/Mongolia").read()
-    tree = lxml.html.document_fromstring(data)
-
-    users = []
-    for a in tree.xpath("//*[@class='datatable']//table//tr//td[2]/a[2]"):
-        users.append(a.text.strip())
-    return users
-
-
 def cf_get_user(handle):
     content = url_open("http://codeforces.com/profile/%s" % handle).read()
     data = content.split("data.push(")[1].split(");")[0]
@@ -197,8 +189,14 @@ def cf_get_user(handle):
 
 
 def cf_get_active_users():
+    data = url_open("http://codeforces.com/ratings/country/Mongolia").read()
+    tree = lxml.html.document_fromstring(data)
+    all_users = []
+    for a in tree.xpath("//*[@class='datatable']//table//tr//td[2]/a[2]"):
+        all_users.append(a.text.strip())
+
     r = []
-    for u in cf_get_all_users():
+    for u in all_users:
         d = cf_get_user(u)
         if d["active"]:
             r.append(d)
