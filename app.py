@@ -1,3 +1,4 @@
+# coding: utf-8
 import re
 import json
 import time
@@ -41,31 +42,41 @@ def home(x):
 # Contest
 @route("/contests")
 def contest_list(x, page="1"):
-    # todo: translated problem count in contest list
+    contest_list_paged(x, "1")
+
+
+@route("/contests/page/(\d+)")
+def contest_list_paged(x, page):
     offset = 100 * (int(page) - 1)
 
     contests = Contest.all().order("-id").fetch(100, offset=offset)
+    # todo: assert contests.count() > 0
+
     count = Contest.all().count(1000)
 
     x.render("contest-list.html", locals())
 
 
-@route("/contests/page/(\d+)")
-def contest_list_paged(x, page):
-    contest_list(x, page)
-
-
 @route("/contest/(\d+)")
 def contest_dashboard(x, id):
     contest = Contest.find(id=int(id))
+    if not contest:
+        x.abort(404)
+
     x.render("contest-dashboard.html", locals())
 
 
 @route("/contest/(\d+)/problem/(\w+)")
 def contest_problem(x, contest_id, letter):
     contest = Contest.find(id=int(contest_id))
+    if not contest:
+        x.abort(404)
+
     code = dict(contest.problems)[letter]
     problem = Problem.find(code=code)
+
+    if not problem:
+        x.abort(404)
 
     if problem.credits:
         x.render("contest-problem.html", locals())
@@ -76,20 +87,25 @@ def contest_problem(x, contest_id, letter):
 # Problemset
 @route("/problemset")
 def problemset_index(x, page="1"):
-    offset = 100 * (int(page) - 1)
-    problems = Problem.all().order("-code").fetch(100, offset=offset)
-
-    x.render("problemset-index.html", locals())
+    problemset_paged(x, "1")
 
 
 @route("/problemset/page/(\d+)")
 def problemset_paged(x, page):
-    problemset_index(x, page)
+    offset = 100 * (int(page) - 1)
+    problems = Problem.all().order("-code").fetch(100, offset=offset)
+
+    # todo: assert problems.count > 0
+
+    x.render("problemset-index.html", locals())
 
 
 @route("/problemset/problem/(\d+)/(\w+)")
 def problemset_problem(x, contest_id, index):
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
+
+    if not problem:
+        x.abort(404)
 
     if problem.credits:
         x.render("problemset-problem.html", locals())
@@ -100,6 +116,8 @@ def problemset_problem(x, contest_id, index):
 @route("/problemset/problem/(\d+)/(\w+)/edit")
 def problemset_translate(x, contest_id, index):
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
+    if not problem:
+        x.abort(problem)
 
     x.render("problemset-translate.html", locals())
 
@@ -144,13 +162,12 @@ def suggestion_login(x):
 
     suggestions = Suggestion.all().order("-added")
     login_failed = 1
-    x.render("suggestion-index.html", **locals())
+
+    x.render("suggestion-index.html", locals())
 
 
 @route("/suggestion#insert")
 def suggestion_insert(x):
-    # if not x.session.get("moderator"):
-    #     x.redirect("/suggestion")
     code = x.request["code"]
     source = x.request["source"].strip()
     source = source.replace("\r\n", "\n")
@@ -162,8 +179,7 @@ def suggestion_insert(x):
     source = source.rsplit("\n", 1)[0].strip()
 
     note = ""
-    # '## Temdeglel'
-    heading = u"\n## \u0422\u044d\u043c\u0434\u044d\u0433\u043b\u044d\u043b\n"
+    heading = u"\n## Тэмдэглэл\n"
     if heading in source:
         note = source.split(heading, 1)[1]
         source = source.split(heading, 1)[0]
@@ -195,8 +211,7 @@ def suggestion_publish(x):
     source = source.rsplit("\n", 1)[0].strip()
     note = ""
 
-    # '## Temdeglel'
-    heading = u"\n## \u0422\u044d\u043c\u0434\u044d\u0433\u043b\u044d\u043b\n"
+    heading = u"\n## Тэмдэглэл\n"
     if heading in source:
         note = source.split(heading, 1)[1]
         source = source.split(heading, 1)[0]
@@ -247,7 +262,7 @@ def suggestion_delete(x):
     suggestion = Suggestion.get_by_id(int(id))
     suggestion.delete()
 
-    x.redirect("/suggestion")
+    x.redirect("/suggestion", delay=1.0)
 
 
 @route("/suggestion/(\d+)")
@@ -256,9 +271,12 @@ def suggestion_review(x, id):
         x.redirect("/suggestion")
 
     suggestion = Suggestion.get_by_id(int(id))
+    if not suggestion:
+        x.abort(404)
+
     problem = Problem.find(code=suggestion.code)
 
-    x.render("suggestion-review.html", **locals())
+    x.render("suggestion-review.html", locals())
 
 
 # Others
@@ -281,24 +299,15 @@ def extension(x):
     x.response.write("%s\n" % Problem.all().count(10000))
 
     '''
-    extension old codes
+    todo: support for contest problems
     all_problem = dict(Data.fetch("All:problem"))
-    all_similar = Data.fetch("All:similar")
-    all_contest = Data.fetch("All:contest")
-    contribution = Data.fetch("Rating:contribution")
 
-    for k, v in all_similar.items():
+    for k, v in Data.fetch("All:similar").items():
         all_problem[v] = all_problem[k]
 
     all_problem = sorted(filter(lambda x: x[1][1], all_problem.items()),
-        key=lambda x: x[0])
+                         key=lambda x: x[0])
     self.response.write("|".join([zerotrim(i[0]) for i in all_problem]) + "\n")
-
-    self.response.write("|".join(["%s:%s/%s" % (i[0], i[1][1], i[1][2]) for i
-    in all_contest]) + "\n")
-    self.response.write("|".join(["%s:%s" % (k, v) for k, v in contribution]) +
-    "\n")
-    self.response.write("%s\n" % Data.fetch("Contribution:full"))
     '''
 
 
@@ -346,7 +355,7 @@ def update(x):
             i = md5(json.dumps(parse.problem(code)["tests"])).hexdigest()
             p = Problem.find(identifier=i)
             if not p:
-                warning("not found: %s" % code)
+                warning("Problem not found: %s" % code)
                 continue
             problems[letter] = p.code
         c.problems_json = json.dumps(problems)
@@ -365,6 +374,7 @@ def setup(x):
         x.response("Deny: Only for development")
 
     start_time = time.time()
+    # todo: better and easy setup for local development
 
     # - Ratings
     data.write("Rating:codeforces", codeforces_ratings())
