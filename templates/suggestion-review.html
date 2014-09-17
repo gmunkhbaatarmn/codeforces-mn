@@ -4,6 +4,7 @@
 {% set title = "Хяналт - " ~ suggestion.code %}
 {% set menu = "suggestion" %}
 
+
 {% block content %}
   <div style="border:3px solid #e1e1e1; width:49%; float:right; border-radius:7px">
     <div style="background:#e1e1e1; border-radius:4px 4px 0 0; height:30px; line-height:30px; padding:0 5px 8px 5px" id="toolbar">
@@ -15,8 +16,8 @@
       </div>
     </div>
 
-    <div id="result" style="background:#fff; color:#777; white-space:pre-line; display:none; font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:100%; height: 520px; box-sizing:border-box; resize:vertical; border:0; outline:none; border-radius:7px; padding:5px; margin-top:-5px"></div>
-    <textarea id="source" style="font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:100%; height: 520px; box-sizing:border-box; resize:vertical; border:0; outline:none; border-radius:7px; margin-top:-5px">
+    <div id="result" style="background:#fff; color:#777; white-space:pre-line; display:none; font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:100%; height:520px; box-sizing:border-box; resize:vertical; border:0; outline:none; border-radius:7px; padding:5px; margin-top:-5px"></div>
+    <textarea id="source" style="font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:100%; height:520px; box-sizing:border-box; resize:vertical; border:0; outline:none; border-radius:7px; margin-top:-5px">
       {{- "# " ~ suggestion.title }}
       {{- "\n\n" ~ suggestion.content.strip() }}
       {{- "\n\n## Тэмдэглэл\n" ~ suggestion.note if suggestion.note else "" }}
@@ -24,7 +25,7 @@
     </textarea>
   </div>
 
-  <div style="border:0px solid #ddd; width: 49%; float:left; min-height: 420px; border-radius:7px" class="problem-statement">
+  <div style="border:0px solid #ddd; width:49%; float:left; min-height:420px; border-radius:7px" class="problem-statement">
     <div id="preview" class="mathjax"></div>
 
     <h4>Жишээ тэстүүд</h4>
@@ -69,8 +70,8 @@
     #toolbar a.active            { background: #f6ffb8 }
     #footer                      { display:none }
 
-    del { text-decoration: none; color: #b30000; background: #fadad7 }
-    ins { background: #eaf2c2; color: #406619; text-decoration: none }
+    del { text-decoration:none; color:#b30000; background:#fadad7 }
+    ins { background:#eaf2c2; color:#406619; text-decoration:none }
   </style>
 
   <script src="/static/markdown.js"></script>
@@ -155,10 +156,10 @@
 
         var node;
         if (diff[i].removed) {
-          node = document.createElement('del');
+          node = document.createElement("del");
           node.appendChild(document.createTextNode(diff[i].value));
         } else if (diff[i].added) {
-          node = document.createElement('ins');
+          node = document.createElement("ins");
           node.appendChild(document.createTextNode(diff[i].value));
         } else {
           node = document.createTextNode(diff[i].value);

@@ -3,6 +3,7 @@
 {% set title = "Бодлогууд" %}
 {% set menu = "problemset" %}
 
+
 {% block content %}
   <h1 class="table-title">Бүх бодлогууд ({{ count_all }})</h1>
   <div class="table-container">
@@ -18,12 +19,12 @@
             {# translated #}
             <td style="text-align:center"><a href="{{ t.link }}">{{ t.code.replace("-", "") }}</a></td>
             <td style="border-right:0"><a href="{{ t.link }}">{{ t.title }}</a></td>
-            <td style="text-align:right;color:#666;font-size:11px">{{ t.credits }}</td>
+            <td style="text-align:right; color:#666; font-size:11px">{{ t.credits }}</td>
           {% else %}
             {# not yet translated #}
             <td style="text-align:center"><a href="{{ t.link }}">{{ t.code.replace("-", "") }}</a></td>
             <td style="border-right:0">{{ t.title }}</td>
-            <td style="text-align:right;color:#666;font-size:11px"><a href="{{ t.link }}/edit">Орчуулах</a></td>
+            <td style="text-align:right; color:#666; font-size:11px"><a href="{{ t.link }}/edit">Орчуулах</a></td>
           {% endif %}
         </tr>
       {% endfor %}

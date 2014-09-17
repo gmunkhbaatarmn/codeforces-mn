@@ -31,7 +31,6 @@
     <li {{- ' class="current"'|safe if menu == "home"       }}><a href="/">Нүүр</a></li>
     <li {{- ' class="current"'|safe if menu == "contests"   }}><a href="/contests">Тэмцээнүүд</a></li>
     <li {{- ' class="current"'|safe if menu == "problemset" }}><a href="/problemset">Бодлогууд</a></li>
-    {# <li {{- ' class="current"'|safe if menu == "lessons"    }}><a href="">Хичээлүүд</a></li> #}
     <li {{- ' class="current"'|safe if menu == "ratings"    }}><a href="/ratings">Чансаа</a></li>
     <li {{- ' class="current"'|safe if menu == "suggestion" }} style="float:right; margin-right:0"><a href="/suggestion">Орчуулгын саналууд ({{ suggestion_count }})</a></li>
   </ul>
@@ -42,8 +41,10 @@
       <div class="box">
         <h2>Plugin суулгана уу</h2>
 
-        <div style="font-size:13px;color:#555">
-          Та бодлогуудыг орчуулагдсанаар нь <a href="http://codeforces.com">Codeforces.com</a> дээрээс ч гэсэн уншиж болох ба ингэхийн тулд Chrome хөтчид зориулсан нэмэлтийг суулгаж ашиглана уу.
+        <div style="font-size:13px; color:#555">
+          Та бодлогуудыг орчуулагдсанаар нь <a href="http://codeforces.com">Codeforces.com</a>
+          дээрээс ч гэсэн уншиж болох ба ингэхийн тулд Chrome хөтчид зориулсан
+          нэмэлтийг суулгаж ашиглана уу.
           <br>
           <br>
           <div>
@@ -58,13 +59,13 @@
           <tr>
             <th style="width:2.25em">#</th>
             <th>Нэр</th>
-            <th style="font-weight:normal;font-size:13px">{{ count_done }}/{{ count_all }}</th>
+            <th style="font-weight:normal; font-size:13px">{{ count_done }}/{{ count_all }}</th>
           </tr>
-          {% for u in top %}
+          {% for handle, point in top %}
           <tr {{- ' class="hidden"'|safe if loop.index > 10 }}>
             <td>{{ loop.index }}</td>
-            <td>{{ user(u[0], u[1])|safe }}</td>
-            <td>{{ u[1] }}</td>
+            <td>{{ user(handle, point)|safe }}</td>
+            <td>{{ point }}</td>
           </tr>
           {% endfor %}
           <tr>
@@ -89,7 +90,7 @@
               <td>{{ loop.index }}</td>
               <td>{{ cf_user(u.handle, u.rating)|safe }}</td>
               <td style="text-align:right">{{ u.rating }}</td>
-              <td style="border-left:0;text-align:left">{{ cf_rating(u.change, u.contest_id) }}</td>
+              <td style="border-left:0; text-align:left">{{ cf_rating(u.change, u.contest_id) }}</td>
             </tr>
           {% endfor %}
           <tr>
@@ -114,7 +115,7 @@
               <td>{{ loop.index }}</td>
               <td>{{ tc_user(u.handle, u.rating, u.id)|safe }}</td>
               <td style="text-align:right">{{ u.rating }}</td>
-              <td style="border-left:0;text-align:left">{{ tc_rating(u.change, u.contest_id, u.id) }}</td>
+              <td style="border-left:0; text-align:left">{{ tc_rating(u.change, u.contest_id, u.id) }}</td>
             </tr>
           {% endfor %}
           <tr>

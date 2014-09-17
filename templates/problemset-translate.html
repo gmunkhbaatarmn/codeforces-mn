@@ -5,6 +5,7 @@
 {% set title = problem.code.strip().replace("-", "") ~ " орчуулах" %}
 {% set menu = "problemset" %}
 
+
 {% block content %}
   <div style="border:3px solid #e1e1e1; width:49%; float:right; border-radius:7px">
     <div style="background:#e1e1e1; border-radius:4px 4px 0 0; height:30px; line-height:30px; padding:0 5px 8px 5px" id="toolbar">
@@ -25,10 +26,8 @@
 -- {{ problem.credits or "Орчуулагчийн нэр" }}</textarea>
   </div>
 
-  <div style="border:0px solid #ddd; width: 49%; float:left; min-height: 420px; border-radius:7px" class="problem-statement">
-    <div id="preview" class="mathjax">
-
-    </div>
+  <div style="border:0px solid #ddd; width:49%; float:left; min-height:420px; border-radius:7px" class="problem-statement">
+    <div id="preview" class="mathjax"></div>
 
     <h4>Жишээ тэстүүд</h4>
     {% for sample in problem.meta.tests %}
@@ -63,19 +62,19 @@
     #toolbar a:hover     { text-decoration:underline }
     #toolbar a.btn       { text-decoration:none; padding:2px 7px 3px; background:#eee; border-radius:3px; font-size:12px; background-color:#66c348; color:#fff }
     #toolbar a.btn:hover { background-color:#5daf42 }
-    #toolbar a.active    { background: #f6ffb8 }
-    #footer              { display: none }
+    #toolbar a.active    { background:#f6ffb8 }
+    #footer              { display:none }
   </style>
 
   <script src="/static/markdown.js"></script>
   <script>
     focus_toggle = function(el) {
       if ($("#header").is(":visible")) {
-        $('#header,#menu').toggle();
+        $("#header,#menu").toggle();
         $("#container").css("width", "100%");
         $("#content").css("margin-top", "1em");
       } else {
-        $('#header,#menu').toggle();
+        $("#header,#menu").toggle();
         $("#container").css("width", "1200px");
         $("#content").css("margin-top", "2em");
       }

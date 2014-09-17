@@ -13,6 +13,7 @@
   <span class="user-{{ color }}">{{ handle }}</span>
 {% endmacro %}
 
+
 {%- macro cf_user(handle, rating) -%}
   {%   if rating >= 2200 %}
     {% set color = "red" %}
@@ -30,6 +31,7 @@
   <a class="cf-user-{{ color }}" href="http://codeforces.com/profile/{{ handle }}">{{ handle }}</a>
 {%- endmacro -%}
 
+
 {%- macro cf_rating(change, contest_id, align="left") -%}
   {% if change >= 0 %}
     <a href="http://codeforces.com/contest/{{ contest_id }}" class="rating-up" style="text-align:{{ align }}">+{{ change }}</a>
@@ -37,6 +39,7 @@
     <a href="http://codeforces.com/contest/{{ contest_id }}" class="rating-down" style="text-align:{{ align }}">{{ change }}</a>
   {% endif %}
 {%- endmacro -%}
+
 
 {%- macro tc_user(handle, rating, id) -%}
   {%   if rating >= 2200 %}
@@ -52,6 +55,7 @@
   {% endif %}
   <a class="tc-user-{{ color }}" href="http://community.topcoder.com/tc?module=MemberProfile&tab=alg&cr={{ id }}">{{ handle }}</a>
 {%- endmacro -%}
+
 
 {%- macro tc_rating(change, contest_id, coder_id, align="left") -%}
   {% if change >= 0 %}

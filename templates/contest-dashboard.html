@@ -3,6 +3,7 @@
 {% set title = "Тэмцээн" %}
 {% set menu = "contests" %}
 
+
 {% block content %}
   <h1 class="table-title">Бодлогууд</h1>
   <div class="table-container">
@@ -18,12 +19,12 @@
             {# translated #}
             <td style="text-align:center"><a href="/contest/{{ contest.id }}/problem/{{ letter }}">{{ letter }}</a></td>
             <td style="border-right:0"><a href="/contest/{{ contest.id }}/problem/{{ letter }}">{{ p.title }}</a></td>
-            <td style="text-align:right;color:#666;font-size:11px">{{ p.credits }}</td>
+            <td style="text-align:right; color:#666; font-size:11px">{{ p.credits }}</td>
           {% else %}
             {# not yet translated #}
             <td style="text-align:center"><a href="/contest/{{ contest.id }}/problem/{{ letter }}">{{ letter }}</a></td>
             <td style="border-right:0">{{ p.title }}</td>
-            <td style="text-align:right;color:#666;font-size:11px"><a href="{{ p.link }}/edit">Орчуулах</a></td>
+            <td style="text-align:right; color:#666; font-size:11px"><a href="{{ p.link }}/edit">Орчуулах</a></td>
           {% endif %}
         </tr>
       {% endfor %}
@@ -31,10 +32,11 @@
   </div>
 {% endblock %}
 
+
 {% block sidebar %}
   <div class="box">
     <div style="text-align:center">
-      <span style="color:#000;font-weight:bold">{{ contest.name.replace("(", "<br>(")|safe }}</span>
+      <span style="color:#000; font-weight:bold">{{ contest.name.replace("(", "<br>(")|safe }}</span>
       <br>
       <br>
       <a href="http://codeforces.com/contest/{{ id }}" class="external">Codeforces.com дээрх хаяг</a>
