@@ -46,6 +46,15 @@ class Contest(Model):
     problems_json = db.StringProperty()
 
     @property
+    def translated_count(self):
+        count = 0
+
+        for code, problem in self.problems_object:
+            count += int(problem.credits != "")
+
+        return count
+
+    @property
     def problems(self):
         # dict of {letter: problemset code}
         result = []
