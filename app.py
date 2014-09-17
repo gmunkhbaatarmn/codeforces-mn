@@ -152,7 +152,7 @@ def suggestion_insert(x):
     # if not x.session.get("moderator"):
     #     x.redirect("/suggestion")
     code = x.request["code"]
-    source = x.request["source"].strip().decode("utf-8")
+    source = x.request["source"].strip()
     source = source.replace("\r\n", "\n")
 
     title = source.split("\n", 1)[0][2:]
@@ -187,7 +187,7 @@ def suggestion_publish(x):
     suggestion = Suggestion.get_by_id(int(id))
     problem = Problem.find(code=suggestion.code)
 
-    source = x.request["source"].strip().decode("utf-8")
+    source = x.request["source"].strip()
     source = source.replace("\r\n", "\n")
     title = source.split("\n", 1)[0][2:]
     source = source.split("\n", 1)[1].strip()
