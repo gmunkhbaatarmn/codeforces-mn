@@ -44,19 +44,11 @@ class Contest(Model):
     name = db.StringProperty()
     start = db.StringProperty()
     problems_json = db.StringProperty()
-
-    @property
-    def translated_count(self):
-        count = 0
-
-        for code, problem in self.problems_object:
-            count += int(problem.credits != "")
-
-        return count
+    translated_count = db.IntegerProperty()
 
     @property
     def problems(self):
-        # dict of {letter: problemset code}
+        # list of tuple (letter, problemset code)
         result = []
         if not self.problems_json:
             warning("Contest: %s" % self.id)

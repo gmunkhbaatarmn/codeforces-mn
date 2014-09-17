@@ -213,6 +213,17 @@ def suggestion_publish(x):
     data.write("count_all", count_all)
     data.write("count_done", count_done)
 
+    # update contest translated count
+    for c in Contest.all():
+        if problem.code not in dict(c.problems).values():
+            continue
+
+        count = 0
+        for code, problem in c.problems_object:
+            count += int(problem.credits != "")
+        c.translated_count = count
+        c.save()
+
     # update contribution
     contribution = {}
     for p in Problem.all().filter("credits !=", ""):
