@@ -268,8 +268,9 @@ def extension(x):
     arr = [p.code for p in Problem.all().filter("credits >", "")]
     x.response.write("|".join([p.strip() for p in sorted(arr)]) + "\n")
 
-    # 2. todo: contests "translated/all"
-    x.response.write("001:3/3\n")
+    # 2. contests "translated/all"
+    arr = [(c.id, c.translated_count, len(c.problems)) for c in Contest.all()]
+    x.response.write("|".join(["%03d:%s/%s" % t for t in sorted(arr)]) + "\n")
 
     # 3. contribution
     contribution = data.fetch("Rating:contribution")
@@ -278,11 +279,6 @@ def extension(x):
 
     # 4. all problems count
     x.response.write("%s\n" % Problem.all().count(10000))
-
-    def nozero(x):
-        while x.startswith("0"):
-            x = x[1:]
-        return x
 
     '''
     extension old codes
@@ -296,7 +292,7 @@ def extension(x):
 
     all_problem = sorted(filter(lambda x: x[1][1], all_problem.items()),
         key=lambda x: x[0])
-    self.response.write("|".join([nozero(i[0]) for i in all_problem]) + "\n")
+    self.response.write("|".join([zerotrim(i[0]) for i in all_problem]) + "\n")
 
     self.response.write("|".join(["%s:%s/%s" % (i[0], i[1][1], i[1][2]) for i
     in all_contest]) + "\n")
