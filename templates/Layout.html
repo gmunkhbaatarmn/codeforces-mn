@@ -12,7 +12,7 @@
   {{ head }}
   <meta property="og:title" content="{{ title }} · Codeforces.mn">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="{{ request.url }}">
+  <meta property="og:url" content="http://{{ request.url }}">
   <meta property="og:image" content="http://www.codeforces.mn/images/codeforces-logo.png">
 </head>
 <body>
@@ -57,8 +57,8 @@
         <h2>Шилдэг орчуулагчид</h2>
         <table>
           <tr>
-            <th style="width:2.25em">#</th>
-            <th>Нэр</th>
+            <th style="width:20px">#</th>
+            <th style="width:140px">Нэр</th>
             <th style="font-weight:normal; font-size:13px">{{ count_done }}/{{ count_all }}</th>
           </tr>
           {% for handle, point in top %}
@@ -79,8 +79,8 @@
         <h2>Codeforces чансаа</h2>
         <table>
           <tr>
-            <th style="width:2.25em">#</th>
-            <th>Нэр</th>
+            <th style="width:20px">#</th>
+            <th style="width:140px">Нэр</th>
             <th colspan="2">Чансаа</th>
           </tr>
           {% for u in codeforces %}
@@ -89,7 +89,7 @@
             <tr {{- (' class="%s"' % cls)|safe if cls.strip() else ""  }}>
               <td>{{ loop.index }}</td>
               <td>{{ cf_user(u.handle, u.rating)|safe }}</td>
-              <td style="text-align:right">{{ u.rating }}</td>
+              <td style="text-align:right; width:35px">{{ u.rating }}</td>
               <td style="border-left:0; text-align:left">{{ cf_rating(u.change, u.contest_id) }}</td>
             </tr>
           {% endfor %}
@@ -104,8 +104,8 @@
         <h2>Topcoder чансаа</h2>
         <table>
           <tr>
-            <th style="width:2.25em">#</th>
-            <th>Нэр</th>
+            <th style="width:20px">#</th>
+            <th style="width:140px">Нэр</th>
             <th colspan="2">Чансаа</th>
           </tr>
           {% for u in topcoder %}
@@ -114,7 +114,7 @@
             <tr {{- (' class="%s"' % cls)|safe if cls.strip() else ""  }}>
               <td>{{ loop.index }}</td>
               <td>{{ tc_user(u.handle, u.rating, u.id)|safe }}</td>
-              <td style="text-align:right">{{ u.rating }}</td>
+              <td style="text-align:right; width:35px">{{ u.rating }}</td>
               <td style="border-left:0; text-align:left">{{ tc_rating(u.change, u.contest_id, u.id) }}</td>
             </tr>
           {% endfor %}
