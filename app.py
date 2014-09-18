@@ -31,7 +31,7 @@ def not_found(x):
 
 @route(":error-500")
 def internal_error(x):
-    x.response("Sorry, Something technically wrong.")
+    x.render("error-500.html")
 
 
 @route("/")

@@ -120,6 +120,8 @@ def contest_history(page=1):
 
 # rating update
 def codeforces_user(handle):
+    info("codeforces_user(%s)" % handle)
+
     content = url_open("http://codeforces.com/profile/%s" % handle).read()
     data = content.split("data.push(")[1].split(");")[0]
 
