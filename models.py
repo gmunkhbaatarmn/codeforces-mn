@@ -44,7 +44,7 @@ class Contest(Model):
     name = db.StringProperty()
     start = db.StringProperty()
     problems_json = db.StringProperty()
-    translated_count = db.IntegerProperty()
+    translated_count = db.IntegerProperty(default=0)
 
     @property
     def problems(self):

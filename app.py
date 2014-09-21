@@ -50,7 +50,8 @@ def contest_list_paged(x, page):
     offset = 100 * (int(page) - 1)
 
     contests = Contest.all().order("-id").fetch(100, offset=offset)
-    # todo: assert contests.count() > 0
+    if contests.count() <= 0:
+        x.abort(404)
 
     count = Contest.all().count(1000)
 
@@ -97,7 +98,8 @@ def problemset_paged(x, page):
     offset = 100 * (int(page) - 1)
     problems = Problem.all().order("-code").fetch(100, offset=offset)
 
-    # todo: assert problems.count > 0
+    if problems.count() <= 0:
+        x.abort(404)
 
     x.render("problemset-index.html", locals())
 
