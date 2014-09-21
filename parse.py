@@ -14,6 +14,7 @@ from lxml import etree
 
 # parse from codeforces.com
 def problem(code):
+    info("Problem: %s" % code)
     r = url_open("http://codeforces.com/problemset/problem/" +
                  code.strip().replace("-", "/"))
 
@@ -80,11 +81,11 @@ def contest(id):
 
 def problemset(page=1):
     " Returns list of problems. Example item: (001-A, Theatre Square) "
-    r = url_open("http://codeforces.com/problemset/page/%s" % page)
     try:
+        r = url_open("http://codeforces.com/problemset/page/%s" % page)
         assert r.code == 200
         assert r.url == "http://codeforces.com/problemset/page/%s" % page
-    except AssertionError:
+    except (AssertionError, HTTPException):
         warning("Problemset page %s not reachable" % page)
         return
 
@@ -99,12 +100,11 @@ def problemset(page=1):
 
 def contest_history(page=1):
     " Returns list of contest "
-    r = url_open("http://codeforces.com/contests/page/%s" % page)
-
     try:
+        r = url_open("http://codeforces.com/contests/page/%s" % page)
         assert r.code == 200
         assert r.url == "http://codeforces.com/contests/page/%s" % page
-    except AssertionError:
+    except (AssertionError, HTTPException):
         # Active contest running
         return []
 
@@ -244,7 +244,7 @@ def url_open(url, retry=0):
     if retry < 10:
         return url_open(url, retry + 1)
 
-    raise Exception("Network Error: %s" % url)
+    raise HTTPException("Network Error: %s" % url)
 
 
 def html2text(string):
