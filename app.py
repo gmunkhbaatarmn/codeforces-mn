@@ -72,7 +72,9 @@ def contest_problem(x, contest_id, letter):
     if not contest:
         x.abort(404)
 
-    code = dict(contest.problems)[letter]
+    code = dict(contest.problems).get(letter)
+    if not code:
+        x.abort(404)
     problem = Problem.find(code=code)
 
     if not problem:
@@ -111,6 +113,25 @@ def problemset_problem(x, contest_id, index):
         x.render("problemset-problem.html", locals())
     else:
         x.render("problemset-problem-en.html", locals())
+
+
+@route("/problemset/problem/(\d+)/(\w+)\.html")
+def problem_embed(x, contest_id, index):
+    problem = Problem.find(code="%3s-%s" % (contest_id, index))
+    if not problem:
+        # it maybe contest' problem
+        contest = Contest.find(id=int(contest_id))
+        if not contest:
+            x.abort(404)
+        code = dict(contest.problems).get(index)
+        if not code:
+            x.abort(404)
+        problem = Problem.find(code=code)
+
+    if not problem:
+        x.abort(404)
+
+    x.render("problem-embed.html", locals())
 
 
 @route("/problemset/problem/(\d+)/(\w+)/edit")

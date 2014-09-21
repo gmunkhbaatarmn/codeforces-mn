@@ -1,14 +1,10 @@
-<h1>{{ problem.name }}</h1>
-{{ problem.content|safe }}
+<h1>{{ problem.title }}</h1>
 
-<h3>Оролт</h3>
-{{ problem.inputs|safe }}
+{{ markdown(problem.content.replace("## Оролт", "### Оролт").replace("## Гаралт", "### Гаралт"))|safe }}
 
-<h3>Гаралт</h3>
-{{ problem.outputs|safe }}
-<p class="credit">Орчуулсан: {{ problem.credit }}</p>
+<p class="credit">Орчуулсан: {{ problem.credits }}</p>
 
-{% if notes %}
+{% if problem.note %}
   <h3>Тэмдэглэл</h3>
-  {{ problem.notes|safe }}
+  {{ markdown(problem.note)|safe }}
 {% endif %}
