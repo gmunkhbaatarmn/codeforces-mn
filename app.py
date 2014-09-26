@@ -397,7 +397,6 @@ def setup(x):
         x.response("Deny: Only for development")
 
     start_time = time.time()
-    # todo: better and easy setup for local development
 
     # - Ratings
     data.write("Rating:codeforces", codeforces_ratings())
@@ -436,6 +435,12 @@ def setup(x):
             contribution[t] = contribution.get(t, 0.0) + point
     contribution = sorted(contribution.items(), key=lambda t: -t[1])
     data.write("Rating:contribution", contribution)
+
+    # count query
+    count_all = Problem.all().count(3000)
+    count_done = Problem.all().filter("credits >", "").count(3000)
+    data.write("count_all", count_all)
+    data.write("count_done", count_done)
 
     info("Executed seconds: %.1f" % (time.time() - start_time))
     x.response("Executed seconds: %.1f" % (time.time() - start_time))
