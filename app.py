@@ -403,7 +403,7 @@ def setup(x):
     data.write("Rating:codeforces", codeforces_ratings())
     data.write("Rating:topcoder", topcoder_ratings())
     # - Contests
-    for page in range(5, 0, -1):
+    for page in range(3, 0, -1):
         info("Contests page: %s" % page)
         for id, name, start in parse.contest_history(page):
             c = Contest.find(id=id) or Contest(id=id)
@@ -411,7 +411,7 @@ def setup(x):
             c.start = start
             c.save()
     # - Problemset
-    for page in range(20, 0, -1):
+    for page in range(3, 0, -1):
         info("Problemset page: %s" % page)
         datas = parse.problemset(page)
 
@@ -439,3 +439,13 @@ def setup(x):
 
     info("Executed seconds: %.1f" % (time.time() - start_time))
     x.response("Executed seconds: %.1f" % (time.time() - start_time))
+
+
+@route("/humans\.txt")
+def humans_txt(x):
+    x.response(x.render_string("humans.txt"))
+
+
+@route("/robots\.txt")
+def robots_txt(x):
+    x.response("User-agent: *")

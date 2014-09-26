@@ -105,7 +105,8 @@ def contest_history(page=1):
         assert r.code == 200
         assert r.url == "http://codeforces.com/contests/page/%s" % page
     except (AssertionError, HTTPException):
-        # Active contest running
+        # Reason: Active contest running
+        # Reason: Codeforces is temporary unavailable
         return []
 
     tree = lxml.html.fromstring(r.read())
