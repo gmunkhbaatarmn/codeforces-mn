@@ -34,9 +34,9 @@
 
 {%- macro cf_rating(change, contest_id, align="left") -%}
   {% if change >= 0 %}
-    <a href="http://codeforces.com/contest/{{ contest_id }}" class="rating-up" style="text-align:{{ align }}">+{{ change }}</a>
+    <a href="http://codeforces.com/contest/{{ contest_id }}/standings/friends/true" class="rating-up" style="text-align:{{ align }}">+{{ change }}</a>
   {% else %}
-    <a href="http://codeforces.com/contest/{{ contest_id }}" class="rating-down" style="text-align:{{ align }}">{{ change }}</a>
+    <a href="http://codeforces.com/contest/{{ contest_id }}/standings/friends/true" class="rating-down" style="text-align:{{ align }}">{{ change }}</a>
   {% endif %}
 {%- endmacro -%}
 
