@@ -320,7 +320,7 @@ def extension(x):
     x.response.write("\n")
 
     # 4. all problems count
-    x.response.write("%s\n" % Problem.all().count(10000))
+    x.response.write("%s\n" % data.fetch("count_all"))
 
     '''
     todo: support for contest problems
