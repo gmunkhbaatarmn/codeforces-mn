@@ -53,8 +53,7 @@ def contest_list_paged(x, page):
     if len(contests) <= 0:
         x.abort(404)
 
-    # todo: cache it
-    count = Contest.all().count(1000)
+    count = data.fetch("count:contest-all")
 
     x.render("contest-list.html", locals())
 
@@ -386,6 +385,9 @@ def update(x):
             problems[letter] = p.code
         c.problems_json = json.dumps(problems)
         c.save()
+
+        # update contest count
+        data.write("count:contest-all", Contest.all().count())
     # - Update problems count
     if new_problems > 0:
         count_all = data.fetch("count_all")
