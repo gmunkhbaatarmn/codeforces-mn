@@ -17,7 +17,7 @@ app.config["context"] = lambda x: {
     "codeforces": data.fetch("Rating:codeforces", []),
     "topcoder": data.fetch("Rating:topcoder", []),
     "markdown": lambda x: markdown(x, extras=["code-friendly"]),
-    "suggestion_count": Suggestion.all().count(),
+    "suggestion_count": Suggestion.all().count(10),
     "count_all": data.fetch("count_all"),
     "count_done": data.fetch("count_done"),
 }
@@ -48,11 +48,12 @@ def contest_list(x, page="1"):
 @route("/contests/page/(\d+)")
 def contest_list_paged(x, page):
     offset = 100 * (int(page) - 1)
-
     contests = Contest.all().order("-id").fetch(100, offset=offset)
-    if contests.count() <= 0:
+
+    if len(contests) <= 0:
         x.abort(404)
 
+    # todo: cache it
     count = Contest.all().count(1000)
 
     x.render("contest-list.html", locals())
@@ -76,8 +77,8 @@ def contest_problem(x, contest_id, letter):
     code = dict(contest.problems).get(letter)
     if not code:
         x.abort(404)
-    problem = Problem.find(code=code)
 
+    problem = Problem.find(code=code)
     if not problem:
         x.abort(404)
 
@@ -98,7 +99,7 @@ def problemset_paged(x, page):
     offset = 100 * (int(page) - 1)
     problems = Problem.all().order("-code").fetch(100, offset=offset)
 
-    if problems.count() <= 0:
+    if len(problems) <= 0:
         x.abort(404)
 
     x.render("problemset-index.html", locals())
@@ -107,7 +108,6 @@ def problemset_paged(x, page):
 @route("/problemset/problem/(\d+)/(\w+)")
 def problemset_problem(x, contest_id, index):
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
-
     if not problem:
         x.abort(404)
 
@@ -125,9 +125,11 @@ def problem_embed(x, contest_id, index):
         contest = Contest.find(id=int(contest_id))
         if not contest:
             x.abort(404)
+
         code = dict(contest.problems).get(index)
         if not code:
             x.abort(404)
+
         problem = Problem.find(code=code)
 
     if not problem:
@@ -337,6 +339,7 @@ def extension(x):
 @route("/update")
 def update(x):
     " new contests, new problems "
+
     # - Check problemset first page
     new_problems = 0
     for code, title in parse.problemset(1):
@@ -387,6 +390,7 @@ def update(x):
     if new_problems > 0:
         count_all = data.fetch("count_all")
         data.write("count_all", count_all + new_problems)
+    # endfold
 
     x.response("OK")
 
@@ -441,6 +445,7 @@ def setup(x):
     count_done = Problem.all().filter("credits >", "").count(3000)
     data.write("count_all", count_all)
     data.write("count_done", count_done)
+    # endfold
 
     info("Executed seconds: %.1f" % (time.time() - start_time))
     x.response("Executed seconds: %.1f" % (time.time() - start_time))
