@@ -272,6 +272,27 @@ def html2text(string):
     return result
 
 
+def relative(timestamp):
+    if not timestamp:
+        return "N/A"
+
+    seconds = int(datetime.datetime.now().strftime("%s")) - int(timestamp)
+
+    # Just now
+    if seconds == 0:
+        return u"Дөнгөж сая"
+
+    # Past time
+    if 0 < seconds < 60:
+        return u"%s секундын өмнө" % seconds
+    if 0 < seconds < 60 * 60:
+        return u"%s минутын өмнө" % (seconds / 60)
+    if 0 < seconds < 60 * 60 * 24:
+        return u"%s цагийн өмнө" % (seconds / 60 / 60)
+
+    return u"%s хоногийн өмнө" % (seconds / 60 / 60 / 24)
+
+
 # development only
 def mock_problem():
     " Generate random problem information "
