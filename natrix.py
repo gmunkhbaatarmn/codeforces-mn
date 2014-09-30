@@ -17,7 +17,7 @@ from jinja2 import Environment, FileSystemLoader
 sys.path.append("./packages")
 info, taskqueue  # pyflakes fix
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 
 # Core classes
@@ -30,15 +30,18 @@ class Request(object):
         self.params = parse_qs(environ["QUERY_STRING"], keep_blank_values=1)
 
         content_type = environ.get("HTTP_CONTENT_TYPE", "")
+        content_type = content_type or environ.get("CONTENT_TYPE", "")
+
         if "wsgi.input" in environ:
             if content_type.startswith("multipart/form-data"):
-                form = cgi.FieldStorage(environ["wsgi.input"])
+                form = cgi.FieldStorage(fp=environ["wsgi.input"],
+                                        environ=environ)
                 for k in form.keys():
                     if not form[k].filename:
                         self.params[k] = form[k].value
                     else:
                         self.params[k] = form[k]
-            if content_type.startswith("application/x-www-form-urlencoded"):
+            else:
                 self.POST = parse_qs(environ["wsgi.input"].read(),
                                      keep_blank_values=1)
                 self.params.update(self.POST)
@@ -52,7 +55,11 @@ class Request(object):
                 self.method = method.upper()
 
         cookie = Cookie.SimpleCookie()
-        cookie.load(environ.get("HTTP_COOKIE", ""))
+        for c in environ.get("HTTP_COOKIE", "").split(";"):
+            try:
+                cookie.load(c.strip())
+            except Cookie.CookieError:
+                info("Invalid cookie: %s" % c)
         self.cookies = dict(cookie.items())
 
         # Is X-Requested-With header present and equal to ``XMLHttpRequest``?
@@ -85,7 +92,10 @@ class Request(object):
             value = value[0]
 
         if isinstance(value, str):
-            value = value.decode("utf-8")
+            try:
+                value = value.decode("utf-8")
+            except UnicodeDecodeError:
+                value = value
         return value
 
 
@@ -214,7 +224,10 @@ class Handler(object):
         else:
             session = {}
 
-        self.session = Session(session or {})
+        if not isinstance(session, dict):
+            session = {}
+
+        self.session = Session(session)
 
     @property
     def flash(self):
@@ -255,6 +268,9 @@ class Handler(object):
         if permanent:
             code = 301
 
+        if isinstance(url, unicode):
+            url = url.encode("utf-8")
+
         self.response.headers["Location"] = url
         self.response.code = code
         self.response.body = ""
@@ -270,7 +286,7 @@ class Handler(object):
         if code == 404:
             self.not_found(self)
         else:
-            self.response.body = "Error: %s" % code
+            self.response.body = "Error %s" % code
 
         raise self.response.Sent
 
@@ -315,10 +331,14 @@ class Application(object):
 
                     # save session
                     if x.session != x.session.initial:
-                        cookie = cookie_encode(x.config["session-key"],
-                                               x.session)
-                        x.response.headers["Set-Cookie"] = \
-                            "session=%s; path=/;" % cookie
+                        session_cookie = cookie_encode(x.config["session-key"],
+                                                       x.session)
+                        cookie_value = "session=%s; path=/;" % session_cookie
+
+                        cookie = Cookie.SimpleCookie()
+                        cookie.load(cookie_value)
+                        x.request.cookies = dict(cookie.items())
+                        x.response.headers["Set-Cookie"] = cookie_value
 
                     request = x.request
                     response = x.response
@@ -331,6 +351,7 @@ class Application(object):
                 " handler "
                 x = Handler(request, response, self.config)
                 x.not_found = self.get_error_404()
+                x.internal_error = self.get_error_500()
 
                 handler, args = self.get_handler(request.path, request.method)
                 if handler:
@@ -478,20 +499,20 @@ def cookie_decode(key, value, max_age=None):
 
     # signature
     if signature != cookie_signature(key, encoded_value, timestamp):
-        warning("Invalid cookie signature: %r", value)
+        warning("Invalid cookie signature: %r" % value)
         return None
 
     # session age
     now = int(datetime.now().strftime("%s"))
     if max_age is not None and int(timestamp) < now - max_age:
-        warning("Expired cookie: %r", value)
+        warning("Expired cookie: %r" % value)
         return None
 
     # decode value
     try:
         return json.loads(encoded_value.decode("base64"))
     except Exception:
-        warning("Cookie value not decoded: %r", encoded_value)
+        warning("Cookie value not decoded: %r" % encoded_value)
         return None
 
 
