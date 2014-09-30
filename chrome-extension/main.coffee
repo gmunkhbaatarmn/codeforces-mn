@@ -9,12 +9,12 @@ String.prototype.is_numeric = ()    -> !isNaN(parseFloat(@)) && isFinite(@)
 STYLE =
 """
 <style>
-  .mn-please a { color: green !important; font-weight: bold; padding: 1px 5px 2px; border-radius: 3px }
-  .mn-please a:hover { color: #fff !important; background: #069100 !important }
-  .mn-statement ul { margin-bottom: 1em }
-  .mn-statement .credit { text-align: right; font-style: italic; font-size: 110%; font-family: Georgia, serif }
+  .mn-please a                 { color:green !important; font-weight:bold; padding:1px 5px 2px; border-radius:3px }
+  .mn-please a:hover           { color:#fff !important; background:#069100 !important }
+  .mn-statement ul             { margin-bottom:1em }
+  .mn-statement .credit        { text-align:right; font-style:italic; font-size:110%; font-family:Georgia, serif }
   .sample-tests .section-title { margin-bottom: 0.5em }
-  .sample-tests .title { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important; font-size: 1em !important; text-transform: none !important }
+  .sample-tests .title         { font-family:"Helvetica Neue", Helvetica, Arial, sans-serif !important; font-size:1em !important; text-transform:none !important }
 </style>
 """
 
@@ -74,8 +74,8 @@ if location.pathname is "/"
   $ ->
     $("head").append """
       <style>
-        .rtable tr:last-child td { border-bottom: none !important }
-        .mn-credit { font-weight: bold; color: #000; font-size: 12px !important }
+        .rtable tr:last-child td { border-bottom:none !important }
+        .mn-credit               { font-weight:bold; color:#000; font-size:12px !important }
       </style>
       """
     storage = JSON.parse(localStorage.mn or "{}")
@@ -127,9 +127,9 @@ if location.pathname.match(/\/problemset(?!\/problem\/)/)
   $ ->
     $("head").append """
       <style>
-        .problems tr td:nth-child(2) > div:first-child { margin-left: 14px }
-        .mn td:nth-child(2) > div:first-child { margin-left: 0 !important }
-        .mn td:nth-child(2) > div:first-child a:before { content: "✱ "; color: #c900a9; text-decoration: none; display: inline-block; float: left; margin-right: 4px }
+        .problems tr td:nth-child(2) > div:first-child { margin-left:14px }
+        .mn td:nth-child(2) > div:first-child          { margin-left:0 !important }
+        .mn td:nth-child(2) > div:first-child a:before { content:"✱ "; color:#c900a9; text-decoration:none; display:inline-block; float:left; margin-right:4px }
       </style>
       """
     storage = JSON.parse(localStorage.mn or "{}")
@@ -161,7 +161,7 @@ if location.pathname.match(/\/problemset\/problem\//)
         <div class="mn-please"><a href="javascript:;">Монголоор унших</a></div>
       """
 
-    $(".mn-please a").on "click", translate
+    $(".mn-please a").on("click", translate)
 
 
 #:1 Page: /contests/            - List of contests
@@ -170,8 +170,8 @@ if location.pathname.start_with("/contests")
   $ ->
     $("head").append """
       <style>
-        .mn      { font-size: 0.9em; color: #666666 }
-        .mn-full { font-size: 0.9em; color: #c900a9; font-weight: 600 }
+        .mn      { font-size:0.9em; color:#666666 }
+        .mn-full { font-size:0.9em; color:#c900a9; font-weight:600 }
       </style>
       """
     storage = JSON.parse(localStorage.mn or "{}")
@@ -204,9 +204,9 @@ if location.pathname.match(/^\/contest\/\d+\/?$/)
   $ ->
     $("head").append """
       <style>
-        .problems tr td:nth-child(2) > div:first-child { margin-left: 14px }
-        .mn td:nth-child(2) > div:first-child { margin-left: 0 !important }
-        .mn td:nth-child(2) > div:first-child a:before { content: "✱ "; color: #c900a9; text-decoration: none; display: inline-block; float: left; margin-right: 4px }
+        .problems tr td:nth-child(2) > div:first-child { margin-left:14px }
+        .mn td:nth-child(2) > div:first-child          { margin-left:0 !important }
+        .mn td:nth-child(2) > div:first-child a:before { content:"✱ "; color:#c900a9; text-decoration:none; display:inline-block; float:left; margin-right:4px }
       </style>
       """
     storage = JSON.parse(localStorage.mn or "{}")
@@ -246,10 +246,12 @@ if location.pathname.match(/^\/contest\/\d+\/problem\//)
 translate = ->
   if location.pathname.start_with("/problemset/problem/")
     problem_id = location.pathname.replace("/problemset/problem/", "").replace("/", "-").toUpperCase()
+    problem_path = "problemset/problem/#{problem_id.replace("-", "/")}"
 
   if location.pathname.start_with("/contest/")
     problem_id = location.pathname.replace("/contest/", "")
     problem_id = problem_id.replace("/problem/", "-").toUpperCase()
+    problem_path = "contest/#{problem_id.replace("-", "/problem/")}"
 
   while $.isNumeric(problem_id.slice(-1))
     problem_id = problem_id.slice(0, -1)
@@ -261,7 +263,7 @@ translate = ->
     $(this).html("<strong>Орчуулж байна...</strong>").fadeIn("fast")
 
   $.ajax
-    url: "http://www.codeforces.mn/problemset/problem/#{problem_id.replace("-", "/")}.html?#{(new Date().getTime())}"
+    url: "http://www.codeforces.mn/#{problem_path}.html?#{(new Date().getTime())}"
     dataType: "html"
     success: (data) ->
       $(".problem-statement").addClass("mn-statement")
