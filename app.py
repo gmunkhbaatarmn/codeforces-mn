@@ -300,42 +300,40 @@ def suggestion_review(x, id):
 # Others
 @route("/extension")
 def extension(x):
-    # 1. translated problems
+    # - 1. translated problems
     translated = memcache.get("/extension:translated")
     if not translated:
         translated = [p.code for p in Problem.all().filter("credits >", "")]
-        translated = sorted(translated)
+        translated_set = set(translated)
+        for c in Contest.all():
+            for letter, code in c.problems:
+                if code in translated_set:
+                    translated.append("%3s-%s" % (c.id, letter))
+        translated = sorted(list(set(translated)))
         memcache.set("/extension:translated", translated)
-    x.response.write("|".join([p.strip() for p in translated]) + "\n")
 
-    # 2. contests "translated/all"
+    x.response.write("|".join([p.strip() for p in translated]))
+    x.response.write("\n")
+
+    # - 2. contests "translated/all"
     contests = memcache.get("/extension:contests")
     if not contests:
         contests = [(c.id, c.translated_count, len(c.problems))
                     for c in Contest.all()]
         contests = sorted(contests)
         memcache.set("/extension:contests", contests)
-    x.response.write("|".join(["%03d:%s/%s" % t for t in contests]) + "\n")
 
-    # 3. contribution
+    x.response.write("|".join(["%03d:%s/%s" % t for t in contests]))
+    x.response.write("\n")
+
+    # - 3. contribution
     contribution = data.fetch("Rating:contribution")
+
     x.response.write("|".join(["%s:%s" % (k, v) for k, v in contribution]))
     x.response.write("\n")
 
-    # 4. all problems count
+    # - 4. all problems count
     x.response.write("%s\n" % data.fetch("count_all"))
-
-    '''
-    todo: support for contest problems
-    all_problem = dict(Data.fetch("All:problem"))
-
-    for k, v in Data.fetch("All:similar").items():
-        all_problem[v] = all_problem[k]
-
-    all_problem = sorted(filter(lambda x: x[1][1], all_problem.items()),
-                         key=lambda x: x[0])
-    self.response.write("|".join([zerotrim(i[0]) for i in all_problem]) + "\n")
-    '''
 
 
 @route("/extension/(\d+)-(\w+)\.html")
