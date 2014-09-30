@@ -3,10 +3,11 @@ import re
 import json
 import time
 import parse
+from datetime import datetime
 from hashlib import md5
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, taskqueue, memcache
-from parse import codeforces_ratings, topcoder_ratings, date_format
+from parse import codeforces_ratings, topcoder_ratings, date_format, relative
 from models import Problem, Contest, Suggestion
 
 
@@ -20,6 +21,7 @@ app.config["context"] = lambda x: {
     "suggestion_count": Suggestion.all().count(10),
     "count_all": data.fetch("count_all"),
     "count_done": data.fetch("count_done"),
+    "relative": relative,
 }
 
 
@@ -111,8 +113,18 @@ def problemset_problem(x, contest_id, index):
     index = index.upper()
 
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
+
     if not problem:
-        x.abort(404)
+        # it maybe contest' problem
+        contest = Contest.find(id=int(contest_id))
+        if not contest:
+            x.abort(404)
+
+        code = dict(contest.problems).get(index)
+        if not code:
+            x.abort(404)
+
+        x.redirect("/contest/%s" % code.strip().replace("-", "/problem/"))
 
     if problem.credits:
         x.render("problemset-problem.html", locals())
@@ -165,13 +177,15 @@ def suggestion_index(x):
         x.session.pop("moderator", None)
 
     suggestions = Suggestion.all().order("-added")
+    submissions = data.fetch("submissions", [])
     x.render("suggestion-index.html", **locals())
 
 
 @route("/suggestion#login")
 def suggestion_login(x):
     if x.request["password"] in data.fetch("moderators", {}):
-        x.session["moderator"] = 1
+        moderators = data.fetch("moderators", {})
+        x.session["moderator"] = moderators[x.request["password"]]
         x.redirect("/suggestion")
 
     suggestions = Suggestion.all().order("-added")
@@ -236,13 +250,13 @@ def suggestion_publish(x):
     problem.credits = credits
     problem.save()
 
-    # cache count query
+    # - cache count query
     count_all = Problem.all().count(3000)
     count_done = Problem.all().filter("credits >", "").count(3000)
     data.write("count_all", count_all)
     data.write("count_done", count_done)
 
-    # update contest translated count
+    # - update contest translated count
     for c in Contest.all():
         if problem.code not in dict(c.problems).values():
             continue
@@ -253,7 +267,7 @@ def suggestion_publish(x):
         c.translated_count = count
         c.save()
 
-    # update contribution
+    # - update contribution
     contribution = {}
     for p in Problem.all().filter("credits !=", ""):
         translators = p.credits.split(", ")
@@ -262,6 +276,18 @@ def suggestion_publish(x):
             contribution[t] = contribution.get(t, 0.0) + point
     contribution = sorted(contribution.items(), key=lambda t: -t[1])
     data.write("Rating:contribution", contribution)
+
+    # - last updated problems (submissions)
+    submissions = data.fetch("submissions", [])
+    submissions.append({
+        "code": suggestion.code,
+        "title": title,
+        "credits": credits,
+        "created_at": int(suggestion.added.strftime("%s")),
+        "moderator": x.session["moderator"],
+        "published_at": int(datetime.now().strftime("%s")),
+    })
+    submissions = data.write("submissions", submissions[-50:])
 
     # - reset cached queries
     memcache.delete("/extension:translated")
@@ -425,6 +451,7 @@ def setup(x):
         x.response("Deny: Only for development")
 
     start_time = time.time()
+    data.write("moderators", {"123": "Admin"})
 
     # - Ratings
     data.write("Rating:codeforces", codeforces_ratings())
