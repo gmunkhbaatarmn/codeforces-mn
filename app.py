@@ -5,7 +5,7 @@ import time
 import parse
 from hashlib import md5
 from markdown2 import markdown
-from natrix import app, route, data, info, warning, taskqueue
+from natrix import app, route, data, info, warning, taskqueue, memcache
 from parse import codeforces_ratings, topcoder_ratings, date_format
 from models import Problem, Contest, Suggestion
 
@@ -69,6 +69,8 @@ def contest_dashboard(x, id):
 
 @route("/contest/(\d+)/problem/(\w+)")
 def contest_problem(x, contest_id, letter):
+    letter = letter.upper()
+
     contest = Contest.find(id=int(contest_id))
     if not contest:
         x.abort(404)
@@ -106,6 +108,8 @@ def problemset_paged(x, page):
 
 @route("/problemset/problem/(\d+)/(\w+)")
 def problemset_problem(x, contest_id, index):
+    index = index.upper()
+
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
     if not problem:
         x.abort(404)
@@ -118,6 +122,7 @@ def problemset_problem(x, contest_id, index):
 
 @route("/problemset/problem/(\d+)/(\w+)\.html")
 def problem_embed(x, contest_id, index):
+    index = index.upper()
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
     if not problem:
         # it maybe contest' problem
@@ -139,9 +144,10 @@ def problem_embed(x, contest_id, index):
 
 @route("/problemset/problem/(\d+)/(\w+)/edit")
 def problemset_translate(x, contest_id, index):
+    index = index.upper()
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
     if not problem:
-        x.abort(problem)
+        x.abort(404)
 
     x.render("problemset-translate.html", locals())
 
@@ -273,6 +279,10 @@ def suggestion_publish(x):
     contribution = sorted(contribution.items(), key=lambda t: -t[1])
     data.write("Rating:contribution", contribution)
 
+    # - reset cached queries
+    memcache.delete("/extension:translated")
+    memcache.delete("/extension:contests")
+
     suggestion.delete()
     x.redirect(str(problem.link), delay=1)
 
@@ -307,12 +317,21 @@ def suggestion_review(x, id):
 @route("/extension")
 def extension(x):
     # 1. translated problems
-    arr = [p.code for p in Problem.all().filter("credits >", "")]
-    x.response.write("|".join([p.strip() for p in sorted(arr)]) + "\n")
+    translated = memcache.get("/extension:translated")
+    if not translated:
+        translated = [p.code for p in Problem.all().filter("credits >", "")]
+        translated = sorted(translated)
+        memcache.set("/extension:translated", translated)
+    x.response.write("|".join([p.strip() for p in translated]) + "\n")
 
     # 2. contests "translated/all"
-    arr = [(c.id, c.translated_count, len(c.problems)) for c in Contest.all()]
-    x.response.write("|".join(["%03d:%s/%s" % t for t in sorted(arr)]) + "\n")
+    contests = memcache.get("/extension:contests")
+    if not contests:
+        contests = [(c.id, c.translated_count, len(c.problems))
+                    for c in Contest.all()]
+        contests = sorted(contests)
+        memcache.set("/extension:contests", contests)
+    x.response.write("|".join(["%03d:%s/%s" % t for t in contests]) + "\n")
 
     # 3. contribution
     contribution = data.fetch("Rating:contribution")
@@ -390,8 +409,7 @@ def update(x):
         data.write("count:contest-all", Contest.all().count())
     # - Update problems count
     if new_problems > 0:
-        count_all = data.fetch("count_all")
-        data.write("count_all", count_all + new_problems)
+        data.write("count_all", data.fetch("count_all") + new_problems)
     # endfold
 
     x.response("OK")
