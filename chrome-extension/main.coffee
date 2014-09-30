@@ -252,13 +252,12 @@ if location.pathname.match(/^\/contest\/\d+\/problem\//)
 #:1 Function: translate problem statement
 translate = ->
   if location.pathname.start_with("/problemset/problem/")
-    problem_id = location.pathname.replace("/problemset/problem/", "").replace("/", "-").toUpperCase()
-    problem_path = "problemset/problem/#{problem_id.replace("-", "/")}"
+    problem_id = location.pathname.replace("/problemset/problem/", "")
+    problem_id = problem_id.replace("/", "-").toUpperCase()
 
   if location.pathname.start_with("/contest/")
     problem_id = location.pathname.replace("/contest/", "")
     problem_id = problem_id.replace("/problem/", "-").toUpperCase()
-    problem_path = "contest/#{problem_id.replace("-", "/problem/")}"
 
   while $.isNumeric(problem_id.slice(-1))
     problem_id = problem_id.slice(0, -1)
@@ -270,7 +269,7 @@ translate = ->
     $(this).html("<strong>Орчуулж байна...</strong>").fadeIn("fast")
 
   $.ajax
-    url: "http://www.codeforces.mn/#{problem_path}.html?#{(new Date().getTime())}"
+    url: "http://www.codeforces.mn/extension/#{problem_id}.html?#{(new Date().getTime())}"
     dataType: "html"
     success: (data) ->
       $(".problem-statement").addClass("mn-statement")
