@@ -1,15 +1,11 @@
 {
 	"name": "Codeforces Mongolia",
-	"short_name": "Codeforces MN",
+	"short_name": "Codeforces.mn",
 	"version": "0.2.2",
 	"manifest_version": 2,
 	"description": "Codeforces.com Mongolian translation",
 	"homepage_url": "http://github.com/gmunkhbaatarmn/codeforces-mn",
-	"icons": {
-		"16": "icon16.png",
-		"48": "icon48.png",
-		"128": "icon128.png"
-	},
+	"icons": {"16": "icon.png", "48": "icon.png", "128": "icon.png"},
 	"permissions": [
 		"http://www.codeforces.mn/*",
 		"http://codeforces.com/*",
@@ -17,8 +13,8 @@
 	],
 	"content_scripts": [{
 		"all_frames": true,
-		"run_at":     "document_start",
-		"matches":   ["http://codeforces.com/*", "http://www.codeforces.com/*"],
-		"js":        ["jquery.js", "main.min.js"]
+		"run_at": "document_start",
+		"matches": ["http://codeforces.com/*", "http://www.codeforces.com/*"],
+		"js": ["jquery.js", "main.min.js"]
 	}]
 }
