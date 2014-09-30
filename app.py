@@ -67,8 +67,8 @@ def contest_dashboard(x, id):
     x.render("contest-dashboard.html", locals())
 
 
-@route("/contest/(\d+)/problem/(\w+)")
-def contest_problem(x, contest_id, letter):
+@route("/contest/(\d+)/problem/(\w+)(\.html)?")
+def contest_problem(x, contest_id, letter, embed):
     letter = letter.upper()
 
     contest = Contest.find(id=int(contest_id))
@@ -83,7 +83,9 @@ def contest_problem(x, contest_id, letter):
     if not problem:
         x.abort(404)
 
-    if problem.credits:
+    if problem.credits and embed:
+        x.render("problem-embed.html", locals())
+    elif problem.credits:
         x.render("contest-problem.html", locals())
     else:
         x.render("contest-problem-en.html", locals())
@@ -106,24 +108,15 @@ def problemset_paged(x, page):
     x.render("problemset-index.html", locals())
 
 
-@route("/problemset/problem/(\d+)/(\w+)")
-def problemset_problem(x, contest_id, index):
+@route("/problemset/problem/(\d+)/(\w+)(\.html)?")
+def problemset_problem(x, contest_id, index, embed):
     index = index.upper()
 
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
     if not problem:
         x.abort(404)
 
-    if problem.credits:
-        x.render("problemset-problem.html", locals())
-    else:
-        x.render("problemset-problem-en.html", locals())
-
-
-@route("/problemset/problem/(\d+)/(\w+)\.html")
-def problem_embed(x, contest_id, index):
-    index = index.upper()
-    problem = Problem.find(code="%3s-%s" % (contest_id, index))
+    # - todo: (deprecated) remove after extension users upgraded
     if not problem:
         # it maybe contest' problem
         contest = Contest.find(id=int(contest_id))
@@ -133,13 +126,15 @@ def problem_embed(x, contest_id, index):
         code = dict(contest.problems).get(index)
         if not code:
             x.abort(404)
-
         problem = Problem.find(code=code)
+    # endfold
 
-    if not problem:
-        x.abort(404)
-
-    x.render("problem-embed.html", locals())
+    if problem.credits and embed:
+        x.render("problem-embed.html", locals())
+    elif problem.credits:
+        x.render("problemset-problem.html", locals())
+    else:
+        x.render("problemset-problem-en.html", locals())
 
 
 @route("/problemset/problem/(\d+)/(\w+)/edit")
