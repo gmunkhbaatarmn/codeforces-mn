@@ -17,19 +17,11 @@
       </tr>
       {% for s in suggestions %}
       <tr>
-        {% if session.moderator %}
-          <td class="text-center"><a href="/suggestion/{{ s.key().id() }}">{{ s.code.strip() }}</a></td>
-          <td style="border-right:0">
-            <a href="/suggestion/{{ s.key().id() }}">{{ s.title }}</a>
-            <span style="border-right:0; text-align:right; color:#888">({{ relative(s.added.strftime("%s")) }})</span>
-          </td>
-        {% else %}
-          <td class="text-center"><a href="/problemset/problem/{{ s.code.strip().replace("-", "/")}}">{{ s.code.strip() }}</a></td>
-          <td style="border-right:0">
-            <a href="/problemset/problem/{{ s.code.strip().replace("-", "/")}}">{{ s.title }}</a>
-            <span style="border-right:0; text-align:right; color:#888">({{ relative(s.added.strftime("%s")) }})</span>
-          </td>
-        {% endif %}
+        <td class="text-center"><a href="/suggestion/{{ s.key().id() }}">{{ s.code.strip() }}</a></td>
+        <td style="border-right:0">
+          <a href="/suggestion/{{ s.key().id() }}">{{ s.title }}</a>
+          <span style="border-right:0; text-align:right; color:#888">({{ relative(s.added.strftime("%s")) }})</span>
+        </td>
         <td style="text-align:right">{{ s.credits }}</td>
       </tr>
       {% else %}

@@ -18,7 +18,7 @@ app.config["context"] = lambda x: {
     "codeforces": data.fetch("Rating:codeforces", []),
     "topcoder": data.fetch("Rating:topcoder", []),
     "markdown": lambda x: markdown(x, extras=["code-friendly"]),
-    "suggestion_count": Suggestion.all().count(10),
+    "suggestion_count": Suggestion.all().count(30),
     "count_all": data.fetch("count_all"),
     "count_done": data.fetch("count_done"),
     "relative": relative,
@@ -316,15 +316,11 @@ def suggestion_delete(x):
 
 @route("/suggestion/(\d+)")
 def suggestion_review(x, id):
-    if not x.session.get("moderator"):
-        x.redirect("/suggestion")
-
     suggestion = Suggestion.get_by_id(int(id))
     if not suggestion:
         x.abort(404)
 
     problem = Problem.find(code=suggestion.code)
-
     x.render("suggestion-review.html", locals())
 
 
