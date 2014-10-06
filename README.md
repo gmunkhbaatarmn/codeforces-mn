@@ -1,3 +1,9 @@
+- redirect table
+
+/apple-touch-icon-precomposed.png
+/apple-touch-icon.png
+
+
 Mongolian translation of [codeforces.com](http://www.codeforces.com/).
 Runs live on [codeforces.mn](http://www.codeforces.mn/)
 

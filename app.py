@@ -163,8 +163,13 @@ def ratings_update(x):
 def ratings_update_task(x):
     start = time.time()
 
-    data.write("Rating:codeforces", codeforces_ratings())
-    data.write("Rating:topcoder", topcoder_ratings())
+    ratings = codeforces_ratings()
+    if ratings:
+        data.write("Rating:codeforces", ratings)
+
+    ratings = topcoder_ratings()
+    if ratings:
+        data.write("Rating:topcoder", ratings)
 
     info("Executed seconds: %.1f" % (time.time() - start))
     x.response("OK")
@@ -262,8 +267,8 @@ def suggestion_publish(x):
             continue
 
         count = 0
-        for code, problem in c.problems_object:
-            count += int(problem.credits != "")
+        for code, p in c.problems_object:
+            count += int(p.credits != "")
         c.translated_count = count
         c.save()
 
