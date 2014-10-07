@@ -17,12 +17,17 @@ def problem(code):
     info("Problem: %s" % code)
     r = url_open("http://codeforces.com/problemset/problem/" +
                  code.strip().replace("-", "/"))
+    source = r.read()
 
-    tree = lxml.html.fromstring(r.read())
+    tree = lxml.html.fromstring(source)
 
     def html(e):
         " inner html "
         return etree.tostring(e).split(">", 1)[1].rsplit("</", 1)[0]
+
+    if not tree.xpath("//div[@class='problem-statement']"):
+        warning("%s unexpected response:\n%s" % source)
+        return
 
     inputs = tree.xpath("//div[@class='input']/pre")
     outputs = tree.xpath("//div[@class='output']/pre")

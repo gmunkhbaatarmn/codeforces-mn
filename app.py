@@ -405,6 +405,9 @@ def update(x):
         # new problem found
         new_problems += 1
         meta = parse.problem(p.code)
+        if not meta:
+            warning("Problem (%s) parsing failed" % p.code)
+            continue
 
         p.content = meta.pop("content")
         p.note = meta.pop("note")
