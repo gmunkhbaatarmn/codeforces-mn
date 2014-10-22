@@ -91,8 +91,8 @@ def problemset(page=1):
         assert r.code == 200
         assert r.url == "http://codeforces.com/problemset/page/%s" % page
     except (AssertionError, HTTPException):
-        warning("Problemset page %s not reachable" % page)
-        return
+        warning("Problemset page %s not reachable" % page, exc_info=True)
+        return []
 
     tree = lxml.html.fromstring(r.read())
     rows = tree.xpath("//table[@class='problems']/tr")[1:]
