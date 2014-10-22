@@ -26,7 +26,7 @@ def problem(code):
         return etree.tostring(e).split(">", 1)[1].rsplit("</", 1)[0]
 
     if not tree.xpath("//div[@class='problem-statement']"):
-        warning("%s unexpected response:\n%s" % source)
+        warning("%s unexpected response:\n%s" % (code, source))
         return
 
     inputs = tree.xpath("//div[@class='input']/pre")
