@@ -129,7 +129,12 @@ def codeforces_user(handle):
     info("codeforces_user(%s)" % handle)
 
     content = url_open("http://codeforces.com/profile/%s" % handle).read()
-    data = content.split("data.push(")[1].split(");")[0]
+
+    try:
+        data = content.split("data.push(")[1].split(");")[0]
+    except:
+        warning("codeforces_user(%s): %s" % (handle, content), exc_info=True)
+        return
 
     log = json.loads(data)[-1]
     now = int(datetime.datetime.now().strftime("%s"))
@@ -160,6 +165,7 @@ def codeforces_ratings():
 
     # Fetch each user and exclude inactives
     users = [codeforces_user(handle) for handle in handles]
+    users = filter(lambda u: u, users)  # exclude not parsed
     users = filter(lambda u: u["active"], users)
 
     # Mark recent rating updates
