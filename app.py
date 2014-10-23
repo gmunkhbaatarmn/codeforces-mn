@@ -18,7 +18,7 @@ app.config["context"] = lambda x: {
     "codeforces": data.fetch("Rating:codeforces", []),
     "topcoder": data.fetch("Rating:topcoder", []),
     "markdown": lambda x: markdown(x, extras=["code-friendly"]),
-    "suggestion_count": Suggestion.all().count(30),
+    "suggestion_count": Suggestion.all().count(),
     "count_all": data.fetch("count_all"),
     "count_done": data.fetch("count_done"),
     "relative": relative,
