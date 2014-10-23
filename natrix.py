@@ -17,7 +17,7 @@ from jinja2 import Environment, FileSystemLoader
 sys.path.append("./packages")
 info, taskqueue  # pyflakes fix
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 
 # Core classes
@@ -37,10 +37,15 @@ class Request(object):
                 form = cgi.FieldStorage(fp=environ["wsgi.input"],
                                         environ=environ)
                 for k in form.keys():
-                    if not form[k].filename:
-                        self.params[k] = form[k].value
+                    if isinstance(form[k], list):
+                        field = form[k][0]  # only first item
                     else:
-                        self.params[k] = form[k]
+                        field = form[k]
+
+                    if not field.filename:
+                        self.params[k] = field.value
+                    else:
+                        self.params[k] = field
             else:
                 self.POST = parse_qs(environ["wsgi.input"].read(),
                                      keep_blank_values=1)
@@ -80,6 +85,13 @@ class Request(object):
         self.url = self.host + self.path
         if self.query:
             self.url += "?" + self.query
+
+        # unicode
+        self.host = _unicode(self.host)
+        self.path = _unicode(self.path)
+        self.domain = _unicode(self.domain)
+        self.url = _unicode(self.url)
+        self.query = _unicode(self.query)
 
     def __getitem__(self, name):
         " Example: self.request[:name] "
@@ -215,7 +227,6 @@ class Handler(object):
 
         if "session-key" not in self.config:
             self.session = Session({})
-            # info("session-key not configured")
             return  # no session setup
 
         if "session" in self.request.cookies:
@@ -238,7 +249,7 @@ class Handler(object):
         self.session[":flash"] = value
 
     def render(self, template, *args, **kwargs):
-        self.response.headers["Content-Type"] = "text/html"
+        self.response.headers["Content-Type"] = "text/html; charset=UTF-8"
         self.response.write(self.render_string(template, *args, **kwargs))
         raise self.response.Sent
 
@@ -299,7 +310,6 @@ class Application(object):
 
     Returns WSGI app function
     """
-
     def __init__(self, routes=None, config=None):
         self.routes = routes or []
         self.config = config or {}  # none to dict
@@ -384,7 +394,7 @@ class Application(object):
                 x.response.code = 500
 
                 # logging to console
-                error("".join(traceback.format_exception(*sys.exc_info())))
+                error("Error occured", exc_info=True)
 
                 internal_error = self.get_error_500()
                 try:
@@ -408,6 +418,8 @@ class Application(object):
     def get_handler(self, request_path, request_method):
         " Returns (handler, args) or (none, none) "
         for rule, handler in self.routes:
+            rule = _unicode(rule)
+
             " route method. route rule: /path/to#method "
             if re.search("#[a-z-]+$", rule):
                 rule, method = rule.rsplit("#", 1)
@@ -462,7 +474,7 @@ class Application(object):
 
 # Helpers
 class Session(dict):
-    " customized dict for session "
+    " Customized `dict` data structure for session "
     def __init__(self, *args, **kwargs):
         super(Session, self).__init__(*args, **kwargs)
         self.initial = self.copy()
@@ -492,23 +504,24 @@ def cookie_decode(key, value, max_age=None):
 
     Returns the deserialized secure cookie or none
     """
+    # Cookie must be formatted in `data|timestamp|signature`
     if not value or value.count("|") != 2:
         return None
 
     encoded_value, timestamp, signature = value.split("|")
 
-    # signature
+    # Validate signature
     if signature != cookie_signature(key, encoded_value, timestamp):
         warning("Invalid cookie signature: %r" % value)
         return None
 
-    # session age
+    # Validate session age. Session is expired or not
     now = int(datetime.now().strftime("%s"))
     if max_age is not None and int(timestamp) < now - max_age:
         warning("Expired cookie: %r" % value)
         return None
 
-    # decode value
+    # Decode cookie value
     try:
         return json.loads(encoded_value.decode("base64"))
     except Exception:
@@ -524,6 +537,12 @@ def cookie_signature(key, value, timestamp):
     return signature.hexdigest()
 
 
+def _unicode(string):
+    if isinstance(string, str):
+        string = string.decode("utf-8")
+    return string
+
+
 # Services
 class Model(db.Model):
     @classmethod
@@ -533,6 +552,10 @@ class Model(db.Model):
             q.filter("%s =" % k, v)
 
         return q.get()
+
+    @property
+    def id(self):
+        return self.key().id()
 
 
 class Data(db.Model):
