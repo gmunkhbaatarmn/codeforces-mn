@@ -25,9 +25,9 @@
     <a href="/" class="logo"></a>
 
     <div class="lang">
-      <a class="mn" href="http://codeforces.mn">Монгол хэлээр</a>
-      <a class="en" href="http://codeforces.com">In English</a>
-      <a class="ru" href="http://codeforces.ru">По-Русски</a>
+      <a rel="nofollow" class="mn" href="http://codeforces.mn">Монгол хэлээр</a>
+      <a rel="nofollow" class="en" href="http://codeforces.com">In English</a>
+      <a rel="nofollow" class="ru" href="http://codeforces.ru">По-Русски</a>
     </div>
   </div>
 
@@ -36,7 +36,7 @@
     <li {{- ' class="current"'|safe if menu == "contests"   }}><a href="/contests">Тэмцээнүүд</a></li>
     <li {{- ' class="current"'|safe if menu == "problemset" }}><a href="/problemset">Бодлогууд</a></li>
     <li {{- ' class="current"'|safe if menu == "ratings"    }}><a href="/ratings">Чансаа</a></li>
-    <li {{- ' class="current"'|safe if menu == "suggestion" }}><a href="/suggestion">Орчуулгын саналууд ({{ suggestion_count }})</a></li>
+    <li {{- ' class="current"'|safe if menu == "suggestion" }}><a href="/suggestion" rel="nofollow">Орчуулгын саналууд ({{ suggestion_count }})</a></li>
   </ul>
 
   {% if sidebar != "no" %}
@@ -46,7 +46,7 @@
         <h2>Plugin суулгана уу</h2>
 
         <div class="text">
-          Та бодлогуудыг орчуулагдсанаар нь <a href="http://codeforces.com">Codeforces.com</a>
+          Та бодлогуудыг орчуулагдсанаар нь <a href="http://codeforces.com" rel="nofollow">Codeforces.com</a>
           дээрээс ч гэсэн уншиж болох ба ингэхийн тулд Chrome хөтчид зориулсан
           нэмэлтийг суулгаж ашиглана уу.
           <br>
@@ -137,12 +137,12 @@
 
   <div id="footer">
     <div>
-      <a href="http://www.codeforces.mn/">Codeforces.mn</a> (c) Монгол орчуулгын баг
+      <a href="http://www.codeforces.mn/" rel="nofollow">Codeforces.mn</a> (c) Монгол орчуулгын баг
     </div>
     <p>
       This site contain translated copy of codeforces.com's <a href="http://codeforces.com/blog/entry/967">problems</a>.
       <br>
-      Original <a href="http://codeforces.com">codeforces.com</a> is creature of Mike Mirzayanov
+      Original <a href="http://codeforces.com" rel="nofollow">codeforces.com</a> is creature of Mike Mirzayanov
       <br><br>
       PS: Thank you Mike Mirzayanov for great platform.
     </p>
