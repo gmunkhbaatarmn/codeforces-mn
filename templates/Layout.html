@@ -1,6 +1,6 @@
 {%- from "Macros.html" import user, cf_user, cf_rating, tc_user, tc_rating -%}
 <!DOCTYPE html>
-<html>
+<html lang="mn">
 <head>
   <meta charset="utf-8">
   <title>{{ title }} · Codeforces.mn</title>
@@ -15,6 +15,9 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="http://{{ request.url }}">
   <meta property="og:image" content="http://www.codeforces.mn/images/codeforces-logo.png">
+  <meta name="DC.Title" content="{{ title }} · Codeforces.mn">
+  <meta name="DC.Description" content="{{ description if description else "Програмчлал, мэдээлэлзүй, алгоритмын бодлогууд. Олимпиадад бэлтгэгчдэд тусламж. Codeforces.com сайтын Монгол орчуулга" }}">
+  <meta name="DC.Language" content="mn">
 </head>
 <body>
 <div id="container" class="no-mathjax">
