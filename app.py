@@ -509,8 +509,3 @@ def setup(x):
 @route("/humans\.txt")
 def humans_txt(x):
     x.response(x.render_string("humans.txt"))
-
-
-@route("/robots\.txt")
-def robots_txt(x):
-    x.response("User-agent: *")
