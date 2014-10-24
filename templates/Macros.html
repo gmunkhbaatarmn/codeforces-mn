@@ -28,7 +28,7 @@
   {% else %}
     {% set color = "gray" %}
   {% endif %}
-  <a class="cf-user-{{ color }}" href="http://codeforces.com/profile/{{ handle }}">{{ handle }}</a>
+  <a rel="nofollow" class="cf-user-{{ color }}" href="http://codeforces.com/profile/{{ handle }}">{{ handle }}</a>
 {%- endmacro -%}
 
 
@@ -53,7 +53,7 @@
   {% else %}
     {% set color = "gray" %}
   {% endif %}
-  <a class="tc-user-{{ color }}" href="http://community.topcoder.com/tc?module=MemberProfile&amp;tab=alg&amp;cr={{ id }}">{{ handle }}</a>
+  <a rel="nofollow" class="tc-user-{{ color }}" href="http://community.topcoder.com/tc?module=MemberProfile&amp;tab=alg&amp;cr={{ id }}">{{ handle }}</a>
 {%- endmacro -%}
 
 
