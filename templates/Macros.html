@@ -53,14 +53,14 @@
   {% else %}
     {% set color = "gray" %}
   {% endif %}
-  <a class="tc-user-{{ color }}" href="http://community.topcoder.com/tc?module=MemberProfile&tab=alg&cr={{ id }}">{{ handle }}</a>
+  <a class="tc-user-{{ color }}" href="http://community.topcoder.com/tc?module=MemberProfile&amp;tab=alg&amp;cr={{ id }}">{{ handle }}</a>
 {%- endmacro -%}
 
 
 {%- macro tc_rating(change, contest_id, coder_id, align="left") -%}
   {% if change >= 0 %}
-    <a href="http://community.topcoder.com/stat?c=coder_room_stats&cr={{ coder_id }}&rd={{ contest_id }}" class="rating-up" style="text-align:{{ align }}">+{{ change }}</a>
+    <a href="http://community.topcoder.com/stat?c=coder_room_stats&amp;cr={{ coder_id }}&amp;rd={{ contest_id }}" class="rating-up" style="text-align:{{ align }}">+{{ change }}</a>
   {% else %}
-    <a href="http://community.topcoder.com/stat?c=coder_room_stats&cr={{ coder_id }}&rd={{ contest_id }}" class="rating-down" style="text-align:{{ align }}">{{ change }}</a>
+    <a href="http://community.topcoder.com/stat?c=coder_room_stats&amp;cr={{ coder_id }}&amp;rd={{ contest_id }}" class="rating-down" style="text-align:{{ align }}">{{ change }}</a>
   {% endif %}
 {%- endmacro -%}
