@@ -368,6 +368,12 @@ code {
   font-size: 0.9em;
   font-size: 12px;
 }
+#sidebar .box table th tr:nth-child(1) {
+  width: 20px;
+}
+#sidebar .box table th tr:nth-child(2) {
+  width: 140px;
+}
 #sidebar .box table tr:last-child td {
   border-bottom: 0;
 }
