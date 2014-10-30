@@ -167,10 +167,11 @@ def codeforces_ratings():
     # Fetch each user and exclude inactives
     try:
         users = [codeforces_user(handle) for handle in handles]
+        users = filter(lambda u: u["active"], users)
+        assert len(users), "Active users must be found"
     except AssertionError:
-        warning("parse.codeforces_user(%s) failed" % handle, exc_info=True)
+        warning("parse.codeforces_user(%s) failed", exc_info=True)
         return
-    users = filter(lambda u: u["active"], users)
 
     # Mark recent rating updates
     recent_contest = max(users, key=lambda u: u["contest_at"])["contest_at"]
