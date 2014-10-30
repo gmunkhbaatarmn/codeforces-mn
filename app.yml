@@ -34,15 +34,13 @@ handlers:
   script: app.app
 
 libraries:
-- { name: webapp2,    version: "2.5.2" }
 - { name: jinja2,     version: "2.6"   }
 - { name: markupsafe, version: "0.15"  } # required for jinja2
-- { name: django,     version: "1.3"   }
 - { name: lxml,       version: "2.3"   }
 
 skip_files:
-- ^(app|index)\.y(a)?ml         # appengine config files
-- ^(.*/)?.*\.(styl|coffee)$     # stylus, coffeescript files
-- ^(.*/)?(#.*#)|(.*~)           # editor temp files
-- ^(.*/)?.*\.py[co]             # environment temp files
-- ^(.*/)?\..*$                  # dot-prefixed files
+- ^(.*/)?\..*$         # Dot-prefixed unix hidden files
+- ^(.*/)?(#.*#)|(.*~)  # Editor temp files
+- ^(.*/)?.*\.py[co]    # Environment temp files
+- ^(.*/)?.*\.styl$     # CSS sources
+- ^(.*/)?.*\.coffee$   # JS sources
