@@ -127,11 +127,13 @@
           "top": "5px",
           "right": "5px",
         });
+        $("#source").css("height", "720px");
       } else {
         $("#header,#menu").toggle();
         $("#container").css("width", "1200px");
         $("#content").css("margin-top", "2em");
         $("#toolbar").parent().css("position", "static");
+        $("#source").css("height", "520px");
       }
       $("#js-fullscreen").toggleClass("active");
     });
