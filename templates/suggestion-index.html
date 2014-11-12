@@ -51,7 +51,7 @@
         <th style="width:130px; text-align:right">Орчуулсан</th>
       </tr>
       {% for s in submissions|reverse %}
-      <tr class="recent">
+      <tr {{- ' class="recent"' if (int(now.strftime("%s")) - s.published_at < 3600 * 24) else '' }}>
         <td class="text-center"><a href="/problemset/problem/{{ s.code.strip().replace("-", "/")}}">{{ s.code.strip() }}</a></td>
         <td style="border-right:0">
           <a href="/problemset/problem/{{ s.code.strip().replace("-", "/")}}">{{ s.title }}</a>
