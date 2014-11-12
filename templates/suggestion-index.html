@@ -10,26 +10,30 @@
   <h1 class="table-title">Орчуулгын саналууд ({{ suggestions.count() }})</h1>
 
   <div class="table-container">
-    <table>
-      <tr>
-        <th style="width:43px">#</th>
-        <th style="border-right:0; text-align:left; border-right:0">Бодлогын нэр</th>
-        <th style="width:130px; text-align:right">Орчуулсан</th>
-      </tr>
-      {% for s in suggestions %}
-      <tr>
-        <td class="text-center"><a href="/suggestion/{{ s.key().id() }}">{{ s.code.strip() }}</a></td>
-        <td style="border-right:0">
-          <a href="/suggestion/{{ s.key().id() }}">{{ s.title }}</a>
-          <span style="border-right:0; text-align:right; color:#888">({{ relative(s.added.strftime("%s")) }})</span>
-        </td>
-        <td style="text-align:right">{{ s.credits }}</td>
-      </tr>
-      {% else %}
-      <tr>
-        <td colspan="3" style="text-align:center">Хүлээгдэж байгаа санал алга</td>
-      </tr>
-      {% endfor %}
+    <table class="sortable-table">
+      <thead>
+        <tr>
+          <th data-sort="string" style="width:43px">#</th>
+          <th data-sort="string" style="border-right:0; text-align:left; border-right:0">Бодлогын нэр</th>
+          <th data-sort="string" style="width:130px; text-align:right">Орчуулсан</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in suggestions %}
+        <tr>
+          <td class="text-center" data-sort-value="{{ s.code }}"><a href="/suggestion/{{ s.key().id() }}">{{ s.code.strip() }}</a></td>
+          <td style="border-right:0" data-sort-value="{{ s.title }}">
+            <a href="/suggestion/{{ s.key().id() }}">{{ s.title }}</a>
+            <span style="border-right:0; text-align:right; color:#888">({{ relative(s.added.strftime("%s")) }})</span>
+          </td>
+          <td style="text-align:right">{{ s.credits }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="3" style="text-align:center">Хүлээгдэж байгаа санал алга</td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
   </div>
   {# endfold #}

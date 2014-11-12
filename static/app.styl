@@ -1,5 +1,3 @@
-@import url("http://fonts.googleapis.com/css?family=Ubuntu+Condensed&subset=cyrillic-ext,cyrillic")
-@import "normalize"
 @import "nib"
 
 .text-center { text-align: center !important }
@@ -417,3 +415,17 @@ code
 #footer p a
   color #777
   font-weight bold
+
+//:1 table column sort
+table th[data-sort]
+  cursor pointer
+  user-select none
+table th[data-sort]:after
+  content "\0020"
+  width 10px
+  height 16px
+  float right
+table th.sorting-asc:after
+  content " ↑"
+table th.sorting-desc:after
+  content " ↓"
