@@ -292,7 +292,7 @@ def suggestion_publish(x):
         "moderator": x.session["moderator"],
         "published_at": int(datetime.now().strftime("%s")),
     })
-    submissions = data.write("submissions", submissions[-50:])
+    submissions = data.write("submissions", submissions[-150:])
 
     # - reset cached queries
     memcache.delete("/extension:translated")
