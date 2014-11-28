@@ -20,7 +20,7 @@
       </thead>
       <tbody>
         {% for s in suggestions %}
-        <tr>
+          <tr {{- ' class="recent"' if not s.title.strip().startswith("* ") else '' }}>
           <td class="text-center" data-sort-value="{{ s.code }}"><a href="/suggestion/{{ s.key().id() }}">{{ s.code.strip() }}</a></td>
           <td style="border-right:0" data-sort-value="{{ s.title }}">
             <a href="/suggestion/{{ s.key().id() }}">{{ s.title }}</a>
@@ -38,7 +38,7 @@
   </div>
   {# endfold #}
 
-  {#:1 Last updated problems #}
+  {#:1# Last updated problems #}
   <br><br>
   <h1 class="table-title">Сүүлд шинэчлэгдсэн бодлогууд</h1>
 
