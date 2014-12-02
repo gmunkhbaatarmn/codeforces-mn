@@ -409,6 +409,13 @@ def update(x):
             warning("Problem (%s) parsing failed" % p.code)
             continue
 
+        # it's duplicated problem
+        identifier = md5(json.dumps(meta["tests"])).hexdigest()
+        f = Problem.find(identifier=identifier)
+        if f:
+            warning("Duplicated problem. %s is copy of %s" % (p.code, f.code))
+            continue
+
         p.content = meta.pop("content")
         p.note = meta.pop("note")
         p.meta_json = json.dumps(meta)
