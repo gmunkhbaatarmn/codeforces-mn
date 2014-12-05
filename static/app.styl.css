@@ -202,6 +202,12 @@ code {
 .text-normal {
   font-weight: normal;
 }
+blockquote {
+  border-left: 3px solid #ccc;
+  padding: 10px 10px 10px 20px;
+  margin: 0;
+  background: #fafafa;
+}
 .button {
   color: #fff;
   background-color: #5cb85c;
