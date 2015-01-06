@@ -192,4 +192,12 @@
 
     render();
   </script>
+  <style media="print">
+    #content > div:nth-child(1) {
+      display: none;
+    }
+    #content > div.problem-statement {
+      width: 100% !important;
+    }
+  </style>
 {% endblock %}
