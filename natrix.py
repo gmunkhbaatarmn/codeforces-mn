@@ -17,7 +17,7 @@ from jinja2 import Environment, FileSystemLoader
 sys.path.append("./packages")
 info, taskqueue  # pyflakes fix
 
-__version__ = "0.0.4"
+__version__ = "0.0.7"
 
 
 # Core classes
@@ -28,6 +28,12 @@ class Request(object):
         self.path = environ["PATH_INFO"]
         self.query = environ["QUERY_STRING"]
         self.params = parse_qs(environ["QUERY_STRING"], keep_blank_values=1)
+
+        self.headers = {}
+        for k, v in environ.iteritems():
+            if k.startswith("HTTP_"):
+                name = k[5:].lower().replace("_", "-")
+                self.headers[name] = v
 
         content_type = environ.get("HTTP_CONTENT_TYPE", "")
         content_type = content_type or environ.get("CONTENT_TYPE", "")
@@ -87,11 +93,11 @@ class Request(object):
             self.url += "?" + self.query
 
         # unicode
-        self.host = _unicode(self.host)
-        self.path = _unicode(self.path)
-        self.domain = _unicode(self.domain)
-        self.url = _unicode(self.url)
-        self.query = _unicode(self.query)
+        self.host = ensure_unicode(self.host)
+        self.path = ensure_unicode(self.path)
+        self.domain = ensure_unicode(self.domain)
+        self.url = ensure_unicode(self.url)
+        self.query = ensure_unicode(self.query)
 
     def __getitem__(self, name):
         " Example: self.request[:name] "
@@ -103,11 +109,11 @@ class Request(object):
         if isinstance(value, list) and len(value) == 1:
             value = value[0]
 
-        if isinstance(value, str):
-            try:
-                value = value.decode("utf-8")
-            except UnicodeDecodeError:
-                value = value
+        try:
+            value = ensure_unicode(value)
+        except UnicodeDecodeError:
+            pass
+
         return value
 
 
@@ -132,12 +138,7 @@ class Response(object):
             value = json.dumps(value)
             self.headers["Content-Type"] = "application/json"
 
-        text = "%s" % value
-
-        if not isinstance(text, str):
-            text = text.encode("utf-8")
-
-        self.body += text
+        self.body += ensure_ascii("%s" % value)
 
     @property
     def status(self):
@@ -213,6 +214,9 @@ class Response(object):
     class Sent(Exception):
         " Response sent "
 
+    class Sent404(Exception):
+        " Response sent "
+
 
 class Handler(object):
     def __init__(self, request, response, config):
@@ -273,16 +277,15 @@ class Handler(object):
         context_dict.update(context or {})
         context_dict.update(kwargs)
 
+        env.filters.update(context_dict)
+
         return env.get_template(template).render(context_dict)
 
     def redirect(self, url, permanent=False, code=302, delay=0):
         if permanent:
             code = 301
 
-        if isinstance(url, unicode):
-            url = url.encode("utf-8")
-
-        self.response.headers["Location"] = url
+        self.response.headers["Location"] = ensure_ascii(url)
         self.response.code = code
         self.response.body = ""
 
@@ -325,61 +328,48 @@ class Application(object):
 
         Returns an iterable with the response to return the client
         """
+        request = Request(environ)
+        response = Response()
+
         try:
-            request = Request(environ)
-            response = Response()
-
-            try:
-                " before "
-                before, args = self.get_before(request.path, request.method)
-                if before:
-                    x = Handler(request, response, self.config)
-                    try:
-                        before(x, *args)
-                    except response.Sent:
-                        pass
-
-                    # save session
-                    if x.session != x.session.initial:
-                        session_cookie = cookie_encode(x.config["session-key"],
-                                                       x.session)
-                        cookie_value = "session=%s; path=/;" % session_cookie
-
-                        cookie = Cookie.SimpleCookie()
-                        cookie.load(cookie_value)
-                        x.request.cookies = dict(cookie.items())
-                        x.response.headers["Set-Cookie"] = cookie_value
-
-                    request = x.request
-                    response = x.response
-
-                    if response.body or response.code != 200:
-                        start_response(response.status,
-                                       response.headers.items())
-                        return [response.body]
-
-                " handler "
+            " before "
+            before, args = self.get_before(request.path, request.method)
+            if before:
                 x = Handler(request, response, self.config)
-                x.not_found = self.get_error_404()
-                x.internal_error = self.get_error_500()
+                try:
+                    before(x, *args)
+                except response.Sent:
+                    pass
 
-                handler, args = self.get_handler(request.path, request.method)
-                if handler:
-                    try:
-                        handler(x, *args)
-                    except response.Sent:
-                        pass
+                # save session
+                if x.session != x.session.initial:
+                    session_cookie = cookie_encode(x.config["session-key"],
+                                                   x.session)
+                    cookie_value = "session=%s; path=/;" % session_cookie
 
-                    # save session
-                    if x.session != x.session.initial:
-                        cookie = cookie_encode(x.config["session-key"],
-                                               x.session)
-                        x.response.headers["Set-Cookie"] = \
-                            "session=%s; path=/;" % cookie
+                    cookie = Cookie.SimpleCookie()
+                    cookie.load(cookie_value)
+                    x.request.cookies = dict(cookie.items())
+                    x.response.headers["Set-Cookie"] = cookie_value
 
-                    request = x.request
-                    response = x.response
-                else:
+                request = x.request
+                response = x.response
+
+                if response.body or response.code != 200:
+                    start_response(response.status,
+                                   response.headers.items())
+                    return [response.body]
+
+            " handler "
+            x = Handler(request, response, self.config)
+            x.not_found = self.get_error_404()
+            x.internal_error = self.get_error_500()
+
+            handler, args = self.get_handler(request.path, request.method)
+            if handler:
+                try:
+                    handler(x, *args)
+                except Response.Sent404:
                     not_found = self.get_error_404()
                     x.response.code = 404
                     try:
@@ -387,26 +377,53 @@ class Application(object):
                     except response.Sent:
                         pass
                     response = x.response
+                except Response.Sent:
+                    pass
 
-            except Exception as ex:
-                x = Handler(request, response, self.config)
-                x.exception = ex
-                x.response.code = 500
+                # save session
+                if x.session != x.session.initial:
+                    cookie = cookie_encode(x.config["session-key"],
+                                           x.session)
+                    x.response.headers["Set-Cookie"] = \
+                        "session=%s; path=/;" % cookie
 
-                # logging to console
-                error("Error occured", exc_info=True)
-
-                internal_error = self.get_error_500()
+                request = x.request
+                response = x.response
+            else:
+                not_found = self.get_error_404()
+                x.response.code = 404
                 try:
-                    internal_error(x)
+                    not_found(x)
                 except response.Sent:
                     pass
                 response = x.response
 
-            start_response(response.status, response.headers.items())
-            return [response.body]
-        finally:
-            pass
+        except Exception as ex:
+            x = Handler(request, response, self.config)
+            x.exception = ex
+            x.response.code = 500
+
+            # logging to console
+            message = ("Error occured. Params:\n"
+                       "---------------------------------------------------\n"
+                       "%s\n"
+                       "===================================================\n")
+            error(message % request.params, exc_info=True)
+
+            internal_error = self.get_error_500()
+            try:
+                internal_error(x)
+            except response.Sent:
+                pass
+            response = x.response
+
+        # Response headers must be str not unicode
+        for k in response.headers:
+            response.headers[k] = ensure_ascii(response.headers[k])
+
+        start_response(response.status, response.headers.items())
+        return [response.body]
+        # threadsafe support needed
 
     def route(self, route):
         def func(handler):
@@ -418,7 +435,11 @@ class Application(object):
     def get_handler(self, request_path, request_method):
         " Returns (handler, args) or (none, none) "
         for rule, handler in self.routes:
-            rule = _unicode(rule)
+            rule = ensure_unicode(rule)
+            rule = rule.replace("<int>", "(int:\d+)")
+            rule = rule.replace("<string>", "([^/]+)")
+            for k, v in self.config.get("route-shortcut", {}).items():
+                rule = rule.replace(k, v)
 
             " route method. route rule: /path/to#method "
             if re.search("#[a-z-]+$", rule):
@@ -433,10 +454,31 @@ class Application(object):
                 continue
 
             " match url "
-            if not re.search("^%s$" % rule, request_path):
+            # has any groups
+            re_groups = re.compile('''
+              \(        # `(` character. Marks group start
+              (
+                [^\)]+  # Until ")" character
+              )
+              \)        # `)` character. Marks group ends
+            ''', re.VERBOSE)
+
+            convert_rules = []
+            for group in re.findall(re_groups, rule):
+                if group.startswith("int:"):
+                    convert_rules.append(lambda x: int(x))
+                else:
+                    convert_rules.append(lambda x: x)
+
+            rule_simple = re.sub("\([a-z]+\:", "(", rule)
+            if not re.search("^%s$" % rule_simple, request_path):
                 continue
 
-            return handler, re.search("^%s$" % rule, request_path).groups()
+            args = list(re.search("^%s$" % rule_simple, request_path).groups())
+            for i, convert in enumerate(convert_rules):
+                args[i] = convert(args[i])
+
+            return handler, args
 
         return None, None
 
@@ -537,14 +579,24 @@ def cookie_signature(key, value, timestamp):
     return signature.hexdigest()
 
 
-def _unicode(string):
+def ensure_unicode(string):
     if isinstance(string, str):
         string = string.decode("utf-8")
     return string
 
 
+def ensure_ascii(string):
+    if isinstance(string, unicode):
+        string = string.encode("utf-8")
+    return string
+
+
 # Services
-class Model(db.Model):
+class ModelMixin(object):
+    @property
+    def id(self):
+        return self.key().id()
+
     @classmethod
     def find(cls, *args, **kwargs):
         q = cls.all()
@@ -553,9 +605,27 @@ class Model(db.Model):
 
         return q.get()
 
-    @property
-    def id(self):
-        return self.key().id()
+    @classmethod
+    def find_or_404(cls, *args, **kwargs):
+        entity = cls.find(*args, **kwargs)
+        if not entity:
+            raise Response.Sent404
+        return entity
+
+    @classmethod
+    def get_or_404(cls, id):
+        entity = cls.get_by_id(id)
+        if not entity:
+            raise Response.Sent404
+        return entity
+
+
+class Model(db.Model, ModelMixin):
+    pass
+
+
+class Expando(db.Model, ModelMixin):
+    pass
 
 
 class Data(db.Model):

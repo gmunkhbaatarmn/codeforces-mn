@@ -47,7 +47,7 @@
       <tr>
         <th style="width:43px">#</th>
         <th style="text-align:left; border-right:0">Бодлогын нэр</th>
-        <th style="width:250px; border-right:0; text-align:left; border-right:0">Хянасан</th>
+        <th style="width:150px; border-right:0; text-align:right; border-right:0">Нийтлэгдсэн</th>
         <th style="width:130px; text-align:right">Орчуулсан</th>
       </tr>
       {% for s in submissions|reverse %}
@@ -58,8 +58,8 @@
           <span style="border-right:0; text-align:right; color:#888">({{ relative(s.created_at) }})</span>
         </td>
         <td>
-          {{ s.moderator }}
-          <span style="border-right:0; text-align:right; color:#888">({{ relative(s.published_at) }})</span>
+          {# s.moderator #}
+          <div style="border-right:0; text-align:right; color:#888">{{ relative(s.published_at) }}</div>
         </td>
         <td style="text-align:right">{{ s.credits }}</td>
       </tr>
