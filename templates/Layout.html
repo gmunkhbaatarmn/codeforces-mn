@@ -70,7 +70,7 @@
           <tr {{- ' class="hidden"'|safe if loop.index > 10 }}>
             <td>{{ loop.index }}</td>
             <td>{{ user(handle, point)|safe }}</td>
-            <td>{{ point }}</td>
+            <td>{{ int(point) if point == int(point) else point }}</td>
           </tr>
           {% endfor %}
           <tr>
