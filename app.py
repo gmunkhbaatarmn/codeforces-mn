@@ -262,7 +262,11 @@ def suggestion_publish(x):
 
     # - cache count query
     count_all = Problem.all().count(3000)
-    count_done = Problem.all().filter("credits >", "").count(3000)
+    count_done = 0
+    for p in Problem.all().filter("credits >", ""):
+        if p.credits == u"[орчуулагдаж байгаа]":
+            continue
+        count_done += 1
     data.write("count_all", count_all)
     data.write("count_done", count_done)
 
