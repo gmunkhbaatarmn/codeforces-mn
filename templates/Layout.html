@@ -8,7 +8,7 @@
   <meta name="description" content="{{ description if description else "Програмчлал, мэдээлэлзүй, алгоритмын бодлогууд. Олимпиадад бэлтгэгчдэд тусламж. Codeforces.com сайтын Монгол орчуулга" }}">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ubuntu+Condensed&subset=cyrillic-ext,cyrillic">
-  <link rel="stylesheet" href="/static/app.styl.css?10">
+  <link rel="stylesheet" href="/static/app.styl.css?11">
   <link rel="shortcut icon" href="/favicon.ico">
   {{ head }}
   <meta name="google-site-verification" content="tJEnNpw90aAlRgukFlyCTGZtXdjxVuGJmh-vk7p2g3g">
@@ -62,8 +62,8 @@
         <h2>Шилдэг орчуулагчид</h2>
         <table>
           <tr>
-            <th>#</th>
-            <th>Нэр</th>
+            <th class="w02">#</th>
+            <th class="w14">Нэр</th>
             <th><span class="text-normal">{{ count_done }}/{{ count_all }}</span></th>
           </tr>
           {% for handle, point in top %}
@@ -84,8 +84,8 @@
         <h2>Codeforces чансаа</h2>
         <table>
           <tr>
-            <th>#</th>
-            <th>Нэр</th>
+            <th class="w02">#</th>
+            <th class="w14">Нэр</th>
             <th colspan="2">Чансаа</th>
           </tr>
           {% for u in codeforces %}
@@ -95,7 +95,7 @@
               <td>{{ loop.index }}</td>
               <td>{{ cf_user(u.handle, u.rating)|safe }}</td>
               <td style="text-align:right; width:35px">{{ u.rating }}</td>
-              <td style="text-align:left">{{ cf_rating(u.change, u.contest_id) }}</td>
+              <td style="text-align:left; border-left:0">{{ cf_rating(u.change, u.contest_id) }}</td>
             </tr>
           {% endfor %}
           <tr>
@@ -109,8 +109,8 @@
         <h2>Topcoder чансаа</h2>
         <table>
           <tr>
-            <th>#</th>
-            <th>Нэр</th>
+            <th class="w02">#</th>
+            <th class="w14">Нэр</th>
             <th colspan="2">Чансаа</th>
           </tr>
           {% for u in topcoder %}
@@ -120,7 +120,7 @@
               <td>{{ loop.index }}</td>
               <td>{{ tc_user(u.handle, u.rating, u.id)|safe }}</td>
               <td style="text-align:right; width:35px">{{ u.rating }}</td>
-              <td style="text-align:left">{{ tc_rating(u.change, u.contest_id, u.id) }}</td>
+              <td style="text-align:left; border-left:0">{{ tc_rating(u.change, u.contest_id, u.id) }}</td>
             </tr>
           {% endfor %}
           <tr>
