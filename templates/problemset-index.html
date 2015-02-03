@@ -15,10 +15,15 @@
       </tr>
       {% for t in problems %}
         <tr {{- loop.cycle(' class="dark"', "")|safe }}>
-          {% if t.credits %}
+          {% if t.credits and t.credits != "[орчуулагдаж байгаа]" %}
             {# translated #}
             <td style="text-align:center"><a href="{{ t.link }}">{{ t.code.replace("-", "") }}</a></td>
             <td style="border-right:0"><a href="{{ t.link }}">{{ t.title }}</a></td>
+            <td style="text-align:right; color:#666; font-size:11px">{{ t.credits }}</td>
+          {% elif t.credits == "[орчуулагдаж байгаа]" %}
+            {# translating #}
+            <td style="text-align:center"><a href="{{ t.link }}">{{ t.code.replace("-", "") }}</a></td>
+            <td style="border-right:0">{{ t.title }}</td>
             <td style="text-align:right; color:#666; font-size:11px">{{ t.credits }}</td>
           {% else %}
             {# not yet translated #}

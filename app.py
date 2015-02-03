@@ -224,6 +224,11 @@ def suggestion_insert(x):
     s.credits = credits
     s.save()
 
+    problem = Problem.find(code=code)
+    if not problem.credits:
+        problem.credits = u"[орчуулагдаж байгаа]"
+        problem.save()
+
     x.redirect("/suggestion", delay=1)
 
 
@@ -277,6 +282,8 @@ def suggestion_publish(x):
     for p in Problem.all().filter("credits !=", ""):
         translators = p.credits.split(", ")
         for t in translators:
+            if t == u"[орчуулагдаж байгаа]":
+                continue
             point = (p.meta.get("credit_point") or 1.0) / len(translators)
             contribution[t] = contribution.get(t, 0.0) + point
     contribution = sorted(contribution.items(), key=lambda t: -t[1])
@@ -309,6 +316,13 @@ def suggestion_delete(x):
 
     id = x.request["id"]
     suggestion = Suggestion.get_by_id(int(id))
+    code = suggestion.code
+
+    problem = Problem.find(code=code)
+    if problem.credits == u"[орчуулагдаж байгаа]":
+        if Suggestion.all().filter("code =", code).count() <= 1:
+            problem.credits = ""
+            problem.save()
     suggestion.delete()
 
     x.redirect("/suggestion", delay=1.0)
