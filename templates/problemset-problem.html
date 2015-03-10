@@ -20,9 +20,9 @@
     {% for sample in problem.meta.tests %}
       <div class="sample">
         <h5>Оролт</h5>
-        <pre>{{ sample[0] }}</pre>
+        <pre>{{ sample[0]|escape }}</pre>
         <h5>Гаралт</h5>
-        <pre>{{ sample[1] }}</pre>
+        <pre>{{ sample[1]|escape }}</pre>
       </div>
     {% endfor %}
 
