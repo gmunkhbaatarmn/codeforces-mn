@@ -348,7 +348,12 @@ def extension(x):
     # - 1. translated problems
     translated = memcache.get("/extension:translated")
     if not translated:
-        translated = [p.code for p in Problem.all().filter("credits >", "")]
+        translated = []
+        for p in Problem.all().filter("credits >", ""):
+            if p.credits == u"[орчуулагдаж байгаа]":
+                continue
+            translated.append(p.code)
+
         translated_set = set(translated)
         for c in Contest.all():
             for letter, code in c.problems:
