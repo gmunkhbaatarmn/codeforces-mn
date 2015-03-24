@@ -19,10 +19,10 @@
         </tr>
         {% for u in codeforces %}
           <tr {{- ' class="recent"'|safe if u.recent }}>
-            <td style="text-align:center">{{ loop.index }}</td>
+            <td class="text-center">{{ loop.index }}</td>
             <td>{{ cf_user(u.handle, u.rating)|safe }}</td>
-            <td style="text-align:center">{{ u.rating }}</td>
-            <td style="text-align:center">{{ cf_rating(u.change, u.contest_id, "center") }}</td>
+            <td class="text-center">{{ u.rating }}</td>
+            <td class="text-center">{{ cf_rating(u.change, u.contest_id, "center") }}</td>
           </tr>
         {% endfor %}
       </table>
@@ -41,10 +41,10 @@
         </tr>
         {% for u in topcoder %}
           <tr {{- ' class="recent"'|safe if u.recent }}>
-            <td style="text-align:center">{{ loop.index }}</td>
+            <td class="text-center">{{ loop.index }}</td>
             <td>{{ tc_user(u.handle, u.rating, u.id)|safe }}</td>
-            <td style="text-align:center">{{ u.rating }}</td>
-            <td style="text-align:center">{{ tc_rating(u.change, u.contest_id, u.id, "center") }}</td>
+            <td class="text-center">{{ u.rating }}</td>
+            <td class="text-center">{{ tc_rating(u.change, u.contest_id, u.id, "center") }}</td>
           </tr>
         {% endfor %}
       </table>

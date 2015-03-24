@@ -10,25 +10,25 @@
     <table>
       <tr>
         <th style="width:4em">#</th>
-        <th style="border-right:0">Бодлогын нэр</th>
+        <th class="border-right-none">Бодлогын нэр</th>
         <th style="width:16em"></th>
       </tr>
       {% for t in problems %}
         <tr {{- loop.cycle(' class="dark"', "")|safe }}>
           {% if t.credits and t.credits != "[орчуулагдаж байгаа]" %}
             {# translated #}
-            <td style="text-align:center"><a href="{{ t.link }}">{{ t.code.replace("-", "") }}</a></td>
-            <td style="border-right:0"><a href="{{ t.link }}">{{ t.title }}</a></td>
+            <td class="text-center"><a href="{{ t.link }}">{{ t.code.replace("-", "") }}</a></td>
+            <td class="border-right-none"><a href="{{ t.link }}">{{ t.title }}</a></td>
             <td style="text-align:right; color:#666; font-size:11px">{{ t.credits }}</td>
           {% elif t.credits == "[орчуулагдаж байгаа]" %}
             {# translating #}
-            <td style="text-align:center"><a href="{{ t.link }}">{{ t.code.replace("-", "") }}</a></td>
-            <td style="border-right:0">{{ t.title }}</td>
+            <td class="text-center"><a href="{{ t.link }}">{{ t.code.replace("-", "") }}</a></td>
+            <td class="border-right-none">{{ t.title }}</td>
             <td style="text-align:right; color:#666; font-size:11px">{{ t.credits }}</td>
           {% else %}
             {# not yet translated #}
-            <td style="text-align:center"><a href="{{ t.link }}">{{ t.code.replace("-", "") }}</a></td>
-            <td style="border-right:0">{{ t.title }}</td>
+            <td class="text-center"><a href="{{ t.link }}">{{ t.code.replace("-", "") }}</a></td>
+            <td class="border-right-none">{{ t.title }}</td>
             <td style="text-align:right; color:#666; font-size:11px"><a href="{{ t.link }}/edit">Орчуулах</a></td>
           {% endif %}
         </tr>

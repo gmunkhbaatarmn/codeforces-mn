@@ -10,20 +10,20 @@
     <table>
       <tr>
         <th style="width:3em">#</th>
-        <th style="border-right:0">Нэр</th>
+        <th class="border-right-none">Нэр</th>
         <th style="width:15em"></th>
       </tr>
       {% for letter, p in contest.problems_object %}
         <tr {{- loop.cycle(' class="dark"', "")|safe }}>
           {% if p.credits %}
             {# translated #}
-            <td style="text-align:center"><a href="/contest/{{ contest.id }}/problem/{{ letter }}">{{ letter }}</a></td>
-            <td style="border-right:0"><a href="/contest/{{ contest.id }}/problem/{{ letter }}">{{ p.title }}</a></td>
+            <td class="text-center"><a href="/contest/{{ contest.id }}/problem/{{ letter }}">{{ letter }}</a></td>
+            <td class="border-right-none"><a href="/contest/{{ contest.id }}/problem/{{ letter }}">{{ p.title }}</a></td>
             <td style="text-align:right; color:#666; font-size:11px">{{ p.credits }}</td>
           {% else %}
             {# not yet translated #}
-            <td style="text-align:center"><a href="/contest/{{ contest.id }}/problem/{{ letter }}">{{ letter }}</a></td>
-            <td style="border-right:0">{{ p.title }}</td>
+            <td class="text-center"><a href="/contest/{{ contest.id }}/problem/{{ letter }}">{{ letter }}</a></td>
+            <td class="border-right-none">{{ p.title }}</td>
             <td style="text-align:right; color:#666; font-size:11px"><a href="{{ p.link }}/edit">Орчуулах</a></td>
           {% endif %}
         </tr>
@@ -35,7 +35,7 @@
 
 {% block sidebar %}
   <div class="box">
-    <div style="text-align:center">
+    <div class="text-center">
       <span style="color:#000; font-weight:bold">{{ contest.name.replace("(", "<br>(")|safe }}</span>
       <br>
       <br>

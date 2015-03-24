@@ -22,15 +22,15 @@
         {% for s in suggestions %}
           <tr {{- ' class="recent"' if not s.title.strip().startswith("* ") else '' }}>
           <td class="text-center" data-sort-value="{{ s.code }}"><a href="/suggestion/{{ s.key().id() }}">{{ s.code.strip() }}</a></td>
-          <td style="border-right:0" data-sort-value="{{ s.title }}">
+          <td class="border-right-none" data-sort-value="{{ s.title }}">
             <a href="/suggestion/{{ s.key().id() }}">{{ s.title }}</a>
             <span style="border-right:0; text-align:right; color:#888">({{ relative(s.added.strftime("%s")) }})</span>
           </td>
-          <td style="text-align:right">{{ s.credits }}</td>
+          <td class="text-right">{{ s.credits }}</td>
         </tr>
         {% else %}
         <tr>
-          <td colspan="3" style="text-align:center">Хүлээгдэж байгаа санал алга</td>
+          <td colspan="3" class="text-center">Хүлээгдэж байгаа санал алга</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -53,7 +53,7 @@
       {% for s in submissions|reverse %}
       <tr {{- ' class="recent"' if (int(now.strftime("%s")) - s.published_at < 3600 * 24) else '' }}>
         <td class="text-center"><a href="/problemset/problem/{{ s.code.strip().replace("-", "/")}}">{{ s.code.strip() }}</a></td>
-        <td style="border-right:0">
+        <td class="border-right-none">
           <a href="/problemset/problem/{{ s.code.strip().replace("-", "/")}}">{{ s.title }}</a>
           <span style="border-right:0; text-align:right; color:#888">({{ relative(s.created_at) }})</span>
         </td>
@@ -61,7 +61,7 @@
           {# s.moderator #}
           <div style="border-right:0; text-align:right; color:#888">{{ relative(s.published_at) }}</div>
         </td>
-        <td style="text-align:right">{{ s.credits }}</td>
+        <td class="text-right">{{ s.credits }}</td>
       </tr>
       {% endfor %}
     </table>
@@ -73,19 +73,19 @@
 {% block sidebar %}
   <div class="box">
     <h2>Түр хүлээнэ үү</h2>
-    <div style="text-align:center">
+    <div class="text-center">
       Санал болгосон орчуулгуудыг хянагч шалгаж үзээд нийтлэх буюу татгалзаж болно.
     </div>
   </div>
   <div class="box">
     {% if session.moderator %}
       <h2>Хянагчийн булан</h2>
-      <div style="text-align:center">
+      <div class="text-center">
         <a href="/suggestion?logout">Системээс гарах</a> (logout)
       </div>
     {% else %}
       <h2>Хянагч нэвтрэх</h2>
-      <div style="text-align:center">
+      <div class="text-center">
         <form method="post" action="">
           <input type="hidden" name=":method" value="login">
           <input type="password" name="password" value="" placeholder="Нууц үг">
