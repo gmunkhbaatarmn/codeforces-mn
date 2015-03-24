@@ -41,6 +41,14 @@ def home(x):
     x.render("home.html")
 
 
+@route(":before")
+def before(x):
+    # Redirect www urls to non-www
+    if x.request.url.startswith("www."):
+        url = "http://%s" % x.request.url.replace("www.", "")
+        x.redirect(url, permanent=True)
+
+
 # Contest
 @route("/contests")
 def contest_list(x, page="1"):
