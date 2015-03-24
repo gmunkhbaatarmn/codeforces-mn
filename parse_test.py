@@ -19,7 +19,7 @@ def test_contest():
 
 
 def test_problemset():
-    eq(_.problemset(20)[-1], ["1A", "Theatre Square"])
+    eq(_.problemset(23)[-1], ["1A", "Theatre Square"])
 
 
 def test_problem():
