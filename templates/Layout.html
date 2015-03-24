@@ -8,7 +8,7 @@
   <meta name="description" content="{{ description if description else "Програмчлал, мэдээлэлзүй, алгоритмын бодлогууд. Олимпиадад бэлтгэгчдэд тусламж. Codeforces.com сайтын Монгол орчуулга" }}">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ubuntu+Condensed&amp;subset=cyrillic-ext,cyrillic">
-  <link rel="stylesheet" href="/static/app.styl.css?11">
+  <link rel="stylesheet" href="/static/app.css?2">
   <link rel="shortcut icon" href="/favicon.ico">
   {{ head }}
   <meta name="google-site-verification" content="tJEnNpw90aAlRgukFlyCTGZtXdjxVuGJmh-vk7p2g3g">
@@ -94,8 +94,8 @@
             <tr {{- (' class="%s"' % cls)|safe if cls.strip() else ""  }}>
               <td>{{ loop.index }}</td>
               <td>{{ cf_user(u.handle, u.rating)|safe }}</td>
-              <td style="text-align:right; width:35px">{{ u.rating }}</td>
-              <td style="text-align:left; border-left:0">{{ cf_rating(u.change, u.contest_id) }}</td>
+              <td class="text-right w04">{{ u.rating }}</td>
+              <td class="text-left border-left-none">{{ cf_rating(u.change, u.contest_id) }}</td>
             </tr>
           {% endfor %}
           <tr>
@@ -119,8 +119,8 @@
             <tr {{- (' class="%s"' % cls)|safe if cls.strip() else ""  }}>
               <td>{{ loop.index }}</td>
               <td>{{ tc_user(u.handle, u.rating, u.id)|safe }}</td>
-              <td style="text-align:right; width:35px">{{ u.rating }}</td>
-              <td style="text-align:left; border-left:0">{{ tc_rating(u.change, u.contest_id, u.id) }}</td>
+              <td class="text-right w04">{{ u.rating }}</td>
+              <td class="text-left border-left-none">{{ tc_rating(u.change, u.contest_id, u.id) }}</td>
             </tr>
           {% endfor %}
           <tr>

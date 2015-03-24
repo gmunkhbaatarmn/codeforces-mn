@@ -34,9 +34,9 @@
 
 {%- macro cf_rating(change, contest_id, align="left") -%}
   {% if change >= 0 %}
-    <a rel="nofollow" href="http://codeforces.com/contest/{{ contest_id }}/standings/friends/true" class="rating-up" style="text-align:{{ align }}">+{{ change }}</a>
+    <a rel="nofollow" href="http://codeforces.com/contest/{{ contest_id }}/standings/friends/true" class="rating-up text-{{ align }}">+{{ change }}</a>
   {% else %}
-    <a rel="nofollow" href="http://codeforces.com/contest/{{ contest_id }}/standings/friends/true" class="rating-down" style="text-align:{{ align }}">{{ change }}</a>
+    <a rel="nofollow" href="http://codeforces.com/contest/{{ contest_id }}/standings/friends/true" class="rating-down text-{{ align }}">{{ change }}</a>
   {% endif %}
 {%- endmacro -%}
 
@@ -59,8 +59,8 @@
 
 {%- macro tc_rating(change, contest_id, coder_id, align="left") -%}
   {% if change >= 0 %}
-    <a rel="nofollow" href="http://community.topcoder.com/stat?c=coder_room_stats&amp;cr={{ coder_id }}&amp;rd={{ contest_id }}" class="rating-up" style="text-align:{{ align }}">+{{ change }}</a>
+    <a rel="nofollow" href="http://community.topcoder.com/stat?c=coder_room_stats&amp;cr={{ coder_id }}&amp;rd={{ contest_id }}" class="rating-up text-{{ align }}">+{{ change }}</a>
   {% else %}
-    <a rel="nofollow" href="http://community.topcoder.com/stat?c=coder_room_stats&amp;cr={{ coder_id }}&amp;rd={{ contest_id }}" class="rating-down" style="text-align:{{ align }}">{{ change }}</a>
+    <a rel="nofollow" href="http://community.topcoder.com/stat?c=coder_room_stats&amp;cr={{ coder_id }}&amp;rd={{ contest_id }}" class="rating-down text-{{ align }}">{{ change }}</a>
   {% endif %}
 {%- endmacro -%}

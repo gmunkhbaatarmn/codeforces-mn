@@ -32,6 +32,18 @@ for i in (1..9)
 for i in (10..99)
   .w{i} { width: i * 10px }
 
+.left        { float: left        !important }
+.right       { float: right       !important }
+.no-float    { float: none        !important }
+.text-left   { text-align: left   !important }
+.text-center { text-align: center !important }
+.text-right  { text-align: right  !important }
+.hidden      { display: none      !important }
+.centered    { margin: 0 auto     !important }
+
+.border-left-none  { border-left:  none !important }
+.border-right-none { border-right: none !important }
+
 //:1 others
 .button
   color #fff
@@ -218,6 +230,9 @@ for i in (10..99)
   padding-left 1em
   line-height 20px
   font-size 13px
+
+#content .post-title
+  margin-top 0
 
 .warning
   color #ff0202
