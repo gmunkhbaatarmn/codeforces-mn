@@ -1,3 +1,6 @@
+[![Build Status](https://img.shields.io/travis/gmunkhbaatarmn/codeforces-mn.svg?style=flat-square)](https://travis-ci.org/gmunkhbaatarmn/codeforces-mn)
+[![Issues](https://img.shields.io/github/issues/gmunkhbaatarmn/codeforces-mn.svg?style=flat-square)](https://github.com/gmunkhbaatarmn/codeforces-mn/issues)
+
 Mongolian translation of [codeforces.com](http://www.codeforces.com/).
 Runs live on [codeforces.mn](http://www.codeforces.mn/)
 
