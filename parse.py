@@ -62,7 +62,7 @@ def problem(code):
 
 def sample_test(e):
     source = html(e).replace("<br/>", "\n")
-    while source.endswith("\n"):
+    if source.endswith("\n"):
         source = source[:-1]
 
     source = source.replace('<span class="tex-span">', "")
