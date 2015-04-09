@@ -39,70 +39,20 @@ def test_problem_sample_test():
     import cgi
 
     p = _.problem("48-H")
-    eq(p["tests"][0], ("2 2\n0 0 4", "\\../\n#\\/#\n\\##/\n.\\/."))
-    eq(p["tests"][1], ("2 3\n1 2 3", "###/\\#\n##/..\\\n#/....\n/....."))
+    eq(p["tests"][0], ("2 2\n0 0 4\n", "\\../\n#\\/#\n\\##/\n.\\/.\n"))
+    eq(p["tests"][1], ("2 3\n1 2 3\n", "###/\\#\n##/..\\\n#/....\n/.....\n"))
 
     p = _.problem("141-E")
-    eq(p["tests"][0][1], "0\n")
+    eq(p["tests"][0][1], "0\n\n")
 
     p = _.problem("101-A")
-    eq(p["tests"][2][1], "0\n")
+    eq(p["tests"][2][1], "0\n\n")
 
     p = _.problem("223-A")
-    eq(p["tests"][1][1], "0\n")
+    eq(p["tests"][1][1], "0\n\n")
 
     p = _.problem("51-B")
-    eq(p["tests"][0], (cgi.escape("<table><tr><td></td></tr></table>"), "1 "))
-
-    p = _.problem("522-C")
-    eq(p["tests"][0][0], ("2\n\n3 4\n2 3 2 1\n1 0\n0 0\n\n5 5\n"
-                          "1 2 1 3 1\n3 0\n0 0\n2 1\n4 0"))
-
-    '''
-    import re
-    import time
-    import multiprocessing
-
-    def confirm(code):
-        old = _.problem_old(code)
-        new = _.problem_new(code)
-
-        if old["tests"] == new["tests"]:
-            print "%5s: PASSED" % code
-            return
-        print "%5s" % code
-        print "--------------------------------------"
-        print old["tests"]
-        print "--------------------------------------"
-        print new["tests"]
-        print "======================================"
-
-    for page in range(23, 0, -1):
-        for code, __ in reversed(_.problemset(page)):
-            code = "%s-%s" % re.search("(\s*\d+)(.+)", code).groups()
-            if code in ["524-A", "524-B"]:
-                continue
-
-            while True:
-                start = time.time()
-                p = multiprocessing.Process(target=confirm, args=(code,))
-                p.start()
-
-                success = True
-                while p.is_alive():
-                    if start + 10.0 < time.time():
-                        success = False
-                        break
-                    time.sleep(0.1)
-
-                if success:
-                    break
-
-                # Terminate
-                print "Delayed: %s" % code
-                p.terminate()
-                p.join()
-    '''
+    eq(p["tests"][0][0], cgi.escape("<table><tr><td></td></tr></table>\n"))
 
 
 if __name__ == "__main__":
