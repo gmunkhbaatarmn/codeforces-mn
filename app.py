@@ -476,7 +476,12 @@ def update(x):
                 warning("SKIPPED: %s" % code)
                 continue
 
-            i = md5(json.dumps(parse.problem(code)["tests"])).hexdigest()
+            meta = parse.problem(code)
+            if not meta:
+                warning("SKIPPED: %s" % code)
+                continue
+
+            i = md5(json.dumps(meta["tests"])).hexdigest()
             p = Problem.find(identifier=i)
             if not p:
                 warning("Problem not found: %s" % code)
