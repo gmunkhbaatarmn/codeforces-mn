@@ -162,14 +162,17 @@ def codeforces_user(handle):
 
 
 def codeforces_ratings():
-    # List of all Mongolian coders
-    r = url_open("http://codeforces.com/ratings/country/Mongolia")
+    # - List of all Mongolian coders
     try:
+        r = url_open("http://codeforces.com/ratings/country/Mongolia")
+
         assert r.code == 200
         assert r.url == "http://codeforces.com/ratings/country/Mongolia"
-    except AssertionError:
-        warning("Fetch error: Codeforces country ratings")
+    except:
+        warning("CodeForces: list of all mongolia coders", exc_info=True)
         return
+    # endfold
+
     tree = lxml.html.document_fromstring(r.read())
     handles = []
     for a in tree.xpath("//*[@class='datatable']//table//tr//td[2]/a[2]"):
@@ -214,13 +217,15 @@ def topcoder_user(handle, id):
 
 
 def topcoder_ratings():
-    # List of all Mongolian coders
-    r = url_open("http://community.topcoder.com/tc?module=AlgoRank&cc=496")
+    # - List of all Mongolian coders
     try:
+        r = url_open("http://community.topcoder.com/tc?module=AlgoRank&cc=496")
         assert r.code == 200
-    except AssertionError:
-        warning("Fetch error: Topcoder country ratings")
+    except:
+        warning("TopCoder: List of all Mongolian coders", exc_info=True)
         return
+    # endfold
+
     tree = lxml.html.document_fromstring(r.read())
     handle_ids = []
     for a in tree.xpath("//*[@class='stat']//tr/td[2]/a"):
