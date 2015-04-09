@@ -21,10 +21,6 @@ def problem(code):
 
     tree = lxml.html.fromstring(source)
 
-    def html(e):
-        " inner html "
-        return etree.tostring(e).split(">", 1)[1].rsplit("</", 1)[0]
-
     if not tree.xpath("//div[@class='problem-statement']"):
         warning("%s unexpected response:\n%s" % (code, source))
         return
@@ -48,18 +44,36 @@ def problem(code):
         note = html(tree.xpath("//div[@class='note']")[0])
         note = note.replace('<div class="section-title">Note</div>', "")
 
-    return {
+    result = {
         # meta fields
         "time": tree.xpath("//div[@class='time-limit']/text()")[0],
         "memory": tree.xpath("//div[@class='memory-limit']/text()")[0],
         "input": tree.xpath("//div[@class='input-file']/text()")[0],
         "output": tree.xpath("//div[@class='output-file']/text()")[0],
-        "tests": zip(map(lambda e: "\n".join(e.xpath("./text()")), inputs),
-                     map(lambda e: "\n".join(e.xpath("./text()")), outputs)),
+        "tests": zip(map(lambda e: sample_test(e), inputs),
+                     map(lambda e: sample_test(e), outputs)),
         # statement fields
         "content": html2text(content),
         "note": html2text(note),
     }
+
+    return result
+
+
+def sample_test(e):
+    source = html(e).replace("<br/>", "\n")
+    while source.endswith("\n"):
+        source = source[:-1]
+
+    source = source.replace('<span class="tex-span">', "")
+    source = source.replace("</span>", "")
+
+    return source
+
+
+def html(e):
+    " inner html "
+    return etree.tostring(e).split(">", 1)[1].rsplit("</", 1)[0]
 
 
 def contest(id):
