@@ -137,7 +137,7 @@ def contest_history(page=1):
 
 # rating update
 def codeforces_user(handle):
-    info("codeforces_user(%s)" % handle)
+    info("CodeForces: %s" % handle)
 
     content = url_open("http://codeforces.com/profile/%s" % handle).read()
     assert "Codeforces is temporary unavailable" not in content
@@ -162,7 +162,8 @@ def codeforces_user(handle):
 
 
 def codeforces_ratings():
-    # - List of all Mongolian coders
+    # - List of Mongolians
+    info("CodeForces: List of Mongolians")
     try:
         r = url_open("http://codeforces.com/ratings/country/Mongolia")
 
@@ -196,6 +197,7 @@ def codeforces_ratings():
 
 
 def topcoder_user(handle, id):
+    info("TopCoder: %s" % handle)
     data = url_open("http://community.topcoder.com/tc?module=BasicData"
                     "&c=dd_rating_history&cr=%s" % id).read()
 
@@ -217,7 +219,8 @@ def topcoder_user(handle, id):
 
 
 def topcoder_ratings():
-    # - List of all Mongolian coders
+    # - List of Mongolians
+    info("TopCoder: List of Mongolians")
     try:
         r = url_open("http://community.topcoder.com/tc?module=AlgoRank&cc=496")
         assert r.code == 200
