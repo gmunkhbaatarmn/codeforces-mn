@@ -427,6 +427,9 @@ def update(x):
             warning("SKIPPED: %s" % code)
             continue
         code = "%3s-%s" % (code[:-1], code[-1])
+        if code in ["524-A", "524-B"]:
+            warning("SKIPPED: %s" % code)
+            continue
 
         p = Problem.find(code=code) or Problem(code=code)
         p.title = p.title or title
@@ -452,6 +455,7 @@ def update(x):
         p.meta_json = json.dumps(meta)
         p.identifier = md5(json.dumps(meta["tests"])).hexdigest()
         p.save()
+
     # - Check contests first page
     for id, name, start in parse.contest_history(1):
         # read only contest
@@ -468,6 +472,10 @@ def update(x):
         problems = {}
         for letter, _ in parse.contest(c.id)["problems"]:
             code = "%3s-%s" % (c.id, letter)
+            if code in ["524-A", "524-B"]:
+                warning("SKIPPED: %s" % code)
+                continue
+
             i = md5(json.dumps(parse.problem(code)["tests"])).hexdigest()
             p = Problem.find(identifier=i)
             if not p:
@@ -479,6 +487,7 @@ def update(x):
 
         # update contest count
         data.write("count:contest-all", Contest.all().count())
+
     # - Update problems count
     if new_problems > 0:
         data.write("count_all", data.fetch("count_all") + new_problems)
