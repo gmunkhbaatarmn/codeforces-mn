@@ -424,11 +424,11 @@ def update(x):
     new_problems = 0
     for code, title in parse.problemset(1):
         if not re.search("^\d+[A-Z]$", code):
-            warning("SKIPPED: %s" % code)
+            info("SKIPPED: %s" % code)
             continue
         code = "%3s-%s" % (code[:-1], code[-1])
         if code in ["524-A", "524-B"]:
-            warning("SKIPPED: %s" % code)
+            info("SKIPPED: %s" % code)
             continue
 
         p = Problem.find(code=code) or Problem(code=code)
@@ -473,12 +473,12 @@ def update(x):
         for letter, _ in parse.contest(c.id)["problems"]:
             code = "%3s-%s" % (c.id, letter)
             if code in ["524-A", "524-B"]:
-                warning("SKIPPED: %s" % code)
+                info("SKIPPED: %s" % code)
                 continue
 
             meta = parse.problem(code)
             if not meta:
-                warning("SKIPPED: %s" % code)
+                warning("Can't parse: %s" % code)
                 continue
 
             i = md5(json.dumps(meta["tests"])).hexdigest()
