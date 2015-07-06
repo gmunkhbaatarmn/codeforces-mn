@@ -11,6 +11,7 @@ from parse import codeforces_ratings, topcoder_ratings, date_format, relative
 from models import Problem, Contest, Suggestion
 
 
+# Application settings
 app.config["session-key"] = "Tiy3ahhiefux2hailaiph4echidaelee3daighahdahruPhoh"
 app.config["context"] = lambda x: {
     "date_format": date_format,
@@ -23,6 +24,10 @@ app.config["context"] = lambda x: {
     "count_done": data.fetch("count_done"),
     "relative": relative,
 }
+app.config["route-shortcut"] = {
+    "<code>": "(\w+)",
+}
+# endfold
 
 
 # Home
@@ -75,7 +80,7 @@ def contest_dashboard(x, id):
     x.render("contest-dashboard.html", locals())
 
 
-@route("/contest/<int>/problem/(\w+)")
+@route("/contest/<int>/problem/<code>")
 def contest_problem(x, contest_id, letter):
     letter = letter.upper()
 
@@ -109,7 +114,7 @@ def problemset_paged(x, page):
     x.render("problemset-index.html", locals())
 
 
-@route("/problemset/problem/<int>/(\w+)")
+@route("/problemset/problem/<int>/<code>")
 def problemset_problem(x, contest_id, index):
     index = index.upper()
 
@@ -133,7 +138,7 @@ def problemset_problem(x, contest_id, index):
         x.render("problemset-problem-en.html", locals())
 
 
-@route("/problemset/problem/<int>/(\w+)/edit")
+@route("/problemset/problem/<int>/<code>/edit")
 def problemset_translate(x, contest_id, index):
     index = index.upper()
     problem = Problem.find_or_404(code="%3s-%s" % (contest_id, index))
@@ -141,7 +146,7 @@ def problemset_translate(x, contest_id, index):
     x.render("problemset-translate.html", locals())
 
 
-@route("/problemset/problem/(\d+)/(\w+)\.html")
+@route("/problemset/problem/<int>/<code>\.html")
 def problem_embed(x, contest_id, index):
     # todo: this route is deprecated. remove after extension users upgraded
     extension_problem(x, contest_id, index)
@@ -383,7 +388,7 @@ def extension(x):
     x.response.write("%s\n" % data.fetch("count_all"))
 
 
-@route("/extension/<int>-(\w+)\.html")
+@route("/extension/<int>-<code>\.html")
 def extension_problem(x, contest_id, index):
     index = index.upper()
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
