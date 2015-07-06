@@ -6,25 +6,25 @@
 
 
 {% block content %}
-  {#:1# Suggestions #}
+  #:1 Suggestions
   <h1 class="table-title">Орчуулгын саналууд ({{ suggestions.count() }})</h1>
 
   <div class="table-container">
     <table class="sortable-table">
       <thead>
         <tr>
-          <th data-sort="string" style="width:43px">#</th>
-          <th data-sort="string" style="border-right:0; text-align:left; border-right:0">Бодлогын нэр</th>
-          <th data-sort="string" style="width:130px; text-align:right">Орчуулсан</th>
+          <th data-sort="string" class="w04">#</th>
+          <th data-sort="string" class="border-right-none text-left">Бодлогын нэр</th>
+          <th data-sort="string" class="w13 text-right">Орчуулсан</th>
         </tr>
       </thead>
       <tbody>
         {% for s in suggestions %}
           <tr {{- ' class="recent"' if not s.title.strip().startswith("* ") else '' }}>
-          <td class="text-center" data-sort-value="{{ s.code }}"><a href="/suggestion/{{ s.key().id() }}">{{ s.code.strip() }}</a></td>
-          <td class="border-right-none" data-sort-value="{{ s.title }}">
-            <a href="/suggestion/{{ s.key().id() }}">{{ s.title }}</a>
-            <span style="border-right:0; text-align:right; color:#888">({{ relative(s.added.strftime("%s")) }})</span>
+          <td data-sort-value="{{ s.code }}" class="text-center"><a href="/suggestion/{{ s.id }}">{{ s.code }}</a></td>
+          <td data-sort-value="{{ s.title }}" class="border-right-none">
+            <a href="/suggestion/{{ s.id }}">{{ s.title }}</a>
+            <span style="color:#888">({{ relative(s.added.strftime("%s")) }})</span>
           </td>
           <td class="text-right">{{ s.credits }}</td>
         </tr>
@@ -36,19 +36,18 @@
       </tbody>
     </table>
   </div>
-  {# endfold #}
 
-  {#:1# Last updated problems #}
+  #:1 Last updated problems
   <br><br>
   <h1 class="table-title">Сүүлд шинэчлэгдсэн бодлогууд</h1>
 
   <div class="table-container">
     <table>
       <tr>
-        <th style="width:43px">#</th>
-        <th style="text-align:left; border-right:0">Бодлогын нэр</th>
-        <th style="width:150px; border-right:0; text-align:right; border-right:0">Нийтлэгдсэн</th>
-        <th style="width:130px; text-align:right">Орчуулсан</th>
+        <th class="w03">#</th>
+        <th class="w15 text-left  border-right-none">Бодлогын нэр</th>
+        <th class="w15 text-right border-right-none">Нийтлэгдсэн</th>
+        <th class="w13 text-right">Орчуулсан</th>
       </tr>
       {% for s in submissions|reverse %}
       <tr {{- ' class="recent"' if (int(now.strftime("%s")) - s.published_at < 3600 * 24) else '' }}>

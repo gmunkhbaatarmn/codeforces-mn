@@ -27,9 +27,12 @@ blockquote
   margin 0
   background #fafafa
 
-for i in (1..9)
+// .w01 .w02 ... .w08 .w09
+for i in range(1, 9)
   .w0{i} { width: i * 10px }
-for i in (10..99)
+
+// .w10 .w11 ... .w98 .w99
+for i in range(10, 99)
   .w{i} { width: i * 10px }
 
 .left        { float: left        !important }
