@@ -333,11 +333,9 @@ def suggestion_delete(x):
 
 @route("/suggestion/<int>")
 def suggestion_review(x, id):
-    suggestion = Suggestion.get_by_id(id)
-    if not suggestion:
-        x.abort(404)
-
+    suggestion = Suggestion.get_or_404(id)
     problem = Problem.find(code=suggestion.code)
+
     x.render("suggestion-review.html", locals())
 
 
