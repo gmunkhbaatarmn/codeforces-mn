@@ -51,13 +51,13 @@ def before(x):
 
 # Contest
 @route("/contests")
-def contest_list(x, page="1"):
-    contest_list_paged(x, "1")
+def contest_list(x):
+    contest_list_paged(x, page=1)
 
 
-@route("/contests/page/(\d+)")
+@route("/contests/page/<int>")
 def contest_list_paged(x, page):
-    offset = 100 * (int(page) - 1)
+    offset = 100 * (page - 1)
     contests = Contest.all().order("-id").fetch(100, offset=offset)
 
     if len(contests) <= 0:
@@ -68,20 +68,20 @@ def contest_list_paged(x, page):
     x.render("contest-list.html", locals())
 
 
-@route("/contest/(\d+)")
+@route("/contest/<int>")
 def contest_dashboard(x, id):
-    contest = Contest.find(id=int(id))
+    contest = Contest.find(id=id)
     if not contest:
         x.abort(404)
 
     x.render("contest-dashboard.html", locals())
 
 
-@route("/contest/(\d+)/problem/(\w+)")
+@route("/contest/<int>/problem/(\w+)")
 def contest_problem(x, contest_id, letter):
     letter = letter.upper()
 
-    contest = Contest.find(id=int(contest_id))
+    contest = Contest.find(id=contest_id)
     if not contest:
         x.abort(404)
 
@@ -101,13 +101,13 @@ def contest_problem(x, contest_id, letter):
 
 # Problemset
 @route("/problemset")
-def problemset_index(x, page="1"):
-    problemset_paged(x, "1")
+def problemset_index(x):
+    problemset_paged(x, page=1)
 
 
-@route("/problemset/page/(\d+)")
+@route("/problemset/page/<int>")
 def problemset_paged(x, page):
-    offset = 100 * (int(page) - 1)
+    offset = 100 * (page - 1)
     problems = Problem.all().order("-code").fetch(100, offset=offset)
 
     if len(problems) <= 0:
@@ -116,7 +116,7 @@ def problemset_paged(x, page):
     x.render("problemset-index.html", locals())
 
 
-@route("/problemset/problem/(\d+)/(\w+)")
+@route("/problemset/problem/<int>/(\w+)")
 def problemset_problem(x, contest_id, index):
     index = index.upper()
 
@@ -124,7 +124,7 @@ def problemset_problem(x, contest_id, index):
 
     if not problem:
         # it maybe contest' problem
-        contest = Contest.find(id=int(contest_id))
+        contest = Contest.find(id=contest_id)
         if not contest:
             x.abort(404)
 
@@ -140,7 +140,7 @@ def problemset_problem(x, contest_id, index):
         x.render("problemset-problem-en.html", locals())
 
 
-@route("/problemset/problem/(\d+)/(\w+)/edit")
+@route("/problemset/problem/<int>/(\w+)/edit")
 def problemset_translate(x, contest_id, index):
     index = index.upper()
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
@@ -340,9 +340,9 @@ def suggestion_delete(x):
     x.redirect("/suggestion", delay=1.0)
 
 
-@route("/suggestion/(\d+)")
+@route("/suggestion/<int>")
 def suggestion_review(x, id):
-    suggestion = Suggestion.get_by_id(int(id))
+    suggestion = Suggestion.get_by_id(id)
     if not suggestion:
         x.abort(404)
 
@@ -394,7 +394,7 @@ def extension(x):
     x.response.write("%s\n" % data.fetch("count_all"))
 
 
-@route("/extension/(\d+)-(\w+)\.html")
+@route("/extension/<int>-(\w+)\.html")
 def extension_problem(x, contest_id, index):
     index = index.upper()
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
