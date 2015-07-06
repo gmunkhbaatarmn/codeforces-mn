@@ -41,17 +41,17 @@ def internal_error(x):
     x.render("error-500.html")
 
 
-@route("/")
-def home(x):
-    x.render("home.html")
-
-
 @route(":before")
 def before(x):
     # Redirect www urls to non-www
     if x.request.url.startswith("www."):
         url = "http://%s" % x.request.url.replace("www.", "")
         x.redirect(url, permanent=True)
+
+
+@route("/")
+def home(x):
+    x.render("home.html")
 
 
 # Contest
