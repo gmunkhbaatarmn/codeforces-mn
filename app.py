@@ -70,9 +70,7 @@ def contest_list_paged(x, page):
 
 @route("/contest/<int>")
 def contest_dashboard(x, id):
-    contest = Contest.find(id=id)
-    if not contest:
-        x.abort(404)
+    contest = Contest.find_or_404(id=id)
 
     x.render("contest-dashboard.html", locals())
 
@@ -81,17 +79,12 @@ def contest_dashboard(x, id):
 def contest_problem(x, contest_id, letter):
     letter = letter.upper()
 
-    contest = Contest.find(id=contest_id)
-    if not contest:
-        x.abort(404)
-
+    contest = Contest.find_or_404(id=contest_id)
     code = dict(contest.problems).get(letter)
     if not code:
         x.abort(404)
 
-    problem = Problem.find(code=code)
-    if not problem:
-        x.abort(404)
+    problem = Problem.find_or_404(code=code)
 
     if problem.credits:
         x.render("contest-problem.html", locals())
@@ -143,9 +136,7 @@ def problemset_problem(x, contest_id, index):
 @route("/problemset/problem/<int>/(\w+)/edit")
 def problemset_translate(x, contest_id, index):
     index = index.upper()
-    problem = Problem.find(code="%3s-%s" % (contest_id, index))
-    if not problem:
-        x.abort(404)
+    problem = Problem.find_or_404(code="%3s-%s" % (contest_id, index))
 
     x.render("problemset-translate.html", locals())
 
@@ -400,9 +391,7 @@ def extension_problem(x, contest_id, index):
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
     if not problem:
         # it maybe contest' problem
-        contest = Contest.find(id=int(contest_id))
-        if not contest:
-            x.abort(404)
+        contest = Contest.find_or_404(id=int(contest_id))
 
         code = dict(contest.problems).get(index)
         if not code:
