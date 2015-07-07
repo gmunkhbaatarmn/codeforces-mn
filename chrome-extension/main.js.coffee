@@ -22,13 +22,13 @@ STYLE =
 $ ->
   if $("#header .lang-chooser").length > 0
     $("#header .lang-chooser > div:first").prepend """
-      <a href="http://www.codeforces.mn/"><img src="http://www.codeforces.mn/images/flag-mn.png" title="Монголоор" alt="Монголоор"></a>
+      <a href="http://codeforces.mn/"><img src="http://codeforces.mn/images/flag-mn.png" title="Монголоор" alt="Монголоор"></a>
     """
 
 #:1 Run in before and renew data
 if location.pathname is "/" or location.pathname.match(/^\/contest\/\d+\/?$/) or location.pathname.match(/\/problemset(?!\/problem\/)/) or location.pathname.start_with("/contests")
   $.ajax
-    url: "http://www.codeforces.mn/extension?#{(new Date().getTime())}"
+    url: "http://codeforces.mn/extension?#{(new Date().getTime())}"
     dataType: "text"
     success: (text) ->
       storage = {}
@@ -269,7 +269,7 @@ translate = ->
     $(this).html("<strong>Орчуулж байна...</strong>").fadeIn("fast")
 
   $.ajax
-    url: "http://www.codeforces.mn/extension/#{problem_id}.html?#{(new Date().getTime())}"
+    url: "http://codeforces.mn/extension/#{problem_id}.html?#{(new Date().getTime())}"
     dataType: "html"
     success: (data) ->
       $(".problem-statement").addClass("mn-statement")
