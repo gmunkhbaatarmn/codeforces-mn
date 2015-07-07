@@ -70,12 +70,14 @@
 
 
 {% block sidebar %}
+  #:1 Түр хүлээнэ үү
   <div class="box">
     <h2>Түр хүлээнэ үү</h2>
     <div class="text-center">
       Санал болгосон орчуулгуудыг хянагч шалгаж үзээд нийтлэх буюу татгалзаж болно.
     </div>
   </div>
+  #:1 Хянагчийн булан
   <div class="box">
     {% if session.moderator %}
       <h2>Хянагчийн булан</h2>
@@ -95,4 +97,5 @@
       </div>
     {% endif %}
   </div>
+  {# endfold #}
 {% endblock %}

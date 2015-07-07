@@ -30,7 +30,7 @@
     <div class="lang">
       <a rel="nofollow" class="mn" href="http://codeforces.mn">Монгол хэлээр</a>
       <a rel="nofollow" class="en" href="http://codeforces.com">In English</a>
-      <a rel="nofollow" class="ru" href="http://codeforces.ru">По-Русски</a>
+      <a rel="nofollow" class="ru" href="http://codeforces.com/?locale=ru">По-Русски</a>
     </div>
   </div>
 
@@ -45,6 +45,7 @@
   {% if sidebar != "no" %}
     <div id="sidebar">
       {% block sidebar %} {% endblock %}
+      #:1 Plugin суулгана уу
       <div class="box">
         <h2>Plugin суулгана уу</h2>
 
@@ -60,6 +61,7 @@
         </div>
       </div>
 
+      #:1 Шилдэг орчуулагчид
       <div class="box">
         <h2>Шилдэг орчуулагчид</h2>
         <table>
@@ -82,6 +84,7 @@
         </table>
       </div>
 
+      #:1 Codeforces чансаа
       <div class="box">
         <h2>Codeforces чансаа</h2>
         <table>
@@ -107,6 +110,7 @@
         </table>
       </div>
 
+      #:1 Topcoder чансаа
       <div class="box">
         <h2>Topcoder чансаа</h2>
         <table>
@@ -131,6 +135,7 @@
           </tr>
         </table>
       </div>
+      {# endfold #}
     </div>
   {% endif %}
 
@@ -139,6 +144,7 @@
   </div>
 
   <div id="footer">
+    #:1 footer
     <div>
       <a href="http://codeforces.mn/" rel="nofollow">Codeforces.mn</a> (c) Монгол орчуулгын баг
     </div>
@@ -149,11 +155,13 @@
       <br><br>
       PS: Thank you Mike Mirzayanov for great platform.
     </p>
+    {# endfold #}
   </div>
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
   <script src="/static/jquery.stupidtable.js"></script>
+  #:1 script: mathjax
   <script>
     $(function() {
       MathJax.Hub.Config({
@@ -173,6 +181,7 @@
       $(".sortable-table").stupidtable()
     });
   </script>
+  #:1 script: analytics
   <script>
     (function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -182,6 +191,7 @@
     ga("create", "UA-4030321-7", "auto");
     ga("send", "pageview");
   </script>
+  {# endfold #}
   {% block bottom %} {% endblock %}
 </div>
 </body>
