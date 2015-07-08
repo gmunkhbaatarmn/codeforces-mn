@@ -188,27 +188,21 @@ if (location.pathname.match(/^\/contest\/\d+\/?$/)) {
 }
 
 if (location.pathname.match(/^\/contest\/\d+\/problem\//)) {
-
-  /* Append "Монголоор унших" button */
   $(function() {
     var problem_id, storage;
     $("head").append(STYLE);
     storage = JSON.parse(localStorage.mn || "{}");
     problem_id = location.pathname.replace("/contest/", "");
     problem_id = problem_id.replace("/problem/", "-").toUpperCase();
-    while ($.isNumeric(problem_id.slice(-1))) {
-      problem_id = problem_id.slice(0, -1);
-    }
-    if (storage["problem:" + problem_id] !== void 0) {
-      $(".problem-statement .header .title").after("<div class=\"mn-please\"><a href=\"javascript:;\">Монголоор унших</a></div>");
+    if (storage["problem:" + problem_id]) {
+      $(".problem-statement .header .title").after("<div class=\"mn-please\"><a>Монголоор унших</a></div>");
     }
     return $(".mn-please a").on("click", translate);
   });
 }
 
-translate = function(e) {
+translate = function() {
   var problem_id;
-  e.preventDefault();
   if (location.pathname.start_with("/problemset/problem/")) {
     problem_id = location.pathname.replace("/problemset/problem/", "");
     problem_id = problem_id.replace("/", "-").toUpperCase();
