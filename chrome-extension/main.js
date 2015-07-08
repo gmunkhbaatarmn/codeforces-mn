@@ -205,12 +205,6 @@ translate = function() {
     problem_id = location.pathname.replace("/contest/", "");
     problem_id = problem_id.replace("/problem/", "-").toUpperCase();
   }
-  while ($.isNumeric(problem_id.slice(-1))) {
-    problem_id = problem_id.slice(0, -1);
-  }
-  while (problem_id.length < 5) {
-    problem_id = "0" + problem_id;
-  }
   $(".mn-please").fadeOut("fast", function() {
     return $(this).html("<strong>Орчуулж байна...</strong>").fadeIn("fast");
   });
