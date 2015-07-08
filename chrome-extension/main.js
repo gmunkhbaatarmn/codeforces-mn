@@ -277,11 +277,11 @@ translate = function() {
     $(".mn-please").fadeOut("fast");
     script = document.createElement("script");
     script.type = "text/x-mathjax-config";
-    script.text = "MathJax.Hub.Config({\n  tex2jax: {\n    inlineMath: [[\"$\", \"$\"]],\n    displayMath: [[\"$$\", \"$$\"]]\n  },\n  showMathMenu: false\n});";
+    script.text = "MathJax.Hub.Config({\n  tex2jax: {\n    inlineMath: [[\"$\", \"$\"]],\n    displayMath: [[\"$$\", \"$$\"]]\n  },\n  TeX: {\n    extensions: [\n      \"AMSmath.js\",\n      \"AMSsymbols.js\",\n      \"noErrors.js\"\n    ]\n  },\n  jax: [\"input/TeX\", \"output/HTML-CSS\"],\n  extensions: [\"tex2jax.js\"],\n  showMathMenu: false\n});";
     document.head.appendChild(script);
     script = document.createElement("script");
     script.type = "text/javascript";
-    script.src = "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML";
+    script.src = "//cdn.mathjax.org/mathjax/latest/MathJax.js";
     return document.head.appendChild(script);
   });
 };

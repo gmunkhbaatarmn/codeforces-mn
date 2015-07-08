@@ -330,6 +330,7 @@ translate = ->
 
     $(".mn-please").fadeOut("fast")
 
+    #:1 Include: mathjax config
     script = document.createElement("script")
     script.type = "text/x-mathjax-config"
     script.text = """
@@ -338,12 +339,22 @@ translate = ->
           inlineMath: [["$", "$"]],
           displayMath: [["$$", "$$"]]
         },
+        TeX: {
+          extensions: [
+            "AMSmath.js",
+            "AMSsymbols.js",
+            "noErrors.js"
+          ]
+        },
+        jax: ["input/TeX", "output/HTML-CSS"],
+        extensions: ["tex2jax.js"],
         showMathMenu: false
       });
     """
     document.head.appendChild(script)
 
+    #:1 Include: mathjax source
     script = document.createElement("script")
     script.type = "text/javascript"
-    script.src  = "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"
+    script.src = "//cdn.mathjax.org/mathjax/latest/MathJax.js"
     document.head.appendChild(script)
