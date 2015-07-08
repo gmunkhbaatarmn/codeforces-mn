@@ -19,7 +19,7 @@ String.prototype.is_numeric = function() {
 
 VERSION = "0.2.4";
 
-STYLE = "<style>\n  .mn-please a                 { color:green !important; font-weight:bold; padding:1px 5px 2px; border-radius:3px }\n  .mn-please a:hover           { color:#fff !important; background:#069100 !important }\n  .mn-statement ul             { margin-bottom:1em }\n  .mn-statement .credit        { text-align:right; font-style:italic; font-size:110%; font-family:Georgia, serif }\n  .sample-tests .section-title { margin-bottom: 0.5em }\n  .sample-tests .title         { font-family:\"Helvetica Neue\", Helvetica, Arial, sans-serif !important; font-size:1em !important; text-transform:none !important }\n</style>";
+STYLE = "<style>\n  .mn-please a          { font-weight:bold }\n  .mn-statement ul      { margin-bottom:1em }\n  .mn-statement .credit { text-align:right; font-style:italic }\n</style>";
 
 $(function() {
   if ($("#header .lang-chooser").length > 0) {

@@ -12,12 +12,9 @@ VERSION = "0.2.4"
 STYLE =
 """
 <style>
-  .mn-please a                 { color:green !important; font-weight:bold; padding:1px 5px 2px; border-radius:3px }
-  .mn-please a:hover           { color:#fff !important; background:#069100 !important }
-  .mn-statement ul             { margin-bottom:1em }
-  .mn-statement .credit        { text-align:right; font-style:italic; font-size:110%; font-family:Georgia, serif }
-  .sample-tests .section-title { margin-bottom: 0.5em }
-  .sample-tests .title         { font-family:"Helvetica Neue", Helvetica, Arial, sans-serif !important; font-size:1em !important; text-transform:none !important }
+  .mn-please a          { font-weight:bold }
+  .mn-statement ul      { margin-bottom:1em }
+  .mn-statement .credit { text-align:right; font-style:italic }
 </style>
 """
 
