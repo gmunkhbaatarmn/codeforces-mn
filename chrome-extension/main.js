@@ -137,11 +137,9 @@ if (location.pathname.match(/\/problemset\/problem\//)) {
 }
 
 if (location.pathname.start_with("/contests")) {
-
-  /* Stats about translated problems */
   $(function() {
     var storage;
-    $("head").append("<style>\n  .mn      { font-size:0.9em; color:#666666 }\n  .mn-full { font-size:0.9em; color:#c900a9; font-weight:600 }\n</style>");
+    $("head").append("<style>\n  .mn      { font-size:0.9em; color:#666666 }\n  .mn-full { font-size:0.9em; color:#c900a9; font-weight:bold }\n</style>");
     storage = JSON.parse(localStorage.mn || "{}");
     return $(".contests-table tr td:nth-child(1)").each(function() {
       var contest_id, ready, ref, ref1, span, total;

@@ -8,7 +8,6 @@ String.prototype.is_numeric = ()    -> !isNaN(parseFloat(@)) && isFinite(@)
 # Note: Also set on `manifest.json`
 VERSION = "0.2.4"
 
-
 STYLE =
 """
 <style>
@@ -50,7 +49,6 @@ $.get "http://codeforces.mn/extension?#{VERSION}", (text) ->
 
   localStorage.mn = JSON.stringify(storage)
 # endfold
-
 
 #:1 Page: /                     - Home page
 if location.pathname is "/"
@@ -178,12 +176,12 @@ if location.pathname.match(/\/problemset\/problem\//)
 
 #:1 Page: /contests/            - List of contests
 if location.pathname.start_with("/contests")
-  ### Stats about translated problems ###
+  # Content list with translated problem count
   $ ->
     $("head").append """
       <style>
         .mn      { font-size:0.9em; color:#666666 }
-        .mn-full { font-size:0.9em; color:#c900a9; font-weight:600 }
+        .mn-full { font-size:0.9em; color:#c900a9; font-weight:bold }
       </style>
       """
     storage = JSON.parse(localStorage.mn or "{}")
@@ -207,7 +205,9 @@ if location.pathname.start_with("/contests")
       return if ready <= 0
       span = if ready is total then "mn-full" else "mn"
 
-      $(this).append """<span class="#{span}">Орчуулагдсан: #{ready} / #{total}</span>"""
+      $(this).append """
+        <span class="#{span}">Орчуулагдсан: #{ready} / #{total}</span>
+      """
 
 
 #:1 Page: /contest/ID/          - List of problems in contest
@@ -249,7 +249,6 @@ if location.pathname.match(/^\/contest\/\d+\/problem\//)
 
     $(".mn-please a").on "click", translate
 # endfold
-
 
 #:1 Function: translate problem statement
 translate = ->
