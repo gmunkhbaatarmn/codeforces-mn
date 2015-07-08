@@ -19,7 +19,7 @@ String.prototype.is_numeric = function() {
 
 VERSION = "0.2.4";
 
-STYLE = "<style>\n  .mn-please a          { font-weight:bold }\n  .mn-statement ul      { margin-bottom:1em }\n  .mn-statement .credit { text-align:right; font-style:italic }\n</style>";
+STYLE = "<style>\n  .mn-please a          { font-weight:bold }\n  .mn-statement ul      { margin-bottom:1em }\n  .mn-statement .credit { text-align:right; font-style:italic }\n  .sample-tests .title  { font-family:sans-serif !important;\n                          font-size:1em !important;\n                          text-transform:none !important }\n</style>";
 
 if (location.host === "codeforces.com") {
   $(function() {

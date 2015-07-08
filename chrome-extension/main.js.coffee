@@ -15,6 +15,9 @@ STYLE =
   .mn-please a          { font-weight:bold }
   .mn-statement ul      { margin-bottom:1em }
   .mn-statement .credit { text-align:right; font-style:italic }
+  .sample-tests .title  { font-family:sans-serif !important;
+                          font-size:1em !important;
+                          text-transform:none !important }
 </style>
 """
 
