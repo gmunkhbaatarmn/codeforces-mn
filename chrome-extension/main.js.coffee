@@ -52,8 +52,9 @@ $.get "http://codeforces.mn/extension?#{VERSION}", (text) ->
 
 #:1 Page: /                     - Home page
 if location.pathname is "/"
-  BOX = """
-  <div class="roundbox sidebox top-contributed" style="">
+  #:2 box_html = "..."
+  box_html = """
+  <div class="roundbox sidebox top-contributed top-translators">
     <div class="roundbox-lt">&nbsp;</div>
     <div class="roundbox-rt">&nbsp;</div>
     <div class="caption titled">→ Top translators</div>
@@ -61,69 +62,94 @@ if location.pathname is "/"
       <tr>
         <th class="left" style="width:2.25em">#</th>
         <th>User</th>
-        <th style="font-weight:normal;font-size:13px">{total}</th>
+        <th style="font-size:13px">{ready}/{total}</th>
       </tr>
       {content}
     </table>
   </div>
   """
-  ROW = """
-      <tr{style}>
+
+  #:2 row_tmpl = "..."
+  row_tmpl = """
+      <tr style="display:{display}" class="{class}">
         <td class="left">{place}</td>
-        <td class="mn-credit">{name}</td>
+        <td>{name}</td>
         <td>{score}</td>
       </tr>
   """
+  # endfold
 
-  ### Contribution score panel ###
+  # Contribution score panel
   $ ->
     $("head").append """
       <style>
-        .rtable tr:last-child td { border-bottom:none !important }
-        .mn-credit               { font-weight:bold; color:#000; font-size:12px !important }
+        .top-translators table tr:last-child td {
+          border-bottom: none
+        }
+        .top-translators .bottom-links {
+          background: #f5f5f5;
+          border-left: none !important;
+          font-size: 11px !important;
+          text-align: right !important
+        }
       </style>
-      """
+    """
     storage = JSON.parse(localStorage.mn or "{}")
-    color = (name, score) ->
+
+    #:2 colorful = function(name, score)
+    colorful = (name, score) ->
       score = Number(score)
-      r = '<span class="user-gray">'+name+'</span>'
-      if score >= 25
-        r = '<span class="user-green">'+name+'</span>'
-      if score >= 50
-        r = '<span class="user-blue">'+name+'</span>'
-      if score >= 75
-        r = '<span class="user-orange">'+name+'</span>'
-      if score >= 100
-        r = '<span class="user-red">'+name+'</span>'
-      return r
+
+      if score >= 0   then color = "gray"
+      if score >= 25  then color = "green"
+      if score >= 50  then color = "blue"
+      if score >= 75  then color = "orange"
+      if score >= 100 then color = "red"
+
+      return """<a class="rated-user user-#{color}">#{name}</a>"""
+    # endfold
 
     if storage.credits
-      content = []
-
-      place = 0
+      #:2 Middle rows
+      content = ""
       ready = 0
-      count = 0
-      for t in storage.credits
-        row = ROW.replace("{place}", ++place)
-        row = row.replace("{name}",  color(t[0], t[1]))
-        row = row.replace("{score}", t[1])
 
-        count++
-        if count > 10
-          row = row.replace("{style}", ' style="display:none"')
+      for [name, score], place in storage.credits
+        row_html = row_tmpl.replace("{place}", place + 1)
+        row_html = row_html.replace("{name}",  colorful(name, score))
+        row_html = row_html.replace("{score}", score)
+
+        if place % 2 == 0
+          row_html = row_html.replace("{class}", "dark")
         else
-          row = row.replace("{style}", '')
+          row_html = row_html.replace("{class}", "")
 
-        ready += Number(t[1])
-        content.push(row)
-      content.push """
-				<tr>
-					<td colspan="2"></td>
-					<td style="border-left:0"><a href="javascript:;" onclick='$(this).closest("table").find("tr").show();$(this).closest("tr").fadeOut().remove()' class="js-more">бүгд &rarr;</a></td>
-				</tr>
-      """
+        if place >= 10
+          row_html = row_html.replace("{display}", "none")
+        else
+          row_html = row_html.replace("{display}", "table-row")
 
-      $("#sidebar .top-contributed:last")[0].outerHTML = BOX.replace("{total}", "#{ready}/#{storage.total}").replace("{content}", content.join("\n"))
+        content += row_html
+        ready += Number(score)
+
+      #:2 Last row
+      content += """
+        <tr>
+          <td class="bottom-links" colspan="3">
+            <a href="javascript:;" class="js-more">View all &rarr;</a>
+          </td>
+        </tr>"""
+      # endfold
+
+      box_html = box_html.replace("{ready}", ready)
+      box_html = box_html.replace("{total}", storage.total)
+      box_html = box_html.replace("{content}", content)
+
+      $("#sidebar .top-contributed:first").before(box_html)
+
+      $(".top-translators .js-more").on "click", ->
+        $(this).closest("table").find("tr").show()
+        $(this).closest("tr").fadeOut().remove()
 
 
 #:1 Page: /problemset/          - List of problems
