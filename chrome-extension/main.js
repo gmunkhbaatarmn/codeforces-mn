@@ -236,7 +236,7 @@ translate = function() {
     return $(this).html("<strong>Орчуулж байна...</strong>").fadeIn("fast");
   });
   return $.get("http://codeforces.mn/extension/" + problem_id + ".html?" + VERSION, function(data) {
-    var $data, body, curr, head, script;
+    var $data, body, curr, script;
     $(".problem-statement").addClass("mn-statement");
     $data = $("<div/>").html(data);
     $(".header .title").html((problem_id.slice(-1)) + ". " + ($data.find("h1")[0].innerHTML));
@@ -275,14 +275,13 @@ translate = function() {
       $(".problem-statement .note").html("<div class=\"section-title\">Тэмдэглэл</div>\n" + (body.join("\n")));
     }
     $(".mn-please").fadeOut("fast");
-    head = document.getElementsByTagName("head")[0];
     script = document.createElement("script");
     script.type = "text/x-mathjax-config";
     script.text = "MathJax.Hub.Config({\n  tex2jax: {\n    inlineMath: [[\"$\", \"$\"]],\n    displayMath: [[\"$$\", \"$$\"]]\n  },\n  showMathMenu: false\n});";
-    head.appendChild(script);
+    document.head.appendChild(script);
     script = document.createElement("script");
     script.type = "text/javascript";
     script.src = "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML";
-    return head.appendChild(script);
+    return document.head.appendChild(script);
   });
 };

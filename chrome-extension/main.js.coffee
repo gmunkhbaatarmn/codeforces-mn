@@ -330,7 +330,6 @@ translate = ->
 
     $(".mn-please").fadeOut("fast")
 
-    head = document.getElementsByTagName("head")[0]
     script = document.createElement("script")
     script.type = "text/x-mathjax-config"
     script.text = """
@@ -342,8 +341,9 @@ translate = ->
         showMathMenu: false
       });
     """
-    head.appendChild(script)
+    document.head.appendChild(script)
+
     script = document.createElement("script")
     script.type = "text/javascript"
     script.src  = "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"
-    head.appendChild(script)
+    document.head.appendChild(script)
