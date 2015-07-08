@@ -253,14 +253,14 @@ translate = function() {
       body.push(curr[0].outerHTML);
       curr = curr.next();
     }
-    $(".input-specification").html("<div class=\"section-title\">Оролт</div>" + (body.join("\n")));
+    $(".input-specification").html("<div class=\"section-title\">Оролт</div>\n" + (body.join("\n")));
     body = [];
     curr = $data.find("h3:eq(1)").next();
     while (curr[0] && curr[0].tagName !== "H3") {
       body.push(curr[0].outerHTML);
       curr = curr.next();
     }
-    $(".output-specification").html("<div class=\"section-title\">Гаралт</div>" + (body.join("\n")));
+    $(".output-specification").html("<div class=\"section-title\">Гаралт</div>\n" + (body.join("\n")));
     $(".sample-tests .section-title").html("Жишээ тэстүүд");
     $(".sample-tests .section-title").html("Жишээ тэстүүд");
     $(".sample-tests .sample-test .input .title").html("Оролт");
@@ -272,7 +272,7 @@ translate = function() {
         body.push(curr[0].outerHTML);
         curr = curr.next();
       }
-      $(".problem-statement .note").html("<div class=\"section-title\">Тэмдэглэл</div>" + (body.join("\n")));
+      $(".problem-statement .note").html("<div class=\"section-title\">Тэмдэглэл</div>\n" + (body.join("\n")));
     }
     $(".mn-please").fadeOut("fast");
     head = document.getElementsByTagName("head")[0];

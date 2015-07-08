@@ -282,6 +282,7 @@ translate = ->
     while curr[0] and curr[0].tagName isnt "H3"
       body.push(curr[0].outerHTML)
       curr = curr.next()
+
     $(".header").next().html body.join("\n")
 
     #:2 Replace: input
@@ -290,7 +291,11 @@ translate = ->
     while curr[0] and curr[0].tagName isnt "H3"
       body.push(curr[0].outerHTML)
       curr = curr.next()
-    $(".input-specification").html """<div class="section-title">Оролт</div>#{body.join("\n")}"""
+
+    $(".input-specification").html """
+      <div class="section-title">Оролт</div>
+      #{body.join("\n")}
+    """
 
     #:2 Replace: output
     body = []
@@ -298,7 +303,11 @@ translate = ->
     while curr[0] and curr[0].tagName isnt "H3"
       body.push(curr[0].outerHTML)
       curr = curr.next()
-    $(".output-specification").html """<div class="section-title">Гаралт</div>#{body.join("\n")}"""
+
+    $(".output-specification").html """
+      <div class="section-title">Гаралт</div>
+      #{body.join("\n")}
+    """
 
     #:2 Replace: sample test(s)
     $(".sample-tests .section-title").html "Жишээ тэстүүд"
@@ -313,7 +322,10 @@ translate = ->
       while curr[0] and curr[0].tagName isnt "H3"
         body.push(curr[0].outerHTML)
         curr = curr.next()
-      $(".problem-statement .note").html """<div class="section-title">Тэмдэглэл</div>#{body.join("\n")}"""
+      $(".problem-statement .note").html """
+        <div class="section-title">Тэмдэглэл</div>
+        #{body.join("\n")}
+      """
     # endfold
 
     $(".mn-please").fadeOut("fast")
