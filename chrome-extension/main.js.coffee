@@ -30,30 +30,25 @@ $ ->
   """
 # endfold
 
-#:1 Run in before and renew data
-if location.pathname is "/" or location.pathname.match(/^\/contest\/\d+\/?$/) or location.pathname.match(/\/problemset(?!\/problem\/)/) or location.pathname.start_with("/contests")
-  $.ajax
-    url: "http://codeforces.mn/extension?#{VERSION}"
-    dataType: "text"
-    success: (text) ->
-      storage = {}
-      storage.updated = new Date().getTime() / 1000
-      for i in text.split("\n")[0].split("|")
-        storage["problem:#{i}"] = 1
+#:1 Update data
+$.get "http://codeforces.mn/extension?#{VERSION}", (text) ->
+  storage = {}
+  for i in text.split("\n")[0].split("|")
+    storage["problem:#{i}"] = 1
 
-      for c in text.split("\n")[1].split("|")
-        i = c.split(":")[0]
-        ready = Number(c.split(":")[1].split("/")[0])
-        total = Number(c.split(":")[1].split("/")[1])
-        storage["contest:#{i}"] = {ready: ready, total: total}
+  for c in text.split("\n")[1].split("|")
+    i = c.split(":")[0]
+    ready = Number(c.split(":")[1].split("/")[0])
+    total = Number(c.split(":")[1].split("/")[1])
+    storage["contest:#{i}"] = {ready: ready, total: total}
 
-      storage.credits = []
-      for t in text.split("\n")[2].split("|")
-        storage.credits.push(t.split(":"))
+  storage.credits = []
+  for t in text.split("\n")[2].split("|")
+    storage.credits.push(t.split(":"))
 
-      storage.total = text.split("\n")[3]
+  storage.total = text.split("\n")[3]
 
-      localStorage.mn = JSON.stringify(storage)
+  localStorage.mn = JSON.stringify(storage)
 # endfold
 
 

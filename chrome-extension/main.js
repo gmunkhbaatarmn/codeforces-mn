@@ -25,41 +25,34 @@ $(function() {
   return $("#header .lang-chooser > div:first").prepend("<a href=\"http://codeforces.mn/\">\n  <img src=\"http://codeforces.mn/images/flag-mn.png\" title=\"Монголоор\">\n</a>");
 });
 
-if (location.pathname === "/" || location.pathname.match(/^\/contest\/\d+\/?$/) || location.pathname.match(/\/problemset(?!\/problem\/)/) || location.pathname.start_with("/contests")) {
-  $.ajax({
-    url: "http://codeforces.mn/extension?" + VERSION,
-    dataType: "text",
-    success: function(text) {
-      var c, i, j, k, l, len, len1, len2, ready, ref, ref1, ref2, storage, t, total;
-      storage = {};
-      storage.updated = new Date().getTime() / 1000;
-      ref = text.split("\n")[0].split("|");
-      for (j = 0, len = ref.length; j < len; j++) {
-        i = ref[j];
-        storage["problem:" + i] = 1;
-      }
-      ref1 = text.split("\n")[1].split("|");
-      for (k = 0, len1 = ref1.length; k < len1; k++) {
-        c = ref1[k];
-        i = c.split(":")[0];
-        ready = Number(c.split(":")[1].split("/")[0]);
-        total = Number(c.split(":")[1].split("/")[1]);
-        storage["contest:" + i] = {
-          ready: ready,
-          total: total
-        };
-      }
-      storage.credits = [];
-      ref2 = text.split("\n")[2].split("|");
-      for (l = 0, len2 = ref2.length; l < len2; l++) {
-        t = ref2[l];
-        storage.credits.push(t.split(":"));
-      }
-      storage.total = text.split("\n")[3];
-      return localStorage.mn = JSON.stringify(storage);
-    }
-  });
-}
+$.get("http://codeforces.mn/extension?" + VERSION, function(text) {
+  var c, i, j, k, l, len, len1, len2, ready, ref, ref1, ref2, storage, t, total;
+  storage = {};
+  ref = text.split("\n")[0].split("|");
+  for (j = 0, len = ref.length; j < len; j++) {
+    i = ref[j];
+    storage["problem:" + i] = 1;
+  }
+  ref1 = text.split("\n")[1].split("|");
+  for (k = 0, len1 = ref1.length; k < len1; k++) {
+    c = ref1[k];
+    i = c.split(":")[0];
+    ready = Number(c.split(":")[1].split("/")[0]);
+    total = Number(c.split(":")[1].split("/")[1]);
+    storage["contest:" + i] = {
+      ready: ready,
+      total: total
+    };
+  }
+  storage.credits = [];
+  ref2 = text.split("\n")[2].split("|");
+  for (l = 0, len2 = ref2.length; l < len2; l++) {
+    t = ref2[l];
+    storage.credits.push(t.split(":"));
+  }
+  storage.total = text.split("\n")[3];
+  return localStorage.mn = JSON.stringify(storage);
+});
 
 if (location.pathname === "/") {
   BOX = "<div class=\"roundbox sidebox top-contributed\" style=\"\">\n  <div class=\"roundbox-lt\">&nbsp;</div>\n  <div class=\"roundbox-rt\">&nbsp;</div>\n  <div class=\"caption titled\">→ Top translators</div>\n  <table class=\"rtable \">\n    <tr>\n      <th class=\"left\" style=\"width:2.25em\">#</th>\n      <th>User</th>\n      <th style=\"font-weight:normal;font-size:13px\">{total}</th>\n    </tr>\n    {content}\n  </table>\n</div>";
