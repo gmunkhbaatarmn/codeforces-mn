@@ -17,7 +17,7 @@ String.prototype.is_numeric = function() {
   return !isNaN(parseFloat(this)) && isFinite(this);
 };
 
-VERSION = "0.2.4";
+VERSION = "0.2.5";
 
 STYLE = "<style>\n  .mn-please a          { font-weight:bold; cursor:pointer }\n  .mn-statement ul      { margin-bottom:1em }\n  .mn-statement .credit { text-align:right; font-style:italic }\n  .sample-tests .title  { font-family:sans-serif !important;\n                          font-size:1em !important;\n                          text-transform:none !important }\n</style>";
 

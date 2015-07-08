@@ -6,7 +6,7 @@ String.prototype.is_numeric = ()    -> !isNaN(parseFloat(@)) && isFinite(@)
 # endfold
 
 # Note: Also set on `manifest.json`
-VERSION = "0.2.4"
+VERSION = "0.2.5"
 
 STYLE =
 """
