@@ -166,19 +166,15 @@ if (location.pathname.start_with("/contests")) {
 }
 
 if (location.pathname.match(/^\/contest\/\d+\/?$/)) {
-
-  /* Highlight translated problems */
   $(function() {
     var storage;
-    $("head").append("<style>\n  .problems tr td:nth-child(2) > div:first-child { margin-left:14px }\n  .mn td:nth-child(2) > div:first-child          { margin-left:0 !important }\n  .mn td:nth-child(2) > div:first-child a:before { content:\"✱ \"; color:#c900a9; text-decoration:none; display:inline-block; float:left; margin-right:4px }\n</style>");
+    $("head").append("<style>\n  .problems tr td:nth-child(2) > div:first-child {\n    margin-left: 14px\n  }\n  .problems .mn td:nth-child(2) > div:first-child {\n    margin-left: 0\n  }\n  .problems .mn td:nth-child(2) > div:first-child a:before {\n    content: \"✱ \";\n    color: #c900a9;\n    display: inline-block;\n    float: left;\n    margin-right: 4px;\n    text-decoration: none\n  }\n</style>");
     storage = JSON.parse(localStorage.mn || "{}");
     return $(".problems tr").each(function() {
       var problem_id;
-      problem_id = location.pathname.replace("/contest/", "").replace("/", "") + "-" + $.trim($(this).find("td.id").text());
-      while ($.isNumeric(problem_id.slice(-1))) {
-        problem_id = problem_id.slice(0, -1);
-      }
-      if (storage["problem:" + problem_id] !== void 0) {
+      problem_id = location.pathname.replace("/contest/", "").replace("/", "");
+      problem_id = problem_id + "-" + $(this).find("td.id").text().trim();
+      if (storage["problem:" + problem_id]) {
         return $(this).addClass("mn");
       }
     });

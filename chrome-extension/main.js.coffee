@@ -212,23 +212,33 @@ if location.pathname.start_with("/contests")
 
 #:1 Page: /contest/ID/          - List of problems in contest
 if location.pathname.match(/^\/contest\/\d+\/?$/)
-  ### Highlight translated problems ###
+  # Highlight translated problems
   $ ->
     $("head").append """
       <style>
-        .problems tr td:nth-child(2) > div:first-child { margin-left:14px }
-        .mn td:nth-child(2) > div:first-child          { margin-left:0 !important }
-        .mn td:nth-child(2) > div:first-child a:before { content:"✱ "; color:#c900a9; text-decoration:none; display:inline-block; float:left; margin-right:4px }
+        .problems tr td:nth-child(2) > div:first-child {
+          margin-left: 14px
+        }
+        .problems .mn td:nth-child(2) > div:first-child {
+          margin-left: 0
+        }
+        .problems .mn td:nth-child(2) > div:first-child a:before {
+          content: "✱ ";
+          color: #c900a9;
+          display: inline-block;
+          float: left;
+          margin-right: 4px;
+          text-decoration: none
+        }
       </style>
       """
     storage = JSON.parse(localStorage.mn or "{}")
 
     $(".problems tr").each ->
-      problem_id = location.pathname.replace("/contest/", "").replace("/", "") + "-" + $.trim($(this).find("td.id").text())
-      while $.isNumeric(problem_id.slice(-1))
-        problem_id = problem_id.slice(0, -1)
+      problem_id = location.pathname.replace("/contest/", "").replace("/", "")
+      problem_id = problem_id + "-" + $(this).find("td.id").text().trim()
 
-      if storage["problem:#{problem_id}"] isnt undefined
+      if storage["problem:#{problem_id}"]
         $(this).addClass("mn")
 
 
