@@ -273,10 +273,10 @@ translate = ->
 
     $data = $("<div/>").html(data)
 
-    # Replace problem name
+    #:2 Replace: problem name
     $(".header .title").html "#{problem_id.slice(-1)}. #{$data.find("h1")[0].innerHTML}"
 
-    # Replace problem statement
+    #:2 Replace: problem statement
     body = []
     curr = $data.find("h1").next()
     while curr[0] and curr[0].tagName isnt "H3"
@@ -284,7 +284,7 @@ translate = ->
       curr = curr.next()
     $(".header").next().html body.join("\n")
 
-    # Replace input
+    #:2 Replace: input
     body = []
     curr = $data.find("h3").next()
     while curr[0] and curr[0].tagName isnt "H3"
@@ -292,7 +292,7 @@ translate = ->
       curr = curr.next()
     $(".input-specification").html """<div class="section-title">Оролт</div>#{body.join("\n")}"""
 
-    # Replace output
+    #:2 Replace: output
     body = []
     curr = $data.find("h3:eq(1)").next()
     while curr[0] and curr[0].tagName isnt "H3"
@@ -300,13 +300,13 @@ translate = ->
       curr = curr.next()
     $(".output-specification").html """<div class="section-title">Гаралт</div>#{body.join("\n")}"""
 
-    # Replace sample test(s)
+    #:2 Replace: sample test(s)
     $(".sample-tests .section-title").html "Жишээ тэстүүд"
     $(".sample-tests .section-title").html "Жишээ тэстүүд"
     $(".sample-tests .sample-test .input .title").html "Оролт"
     $(".sample-tests .sample-test .output .title").html "Гаралт"
 
-    # Replace note
+    #:2 Replace: note
     if $data.find("h3:eq(2)").length
       body = []
       curr = $data.find("h3:eq(2)").next()
@@ -314,6 +314,7 @@ translate = ->
         body.push(curr[0].outerHTML)
         curr = curr.next()
       $(".problem-statement .note").html """<div class="section-title">Тэмдэглэл</div>#{body.join("\n")}"""
+    # endfold
 
     $(".mn-please").fadeOut("fast")
 
