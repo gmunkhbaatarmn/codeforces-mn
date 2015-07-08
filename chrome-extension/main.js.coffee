@@ -5,6 +5,9 @@ String.prototype.contain    = (str) -> @indexOf(str) > -1
 String.prototype.is_numeric = ()    -> !isNaN(parseFloat(@)) && isFinite(@)
 # endfold
 
+# Note: Also set on `manifest.json`
+VERSION = "0.2.4"
+
 
 STYLE =
 """
@@ -28,7 +31,7 @@ $ ->
 #:1 Run in before and renew data
 if location.pathname is "/" or location.pathname.match(/^\/contest\/\d+\/?$/) or location.pathname.match(/\/problemset(?!\/problem\/)/) or location.pathname.start_with("/contests")
   $.ajax
-    url: "http://codeforces.mn/extension?#{(new Date().getTime())}"
+    url: "http://codeforces.mn/extension?#{VERSION}"
     dataType: "text"
     success: (text) ->
       storage = {}
@@ -269,7 +272,7 @@ translate = ->
     $(this).html("<strong>Орчуулж байна...</strong>").fadeIn("fast")
 
   $.ajax
-    url: "http://codeforces.mn/extension/#{problem_id}.html?#{(new Date().getTime())}"
+    url: "http://codeforces.mn/extension/#{problem_id}.html?#{VERSION}"
     dataType: "html"
     success: (data) ->
       $(".problem-statement").addClass("mn-statement")
