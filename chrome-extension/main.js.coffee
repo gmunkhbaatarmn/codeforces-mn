@@ -18,12 +18,16 @@ STYLE =
 </style>
 """
 
-# "mn" flag for language chooser
-$ ->
-  if $("#header .lang-chooser").length > 0
-    $("#header .lang-chooser > div:first").prepend """
-      <a href="http://codeforces.mn/"><img src="http://codeforces.mn/images/flag-mn.png" title="Монголоор" alt="Монголоор"></a>
-    """
+#:1 Mongolian flag for language chooser
+if location.host == "codeforces.com"
+  $ ->
+    if $("#header .lang-chooser").length > 0
+      $("#header .lang-chooser > div:first").prepend """
+        <a href="http://codeforces.mn/">
+          <img src="http://codeforces.mn/images/flag-mn.png" title="Монголоор">
+        </a>
+      """
+# endfold
 
 #:1 Run in before and renew data
 if location.pathname is "/" or location.pathname.match(/^\/contest\/\d+\/?$/) or location.pathname.match(/\/problemset(?!\/problem\/)/) or location.pathname.start_with("/contests")
