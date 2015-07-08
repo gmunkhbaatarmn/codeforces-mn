@@ -5,50 +5,50 @@ String.prototype.contain    = (str) -> @indexOf(str) > -1
 String.prototype.is_numeric = ()    -> !isNaN(parseFloat(@)) && isFinite(@)
 # endfold
 
+# Note: Also set on `manifest.json`
+VERSION = "0.2.4"
+
 
 STYLE =
 """
 <style>
-  .mn-please a                 { color:green !important; font-weight:bold; padding:1px 5px 2px; border-radius:3px }
-  .mn-please a:hover           { color:#fff !important; background:#069100 !important }
-  .mn-statement ul             { margin-bottom:1em }
-  .mn-statement .credit        { text-align:right; font-style:italic; font-size:110%; font-family:Georgia, serif }
-  .sample-tests .section-title { margin-bottom: 0.5em }
-  .sample-tests .title         { font-family:"Helvetica Neue", Helvetica, Arial, sans-serif !important; font-size:1em !important; text-transform:none !important }
+  .mn-please a          { font-weight:bold; cursor:pointer }
+  .mn-statement ul      { margin-bottom:1em }
+  .mn-statement .credit { text-align:right; font-style:italic }
+  .sample-tests .title  { font-family:sans-serif !important;
+                          font-size:1em !important;
+                          text-transform:none !important }
 </style>
 """
 
-# "mn" flag for language chooser
+#:1 Mongolian flag for language chooser
 $ ->
-  if $("#header .lang-chooser").length > 0
-    $("#header .lang-chooser > div:first").prepend """
-      <a href="http://www.codeforces.mn/"><img src="http://www.codeforces.mn/images/flag-mn.png" title="Монголоор" alt="Монголоор"></a>
-    """
+  $("#header .lang-chooser > div:first").prepend """
+    <a href="http://codeforces.mn/">
+      <img src="http://codeforces.mn/images/flag-mn.png" title="Монголоор">
+    </a>
+  """
+# endfold
 
-#:1 Run in before and renew data
-if location.pathname is "/" or location.pathname.match(/^\/contest\/\d+\/?$/) or location.pathname.match(/\/problemset(?!\/problem\/)/) or location.pathname.start_with("/contests")
-  $.ajax
-    url: "http://www.codeforces.mn/extension?#{(new Date().getTime())}"
-    dataType: "text"
-    success: (text) ->
-      storage = {}
-      storage.updated = new Date().getTime() / 1000
-      for i in text.split("\n")[0].split("|")
-        storage["problem:#{i}"] = 1
+#:1 Update data
+$.get "http://codeforces.mn/extension?#{VERSION}", (text) ->
+  storage = {}
+  for i in text.split("\n")[0].split("|")
+    storage["problem:#{i}"] = 1
 
-      for c in text.split("\n")[1].split("|")
-        i = c.split(":")[0]
-        ready = Number(c.split(":")[1].split("/")[0])
-        total = Number(c.split(":")[1].split("/")[1])
-        storage["contest:#{i}"] = {ready: ready, total: total}
+  for c in text.split("\n")[1].split("|")
+    i = c.split(":")[0]
+    ready = Number(c.split(":")[1].split("/")[0])
+    total = Number(c.split(":")[1].split("/")[1])
+    storage["contest:#{i}"] = {ready: ready, total: total}
 
-      storage.credits = []
-      for t in text.split("\n")[2].split("|")
-        storage.credits.push(t.split(":"))
+  storage.credits = []
+  for t in text.split("\n")[2].split("|")
+    storage.credits.push(t.split(":"))
 
-      storage.total = text.split("\n")[3]
+  storage.total = text.split("\n")[3]
 
-      localStorage.mn = JSON.stringify(storage)
+  localStorage.mn = JSON.stringify(storage)
 # endfold
 
 
@@ -130,42 +130,47 @@ if location.pathname is "/"
 
 #:1 Page: /problemset/          - List of problems
 if location.pathname.match(/\/problemset(?!\/problem\/)/)
-  ### Highlight translated problems ###
+  # Highlight translated problems
   $ ->
     $("head").append """
       <style>
-        .problems tr td:nth-child(2) > div:first-child { margin-left:14px }
-        .mn td:nth-child(2) > div:first-child          { margin-left:0 !important }
-        .mn td:nth-child(2) > div:first-child a:before { content:"✱ "; color:#c900a9; text-decoration:none; display:inline-block; float:left; margin-right:4px }
+        .problems tr td:nth-child(2) > div:first-child {
+          margin-left: 14px
+        }
+        .problems .mn td:nth-child(2) > div:first-child {
+          margin-left: 0
+        }
+        .problems .mn td:nth-child(2) > div:first-child a:before {
+          content: "✱ ";
+          color: #c900a9;
+          display: inline-block;
+          float: left;
+          margin-right: 4px;
+          text-decoration: none
+        }
       </style>
       """
     storage = JSON.parse(localStorage.mn or "{}")
 
     $(".problems tr").each ->
-      problem_id = $.trim($(this).find("td.id").text())
-      while $.isNumeric(problem_id.slice(-1))
-        problem_id = problem_id.slice(0, -1)
-      problem_id = problem_id[0..-2] + "-" + problem_id[-1..-1]
-
-      if storage["problem:#{problem_id}"] isnt undefined
+      problem_id = $(this).find("td.id").text().trim().replace(/(\d+)/, "$1-")
+      if storage["problem:#{problem_id}"]
         $(this).addClass("mn")
 
 
 #:1 Page: /problemset/problem/  - Read a problem
 if location.pathname.match(/\/problemset\/problem\//)
-  ### Append "Монголоор унших" button ###
+  # Button: "Монголоор унших"
   $ ->
     $("head").append(STYLE)
     storage = JSON.parse(localStorage.mn or "{}")
 
-    problem_id = location.pathname.replace("/problemset/problem/", "").replace("/", "-").toUpperCase()
+    problem_id = location.pathname.replace("/problemset/problem/", "")
+    problem_id = problem_id.replace("/", "-").toUpperCase()
 
-    while $.isNumeric(problem_id.slice(-1))
-      problem_id = problem_id.slice(0, -1)
-
-    if storage["problem:#{problem_id}"] isnt undefined
+    if storage["problem:#{problem_id}"]
       $(".problem-statement .header .title").after """
-        <div class="mn-please"><a href="javascript:;">Монголоор унших</a></div>
+        <div class="mn-please"><a>Монголоор унших</a></div>
       """
 
     $(".mn-please a").on("click", translate)
@@ -229,7 +234,7 @@ if location.pathname.match(/^\/contest\/\d+\/?$/)
 
 #:1 Page: /contest/ID/problem/  - Read a problem in contest
 if location.pathname.match(/^\/contest\/\d+\/problem\//)
-  ### Append "Монголоор унших" button ###
+  # Button: "Монголоор унших"
   $ ->
     $("head").append(STYLE)
     storage = JSON.parse(localStorage.mn or "{}")
@@ -237,12 +242,9 @@ if location.pathname.match(/^\/contest\/\d+\/problem\//)
     problem_id = location.pathname.replace("/contest/", "")
     problem_id = problem_id.replace("/problem/", "-").toUpperCase()
 
-    while $.isNumeric(problem_id.slice(-1))
-      problem_id = problem_id.slice(0, -1)
-
-    if storage["problem:#{problem_id}"] isnt undefined
+    if storage["problem:#{problem_id}"]
       $(".problem-statement .header .title").after """
-        <div class="mn-please"><a href="javascript:;">Монголоор унших</a></div>
+        <div class="mn-please"><a>Монголоор унших</a></div>
       """
 
     $(".mn-please a").on "click", translate
@@ -268,64 +270,93 @@ translate = ->
   $(".mn-please").fadeOut "fast", ->
     $(this).html("<strong>Орчуулж байна...</strong>").fadeIn("fast")
 
-  $.ajax
-    url: "http://www.codeforces.mn/extension/#{problem_id}.html?#{(new Date().getTime())}"
-    dataType: "html"
-    success: (data) ->
-      $(".problem-statement").addClass("mn-statement")
+  $.get "http://codeforces.mn/extension/#{problem_id}.html?#{VERSION}", (data) ->
+    $(".problem-statement").addClass("mn-statement")
 
-      $data = $("<div/>").html(data)
+    $data = $("<div/>").html(data)
 
-      # Replace problem name
-      $(".header .title").html "#{problem_id.slice(-1)}. #{$data.find("h1")[0].innerHTML}"
+    #:2 Replace: problem name
+    $(".header .title").html "#{problem_id.slice(-1)}. #{$data.find("h1")[0].innerHTML}"
 
-      # Replace problem statement
+    #:2 Replace: problem statement
+    body = []
+    curr = $data.find("h1").next()
+    while curr[0] and curr[0].tagName isnt "H3"
+      body.push(curr[0].outerHTML)
+      curr = curr.next()
+
+    $(".header").next().html body.join("\n")
+
+    #:2 Replace: input
+    body = []
+    curr = $data.find("h3").next()
+    while curr[0] and curr[0].tagName isnt "H3"
+      body.push(curr[0].outerHTML)
+      curr = curr.next()
+
+    $(".input-specification").html """
+      <div class="section-title">Оролт</div>
+      #{body.join("\n")}
+    """
+
+    #:2 Replace: output
+    body = []
+    curr = $data.find("h3:eq(1)").next()
+    while curr[0] and curr[0].tagName isnt "H3"
+      body.push(curr[0].outerHTML)
+      curr = curr.next()
+
+    $(".output-specification").html """
+      <div class="section-title">Гаралт</div>
+      #{body.join("\n")}
+    """
+
+    #:2 Replace: sample test(s)
+    $(".sample-tests .section-title").html "Жишээ тэстүүд"
+    $(".sample-tests .section-title").html "Жишээ тэстүүд"
+    $(".sample-tests .sample-test .input .title").html "Оролт"
+    $(".sample-tests .sample-test .output .title").html "Гаралт"
+
+    #:2 Replace: note
+    if $data.find("h3:eq(2)").length
       body = []
-      curr = $data.find("h1").next()
+      curr = $data.find("h3:eq(2)").next()
       while curr[0] and curr[0].tagName isnt "H3"
         body.push(curr[0].outerHTML)
         curr = curr.next()
-      $(".header").next().html body.join("\n")
+      $(".problem-statement .note").html """
+        <div class="section-title">Тэмдэглэл</div>
+        #{body.join("\n")}
+      """
+    # endfold
 
-      # Replace input
-      body = []
-      curr = $data.find("h3").next()
-      while curr[0] and curr[0].tagName isnt "H3"
-        body.push(curr[0].outerHTML)
-        curr = curr.next()
-      $(".input-specification").html """<div class="section-title">Оролт</div>#{body.join("\n")}"""
+    $(".mn-please").fadeOut("fast")
 
-      # Replace output
-      body = []
-      curr = $data.find("h3:eq(1)").next()
-      while curr[0] and curr[0].tagName isnt "H3"
-        body.push(curr[0].outerHTML)
-        curr = curr.next()
-      $(".output-specification").html """<div class="section-title">Гаралт</div>#{body.join("\n")}"""
+    #:2 Include: mathjax config
+    script = document.createElement("script")
+    script.type = "text/x-mathjax-config"
+    script.text = """
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [["$", "$"]],
+          displayMath: [["$$", "$$"]]
+        },
+        TeX: {
+          extensions: [
+            "AMSmath.js",
+            "AMSsymbols.js",
+            "noErrors.js"
+          ]
+        },
+        jax: ["input/TeX", "output/HTML-CSS"],
+        extensions: ["tex2jax.js"],
+        showMathMenu: false
+      });
+    """
+    document.head.appendChild(script)
 
-      # Replace sample test(s)
-      $(".sample-tests .section-title").html "Жишээ тэстүүд"
-      $(".sample-tests .section-title").html "Жишээ тэстүүд"
-      $(".sample-tests .sample-test .input .title").html "Оролт"
-      $(".sample-tests .sample-test .output .title").html "Гаралт"
-
-      # Replace note
-      if $data.find("h3:eq(2)").length
-        body = []
-        curr = $data.find("h3:eq(2)").next()
-        while curr[0] and curr[0].tagName isnt "H3"
-          body.push(curr[0].outerHTML)
-          curr = curr.next()
-        $(".problem-statement .note").html """<div class="section-title">Тэмдэглэл</div>#{body.join("\n")}"""
-
-      $(".mn-please").fadeOut("fast")
-
-      head = document.getElementsByTagName("head")[0]
-      script = document.createElement("script")
-      script.type = "text/x-mathjax-config"
-      script[(if window.opera then "innerHTML" else "text")] = 'MathJax.Hub.Config({tex2jax:{inlineMath:[["$", "$"]],displayMath:[["$$", "$$"]]}, showMathMenu:false});'
-      head.appendChild(script)
-      script = document.createElement("script")
-      script.type = "text/javascript"
-      script.src  = "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"
-      head.appendChild(script)
+    #:2 Include: mathjax source
+    script = document.createElement("script")
+    script.type = "text/javascript"
+    script.src = "//cdn.mathjax.org/mathjax/latest/MathJax.js"
+    document.head.appendChild(script)
