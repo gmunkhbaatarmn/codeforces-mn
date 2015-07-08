@@ -12,7 +12,7 @@ VERSION = "0.2.4"
 STYLE =
 """
 <style>
-  .mn-please a          { font-weight:bold }
+  .mn-please a          { font-weight:bold; cursor:pointer }
   .mn-statement ul      { margin-bottom:1em }
   .mn-statement .credit { text-align:right; font-style:italic }
   .sample-tests .title  { font-family:sans-serif !important;
@@ -160,19 +160,17 @@ if location.pathname.match(/\/problemset(?!\/problem\/)/)
 
 #:1 Page: /problemset/problem/  - Read a problem
 if location.pathname.match(/\/problemset\/problem\//)
-  ### Append "Монголоор унших" button ###
+  # Button: "Монголоор унших"
   $ ->
     $("head").append(STYLE)
     storage = JSON.parse(localStorage.mn or "{}")
 
-    problem_id = location.pathname.replace("/problemset/problem/", "").replace("/", "-").toUpperCase()
+    problem_id = location.pathname.replace("/problemset/problem/", "")
+    problem_id = problem_id.replace("/", "-").toUpperCase()
 
-    while $.isNumeric(problem_id.slice(-1))
-      problem_id = problem_id.slice(0, -1)
-
-    if storage["problem:#{problem_id}"] isnt undefined
+    if storage["problem:#{problem_id}"]
       $(".problem-statement .header .title").after """
-        <div class="mn-please"><a href="javascript:;">Монголоор унших</a></div>
+        <div class="mn-please"><a>Монголоор унших</a></div>
       """
 
     $(".mn-please a").on("click", translate)
@@ -257,7 +255,9 @@ if location.pathname.match(/^\/contest\/\d+\/problem\//)
 
 
 #:1 Function: translate problem statement
-translate = ->
+translate = (e) ->
+  e.preventDefault()
+
   if location.pathname.start_with("/problemset/problem/")
     problem_id = location.pathname.replace("/problemset/problem/", "")
     problem_id = problem_id.replace("/", "-").toUpperCase()

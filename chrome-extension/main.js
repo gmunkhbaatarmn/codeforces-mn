@@ -19,7 +19,7 @@ String.prototype.is_numeric = function() {
 
 VERSION = "0.2.4";
 
-STYLE = "<style>\n  .mn-please a          { font-weight:bold }\n  .mn-statement ul      { margin-bottom:1em }\n  .mn-statement .credit { text-align:right; font-style:italic }\n  .sample-tests .title  { font-family:sans-serif !important;\n                          font-size:1em !important;\n                          text-transform:none !important }\n</style>";
+STYLE = "<style>\n  .mn-please a          { font-weight:bold; cursor:pointer }\n  .mn-statement ul      { margin-bottom:1em }\n  .mn-statement .credit { text-align:right; font-style:italic }\n  .sample-tests .title  { font-family:sans-serif !important;\n                          font-size:1em !important;\n                          text-transform:none !important }\n</style>";
 
 $(function() {
   return $("#header .lang-chooser > div:first").prepend("<a href=\"http://codeforces.mn/\">\n  <img src=\"http://codeforces.mn/images/flag-mn.png\" title=\"Монголоор\">\n</a>");
@@ -123,18 +123,14 @@ if (location.pathname.match(/\/problemset(?!\/problem\/)/)) {
 }
 
 if (location.pathname.match(/\/problemset\/problem\//)) {
-
-  /* Append "Монголоор унших" button */
   $(function() {
     var problem_id, storage;
     $("head").append(STYLE);
     storage = JSON.parse(localStorage.mn || "{}");
-    problem_id = location.pathname.replace("/problemset/problem/", "").replace("/", "-").toUpperCase();
-    while ($.isNumeric(problem_id.slice(-1))) {
-      problem_id = problem_id.slice(0, -1);
-    }
-    if (storage["problem:" + problem_id] !== void 0) {
-      $(".problem-statement .header .title").after("<div class=\"mn-please\"><a href=\"javascript:;\">Монголоор унших</a></div>");
+    problem_id = location.pathname.replace("/problemset/problem/", "");
+    problem_id = problem_id.replace("/", "-").toUpperCase();
+    if (storage["problem:" + problem_id]) {
+      $(".problem-statement .header .title").after("<div class=\"mn-please\"><a>Монголоор унших</a></div>");
     }
     return $(".mn-please a").on("click", translate);
   });
@@ -210,8 +206,9 @@ if (location.pathname.match(/^\/contest\/\d+\/problem\//)) {
   });
 }
 
-translate = function() {
+translate = function(e) {
   var problem_id;
+  e.preventDefault();
   if (location.pathname.start_with("/problemset/problem/")) {
     problem_id = location.pathname.replace("/problemset/problem/", "");
     problem_id = problem_id.replace("/", "-").toUpperCase();
