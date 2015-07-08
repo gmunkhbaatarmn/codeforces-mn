@@ -22,14 +22,12 @@ STYLE =
 """
 
 #:1 Mongolian flag for language chooser
-if location.host == "codeforces.com"
-  $ ->
-    if $("#header .lang-chooser").length > 0
-      $("#header .lang-chooser > div:first").prepend """
-        <a href="http://codeforces.mn/">
-          <img src="http://codeforces.mn/images/flag-mn.png" title="Монголоор">
-        </a>
-      """
+$ ->
+  $("#header .lang-chooser > div:first").prepend """
+    <a href="http://codeforces.mn/">
+      <img src="http://codeforces.mn/images/flag-mn.png" title="Монголоор">
+    </a>
+  """
 # endfold
 
 #:1 Run in before and renew data
