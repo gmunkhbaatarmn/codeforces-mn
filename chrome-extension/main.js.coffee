@@ -130,24 +130,31 @@ if location.pathname is "/"
 
 #:1 Page: /problemset/          - List of problems
 if location.pathname.match(/\/problemset(?!\/problem\/)/)
-  ### Highlight translated problems ###
+  # Highlight translated problems
   $ ->
     $("head").append """
       <style>
-        .problems tr td:nth-child(2) > div:first-child { margin-left:14px }
-        .mn td:nth-child(2) > div:first-child          { margin-left:0 !important }
-        .mn td:nth-child(2) > div:first-child a:before { content:"✱ "; color:#c900a9; text-decoration:none; display:inline-block; float:left; margin-right:4px }
+        .problems tr td:nth-child(2) > div:first-child {
+          margin-left: 14px
+        }
+        .problems .mn td:nth-child(2) > div:first-child {
+          margin-left: 0
+        }
+        .problems .mn td:nth-child(2) > div:first-child a:before {
+          content: "✱ ";
+          color: #c900a9;
+          display: inline-block;
+          float: left;
+          margin-right: 4px;
+          text-decoration: none
+        }
       </style>
       """
     storage = JSON.parse(localStorage.mn or "{}")
 
     $(".problems tr").each ->
-      problem_id = $.trim($(this).find("td.id").text())
-      while $.isNumeric(problem_id.slice(-1))
-        problem_id = problem_id.slice(0, -1)
-      problem_id = problem_id[0..-2] + "-" + problem_id[-1..-1]
-
-      if storage["problem:#{problem_id}"] isnt undefined
+      problem_id = $(this).find("td.id").text().trim().replace(/(\d+)/, "$1-")
+      if storage["problem:#{problem_id}"]
         $(this).addClass("mn")
 
 
@@ -330,7 +337,7 @@ translate = ->
 
     $(".mn-please").fadeOut("fast")
 
-    #:1 Include: mathjax config
+    #:2 Include: mathjax config
     script = document.createElement("script")
     script.type = "text/x-mathjax-config"
     script.text = """
@@ -353,7 +360,7 @@ translate = ->
     """
     document.head.appendChild(script)
 
-    #:1 Include: mathjax source
+    #:2 Include: mathjax source
     script = document.createElement("script")
     script.type = "text/javascript"
     script.src = "//cdn.mathjax.org/mathjax/latest/MathJax.js"
