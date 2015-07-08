@@ -17,7 +17,7 @@
   "content_scripts": [{
     "all_frames": true,
     "run_at": "document_start",
-    "matches": ["http://codeforces.com/*", "http://codeforces.mn/*"],
+    "matches": ["http://codeforces.com/*"],
     "js": ["jquery.js", "main.js"]
   }]
 }
