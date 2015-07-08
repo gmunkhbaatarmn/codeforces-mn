@@ -268,64 +268,61 @@ translate = ->
   $(".mn-please").fadeOut "fast", ->
     $(this).html("<strong>Орчуулж байна...</strong>").fadeIn("fast")
 
-  $.ajax
-    url: "http://codeforces.mn/extension/#{problem_id}.html?#{VERSION}"
-    dataType: "html"
-    success: (data) ->
-      $(".problem-statement").addClass("mn-statement")
+  $.get "http://codeforces.mn/extension/#{problem_id}.html?#{VERSION}", (data) ->
+    $(".problem-statement").addClass("mn-statement")
 
-      $data = $("<div/>").html(data)
+    $data = $("<div/>").html(data)
 
-      # Replace problem name
-      $(".header .title").html "#{problem_id.slice(-1)}. #{$data.find("h1")[0].innerHTML}"
+    # Replace problem name
+    $(".header .title").html "#{problem_id.slice(-1)}. #{$data.find("h1")[0].innerHTML}"
 
-      # Replace problem statement
+    # Replace problem statement
+    body = []
+    curr = $data.find("h1").next()
+    while curr[0] and curr[0].tagName isnt "H3"
+      body.push(curr[0].outerHTML)
+      curr = curr.next()
+    $(".header").next().html body.join("\n")
+
+    # Replace input
+    body = []
+    curr = $data.find("h3").next()
+    while curr[0] and curr[0].tagName isnt "H3"
+      body.push(curr[0].outerHTML)
+      curr = curr.next()
+    $(".input-specification").html """<div class="section-title">Оролт</div>#{body.join("\n")}"""
+
+    # Replace output
+    body = []
+    curr = $data.find("h3:eq(1)").next()
+    while curr[0] and curr[0].tagName isnt "H3"
+      body.push(curr[0].outerHTML)
+      curr = curr.next()
+    $(".output-specification").html """<div class="section-title">Гаралт</div>#{body.join("\n")}"""
+
+    # Replace sample test(s)
+    $(".sample-tests .section-title").html "Жишээ тэстүүд"
+    $(".sample-tests .section-title").html "Жишээ тэстүүд"
+    $(".sample-tests .sample-test .input .title").html "Оролт"
+    $(".sample-tests .sample-test .output .title").html "Гаралт"
+
+    # Replace note
+    if $data.find("h3:eq(2)").length
       body = []
-      curr = $data.find("h1").next()
+      curr = $data.find("h3:eq(2)").next()
       while curr[0] and curr[0].tagName isnt "H3"
         body.push(curr[0].outerHTML)
         curr = curr.next()
-      $(".header").next().html body.join("\n")
+      $(".problem-statement .note").html """<div class="section-title">Тэмдэглэл</div>#{body.join("\n")}"""
 
-      # Replace input
-      body = []
-      curr = $data.find("h3").next()
-      while curr[0] and curr[0].tagName isnt "H3"
-        body.push(curr[0].outerHTML)
-        curr = curr.next()
-      $(".input-specification").html """<div class="section-title">Оролт</div>#{body.join("\n")}"""
+    $(".mn-please").fadeOut("fast")
 
-      # Replace output
-      body = []
-      curr = $data.find("h3:eq(1)").next()
-      while curr[0] and curr[0].tagName isnt "H3"
-        body.push(curr[0].outerHTML)
-        curr = curr.next()
-      $(".output-specification").html """<div class="section-title">Гаралт</div>#{body.join("\n")}"""
-
-      # Replace sample test(s)
-      $(".sample-tests .section-title").html "Жишээ тэстүүд"
-      $(".sample-tests .section-title").html "Жишээ тэстүүд"
-      $(".sample-tests .sample-test .input .title").html "Оролт"
-      $(".sample-tests .sample-test .output .title").html "Гаралт"
-
-      # Replace note
-      if $data.find("h3:eq(2)").length
-        body = []
-        curr = $data.find("h3:eq(2)").next()
-        while curr[0] and curr[0].tagName isnt "H3"
-          body.push(curr[0].outerHTML)
-          curr = curr.next()
-        $(".problem-statement .note").html """<div class="section-title">Тэмдэглэл</div>#{body.join("\n")}"""
-
-      $(".mn-please").fadeOut("fast")
-
-      head = document.getElementsByTagName("head")[0]
-      script = document.createElement("script")
-      script.type = "text/x-mathjax-config"
-      script[(if window.opera then "innerHTML" else "text")] = 'MathJax.Hub.Config({tex2jax:{inlineMath:[["$", "$"]],displayMath:[["$$", "$$"]]}, showMathMenu:false});'
-      head.appendChild(script)
-      script = document.createElement("script")
-      script.type = "text/javascript"
-      script.src  = "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"
-      head.appendChild(script)
+    head = document.getElementsByTagName("head")[0]
+    script = document.createElement("script")
+    script.type = "text/x-mathjax-config"
+    script[(if window.opera then "innerHTML" else "text")] = 'MathJax.Hub.Config({tex2jax:{inlineMath:[["$", "$"]],displayMath:[["$$", "$$"]]}, showMathMenu:false});'
+    head.appendChild(script)
+    script = document.createElement("script")
+    script.type = "text/javascript"
+    script.src  = "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"
+    head.appendChild(script)
