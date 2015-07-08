@@ -279,17 +279,17 @@ translate = ->
   $(".mn-please").fadeOut "fast", ->
     $(this).html("<strong>Орчуулж байна...</strong>").fadeIn("fast")
 
-  $.get "http://codeforces.mn/extension/#{problem_id}.html?#{VERSION}", (data) ->
+  $.get "http://codeforces.mn/extension/#{problem_id}.html?#{VERSION}", (r) ->
     $(".problem-statement").addClass("mn-statement")
 
-    $data = $("<div/>").html(data)
+    $r = $("<div/>").html(r)
 
     #:2 Replace: problem name
-    $(".header .title").html "#{problem_id.slice(-1)}. #{$data.find("h1")[0].innerHTML}"
+    $(".header .title").html "#{problem_id.slice(-1)}. #{$r.find("h1").html()}"
 
     #:2 Replace: problem statement
     body = []
-    curr = $data.find("h1").next()
+    curr = $r.find("h1").next()
     while curr[0] and curr[0].tagName isnt "H3"
       body.push(curr[0].outerHTML)
       curr = curr.next()
@@ -298,7 +298,7 @@ translate = ->
 
     #:2 Replace: input
     body = []
-    curr = $data.find("h3").next()
+    curr = $r.find("h3").next()
     while curr[0] and curr[0].tagName isnt "H3"
       body.push(curr[0].outerHTML)
       curr = curr.next()
@@ -310,7 +310,7 @@ translate = ->
 
     #:2 Replace: output
     body = []
-    curr = $data.find("h3:eq(1)").next()
+    curr = $r.find("h3:eq(1)").next()
     while curr[0] and curr[0].tagName isnt "H3"
       body.push(curr[0].outerHTML)
       curr = curr.next()
@@ -327,9 +327,9 @@ translate = ->
     $(".sample-tests .sample-test .output .title").html "Гаралт"
 
     #:2 Replace: note
-    if $data.find("h3:eq(2)").length
+    if $r.find("h3:eq(2)").length
       body = []
-      curr = $data.find("h3:eq(2)").next()
+      curr = $r.find("h3:eq(2)").next()
       while curr[0] and curr[0].tagName isnt "H3"
         body.push(curr[0].outerHTML)
         curr = curr.next()

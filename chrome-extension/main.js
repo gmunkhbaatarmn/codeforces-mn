@@ -214,27 +214,27 @@ translate = function() {
   $(".mn-please").fadeOut("fast", function() {
     return $(this).html("<strong>Орчуулж байна...</strong>").fadeIn("fast");
   });
-  return $.get("http://codeforces.mn/extension/" + problem_id + ".html?" + VERSION, function(data) {
-    var $data, body, curr, script;
+  return $.get("http://codeforces.mn/extension/" + problem_id + ".html?" + VERSION, function(r) {
+    var $r, body, curr, script;
     $(".problem-statement").addClass("mn-statement");
-    $data = $("<div/>").html(data);
-    $(".header .title").html((problem_id.slice(-1)) + ". " + ($data.find("h1")[0].innerHTML));
+    $r = $("<div/>").html(r);
+    $(".header .title").html((problem_id.slice(-1)) + ". " + ($r.find("h1").html()));
     body = [];
-    curr = $data.find("h1").next();
+    curr = $r.find("h1").next();
     while (curr[0] && curr[0].tagName !== "H3") {
       body.push(curr[0].outerHTML);
       curr = curr.next();
     }
     $(".header").next().html(body.join("\n"));
     body = [];
-    curr = $data.find("h3").next();
+    curr = $r.find("h3").next();
     while (curr[0] && curr[0].tagName !== "H3") {
       body.push(curr[0].outerHTML);
       curr = curr.next();
     }
     $(".input-specification").html("<div class=\"section-title\">Оролт</div>\n" + (body.join("\n")));
     body = [];
-    curr = $data.find("h3:eq(1)").next();
+    curr = $r.find("h3:eq(1)").next();
     while (curr[0] && curr[0].tagName !== "H3") {
       body.push(curr[0].outerHTML);
       curr = curr.next();
@@ -244,9 +244,9 @@ translate = function() {
     $(".sample-tests .section-title").html("Жишээ тэстүүд");
     $(".sample-tests .sample-test .input .title").html("Оролт");
     $(".sample-tests .sample-test .output .title").html("Гаралт");
-    if ($data.find("h3:eq(2)").length) {
+    if ($r.find("h3:eq(2)").length) {
       body = [];
-      curr = $data.find("h3:eq(2)").next();
+      curr = $r.find("h3:eq(2)").next();
       while (curr[0] && curr[0].tagName !== "H3") {
         body.push(curr[0].outerHTML);
         curr = curr.next();
