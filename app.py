@@ -3,14 +3,15 @@ import re
 import json
 import time
 import parse
-from datetime import datetime
 from hashlib import md5
+from datetime import datetime
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, taskqueue, memcache
 from parse import codeforces_ratings, topcoder_ratings, date_format, relative
 from models import Problem, Contest, Suggestion
 
 
+# Application settings
 app.config["session-key"] = "Tiy3ahhiefux2hailaiph4echidaelee3daighahdahruPhoh"
 app.config["context"] = lambda x: {
     "date_format": date_format,
@@ -23,6 +24,10 @@ app.config["context"] = lambda x: {
     "count_done": data.fetch("count_done"),
     "relative": relative,
 }
+app.config["route-shortcut"] = {
+    "<code>": "(\w+)",
+}
+# endfold
 
 
 # Home
@@ -36,11 +41,6 @@ def internal_error(x):
     x.render("error-500.html")
 
 
-@route("/")
-def home(x):
-    x.render("home.html")
-
-
 @route(":before")
 def before(x):
     # Redirect www urls to non-www
@@ -49,15 +49,20 @@ def before(x):
         x.redirect(url, permanent=True)
 
 
+@route("/")
+def home(x):
+    x.render("home.html")
+
+
 # Contest
 @route("/contests")
-def contest_list(x, page="1"):
-    contest_list_paged(x, "1")
+def contest_list(x):
+    contest_list_paged(x, page=1)
 
 
-@route("/contests/page/(\d+)")
+@route("/contests/page/<int>")
 def contest_list_paged(x, page):
-    offset = 100 * (int(page) - 1)
+    offset = 100 * (page - 1)
     contests = Contest.all().order("-id").fetch(100, offset=offset)
 
     if len(contests) <= 0:
@@ -68,30 +73,23 @@ def contest_list_paged(x, page):
     x.render("contest-list.html", locals())
 
 
-@route("/contest/(\d+)")
+@route("/contest/<int>")
 def contest_dashboard(x, id):
-    contest = Contest.find(id=int(id))
-    if not contest:
-        x.abort(404)
+    contest = Contest.find_or_404(id=id)
 
     x.render("contest-dashboard.html", locals())
 
 
-@route("/contest/(\d+)/problem/(\w+)")
+@route("/contest/<int>/problem/<code>")
 def contest_problem(x, contest_id, letter):
     letter = letter.upper()
 
-    contest = Contest.find(id=int(contest_id))
-    if not contest:
-        x.abort(404)
-
+    contest = Contest.find_or_404(id=contest_id)
     code = dict(contest.problems).get(letter)
     if not code:
         x.abort(404)
 
-    problem = Problem.find(code=code)
-    if not problem:
-        x.abort(404)
+    problem = Problem.find_or_404(code=code)
 
     if problem.credits:
         x.render("contest-problem.html", locals())
@@ -101,13 +99,13 @@ def contest_problem(x, contest_id, letter):
 
 # Problemset
 @route("/problemset")
-def problemset_index(x, page="1"):
-    problemset_paged(x, "1")
+def problemset_index(x):
+    problemset_paged(x, page=1)
 
 
-@route("/problemset/page/(\d+)")
+@route("/problemset/page/<int>")
 def problemset_paged(x, page):
-    offset = 100 * (int(page) - 1)
+    offset = 100 * (page - 1)
     problems = Problem.all().order("-code").fetch(100, offset=offset)
 
     if len(problems) <= 0:
@@ -116,7 +114,7 @@ def problemset_paged(x, page):
     x.render("problemset-index.html", locals())
 
 
-@route("/problemset/problem/(\d+)/(\w+)")
+@route("/problemset/problem/<int>/<code>")
 def problemset_problem(x, contest_id, index):
     index = index.upper()
 
@@ -124,7 +122,7 @@ def problemset_problem(x, contest_id, index):
 
     if not problem:
         # it maybe contest' problem
-        contest = Contest.find(id=int(contest_id))
+        contest = Contest.find(id=contest_id)
         if not contest:
             x.abort(404)
 
@@ -140,20 +138,12 @@ def problemset_problem(x, contest_id, index):
         x.render("problemset-problem-en.html", locals())
 
 
-@route("/problemset/problem/(\d+)/(\w+)/edit")
+@route("/problemset/problem/<int>/<code>/edit")
 def problemset_translate(x, contest_id, index):
     index = index.upper()
-    problem = Problem.find(code="%3s-%s" % (contest_id, index))
-    if not problem:
-        x.abort(404)
+    problem = Problem.find_or_404(code="%3s-%s" % (contest_id, index))
 
     x.render("problemset-translate.html", locals())
-
-
-@route("/problemset/problem/(\d+)/(\w+)\.html")
-def problem_embed(x, contest_id, index):
-    # todo: this route is deprecated. remove after extension users upgraded
-    extension_problem(x, contest_id, index)
 
 
 # Rating
@@ -190,8 +180,9 @@ def suggestion_index(x):
         x.session.pop("moderator", None)
 
     suggestions = Suggestion.all().order("-added")
-    submissions = data.fetch("submissions", [])
-    x.render("suggestion-index.html", **locals())
+    submissions = data.fetch("submissions", [])[50:]
+
+    x.render("suggestion-index.html", locals())
 
 
 @route("/suggestion#login")
@@ -268,7 +259,7 @@ def suggestion_publish(x):
     problem.credits = credits
     problem.save()
 
-    # - cache count query
+    # Cache count query
     count_all = Problem.all().count(3000)
     count_done = 0
     for p in Problem.all().filter("credits >", ""):
@@ -278,7 +269,7 @@ def suggestion_publish(x):
     data.write("count_all", count_all)
     data.write("count_done", count_done)
 
-    # - update contest translated count
+    # Update contest translated count
     for c in Contest.all():
         if problem.code not in dict(c.problems).values():
             continue
@@ -289,7 +280,7 @@ def suggestion_publish(x):
         c.translated_count = count
         c.save()
 
-    # - update contribution
+    # Update contribution
     contribution = {}
     for p in Problem.all().filter("credits !=", ""):
         translators = p.credits.split(", ")
@@ -301,7 +292,7 @@ def suggestion_publish(x):
     contribution = sorted(contribution.items(), key=lambda t: -t[1])
     data.write("Rating:contribution", contribution)
 
-    # - last updated problems (submissions)
+    # Last updated problems (submissions)
     submissions = data.fetch("submissions", [])
     submissions.append({
         "code": suggestion.code,
@@ -313,12 +304,13 @@ def suggestion_publish(x):
     })
     submissions = data.write("submissions", submissions[-150:])
 
-    # - reset cached queries
+    # Reset cached queries
     memcache.delete("/extension:translated")
     memcache.delete("/extension:contests")
+    # endfold
 
     suggestion.delete()
-    x.redirect(str(problem.link), delay=1)
+    x.redirect(problem.link, delay=1)
 
 
 @route("/suggestion#delete")
@@ -326,8 +318,7 @@ def suggestion_delete(x):
     if not x.session.get("moderator"):
         x.redirect("/suggestion")
 
-    id = x.request["id"]
-    suggestion = Suggestion.get_by_id(int(id))
+    suggestion = Suggestion.get_by_id(int(x.request["id"]))
     code = suggestion.code
 
     problem = Problem.find(code=code)
@@ -340,20 +331,18 @@ def suggestion_delete(x):
     x.redirect("/suggestion", delay=1.0)
 
 
-@route("/suggestion/(\d+)")
+@route("/suggestion/<int>")
 def suggestion_review(x, id):
-    suggestion = Suggestion.get_by_id(int(id))
-    if not suggestion:
-        x.abort(404)
-
+    suggestion = Suggestion.get_or_404(id)
     problem = Problem.find(code=suggestion.code)
+
     x.render("suggestion-review.html", locals())
 
 
 # Others
 @route("/extension")
 def extension(x):
-    # - 1. translated problems
+    # 1. translated problems
     translated = memcache.get("/extension:translated")
     if not translated:
         translated = []
@@ -373,7 +362,7 @@ def extension(x):
     x.response.write("|".join([p.strip() for p in translated]))
     x.response.write("\n")
 
-    # - 2. contests "translated/all"
+    # 2. contests "translated/all"
     contests = memcache.get("/extension:contests")
     if not contests:
         contests = [(c.id, c.translated_count, len(c.problems))
@@ -384,25 +373,23 @@ def extension(x):
     x.response.write("|".join(["%03d:%s/%s" % t for t in contests]))
     x.response.write("\n")
 
-    # - 3. contribution
+    # 3. contribution
     contribution = data.fetch("Rating:contribution")
 
     x.response.write("|".join(["%s:%s" % (k, v) for k, v in contribution]))
     x.response.write("\n")
 
-    # - 4. all problems count
+    # 4. all problems count
     x.response.write("%s\n" % data.fetch("count_all"))
 
 
-@route("/extension/(\d+)-(\w+)\.html")
+@route("/extension/<int>-<code>.html")
 def extension_problem(x, contest_id, index):
     index = index.upper()
     problem = Problem.find(code="%3s-%s" % (contest_id, index))
     if not problem:
         # it maybe contest' problem
-        contest = Contest.find(id=int(contest_id))
-        if not contest:
-            x.abort(404)
+        contest = Contest.find_or_404(id=int(contest_id))
 
         code = dict(contest.problems).get(index)
         if not code:
@@ -420,7 +407,7 @@ def extension_problem(x, contest_id, index):
 def update(x):
     " new contests, new problems "
 
-    # - Check problemset first page
+    # Check problemset first page
     new_problems = 0
     for code, title in parse.problemset(1):
         if not re.search("^\d+[A-Z]$", code):
@@ -456,7 +443,7 @@ def update(x):
         p.identifier = md5(json.dumps(meta["tests"])).hexdigest()
         p.save()
 
-    # - Check contests first page
+    # Check contests first page
     for id, name, start in parse.contest_history(1):
         # read only contest
         if id in [419]:
@@ -493,7 +480,7 @@ def update(x):
         # update contest count
         data.write("count:contest-all", Contest.all().count())
 
-    # - Update problems count
+    # Update problems count
     if new_problems > 0:
         data.write("count_all", data.fetch("count_all") + new_problems)
     # endfold
@@ -556,8 +543,3 @@ def setup(x):
 
     info("Executed seconds: %.1f" % (time.time() - start_time))
     x.response("Executed seconds: %.1f" % (time.time() - start_time))
-
-
-@route("/humans\.txt")
-def humans_txt(x):
-    x.response(x.render_string("humans.txt"))

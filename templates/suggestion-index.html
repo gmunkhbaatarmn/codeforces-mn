@@ -6,25 +6,25 @@
 
 
 {% block content %}
-  {#:1# Suggestions #}
+  #:1 Орчуулгын саналууд
   <h1 class="table-title">Орчуулгын саналууд ({{ suggestions.count() }})</h1>
 
   <div class="table-container">
     <table class="sortable-table">
       <thead>
         <tr>
-          <th data-sort="string" style="width:43px">#</th>
-          <th data-sort="string" style="border-right:0; text-align:left; border-right:0">Бодлогын нэр</th>
-          <th data-sort="string" style="width:130px; text-align:right">Орчуулсан</th>
+          <th data-sort="string" class="w04">#</th>
+          <th data-sort="string" class="border-right-none text-left">Бодлогын нэр</th>
+          <th data-sort="string" class="w13 text-right">Орчуулсан</th>
         </tr>
       </thead>
       <tbody>
         {% for s in suggestions %}
           <tr {{- ' class="recent"' if not s.title.strip().startswith("* ") else '' }}>
-          <td class="text-center" data-sort-value="{{ s.code }}"><a href="/suggestion/{{ s.key().id() }}">{{ s.code.strip() }}</a></td>
-          <td class="border-right-none" data-sort-value="{{ s.title }}">
-            <a href="/suggestion/{{ s.key().id() }}">{{ s.title }}</a>
-            <span style="border-right:0; text-align:right; color:#888">({{ relative(s.added.strftime("%s")) }})</span>
+          <td data-sort-value="{{ s.code }}" class="text-center"><a href="/suggestion/{{ s.id }}">{{ s.code }}</a></td>
+          <td data-sort-value="{{ s.title }}" class="border-right-none">
+            <a href="/suggestion/{{ s.id }}">{{ s.title }}</a>
+            <span style="color:#888">({{ s.added|relative }})</span>
           </td>
           <td class="text-right">{{ s.credits }}</td>
         </tr>
@@ -36,30 +36,24 @@
       </tbody>
     </table>
   </div>
-  {# endfold #}
 
-  {#:1# Last updated problems #}
+  #:1 Сүүлд шинэчлэгдсэн бодлогууд
   <br><br>
   <h1 class="table-title">Сүүлд шинэчлэгдсэн бодлогууд</h1>
 
   <div class="table-container">
     <table>
       <tr>
-        <th style="width:43px">#</th>
-        <th style="text-align:left; border-right:0">Бодлогын нэр</th>
-        <th style="width:150px; border-right:0; text-align:right; border-right:0">Нийтлэгдсэн</th>
-        <th style="width:130px; text-align:right">Орчуулсан</th>
+        <th class="w04">#</th>
+        <th class="w55 text-left  border-right-none">Бодлогын нэр</th>
+        <th class="text-right">Орчуулсан</th>
       </tr>
       {% for s in submissions|reverse %}
       <tr {{- ' class="recent"' if (int(now.strftime("%s")) - s.published_at < 3600 * 24) else '' }}>
-        <td class="text-center"><a href="/problemset/problem/{{ s.code.strip().replace("-", "/")}}">{{ s.code.strip() }}</a></td>
+        <td class="text-center"><a href="{{ s.problem_link }}">{{ s.code }}</a></td>
         <td class="border-right-none">
-          <a href="/problemset/problem/{{ s.code.strip().replace("-", "/")}}">{{ s.title }}</a>
-          <span style="border-right:0; text-align:right; color:#888">({{ relative(s.created_at) }})</span>
-        </td>
-        <td>
-          {# s.moderator #}
-          <div style="border-right:0; text-align:right; color:#888">{{ relative(s.published_at) }}</div>
+          <a href="{{ s.problem_link }}">{{ s.title }}</a>
+          <span style="color:#888">({{ s.published_at|relative }})</span>
         </td>
         <td class="text-right">{{ s.credits }}</td>
       </tr>
@@ -71,12 +65,15 @@
 
 
 {% block sidebar %}
+  #:1 Түр хүлээнэ үү
   <div class="box">
     <h2>Түр хүлээнэ үү</h2>
     <div class="text-center">
       Санал болгосон орчуулгуудыг хянагч шалгаж үзээд нийтлэх буюу татгалзаж болно.
     </div>
   </div>
+
+  #:1 Хянагчийн булан
   <div class="box">
     {% if session.moderator %}
       <h2>Хянагчийн булан</h2>
@@ -86,7 +83,7 @@
     {% else %}
       <h2>Хянагч нэвтрэх</h2>
       <div class="text-center">
-        <form method="post" action="">
+        <form method="post">
           <input type="hidden" name=":method" value="login">
           <input type="password" name="password" value="" placeholder="Нууц үг">
         </form>
@@ -96,4 +93,5 @@
       </div>
     {% endif %}
   </div>
+  {# endfold #}
 {% endblock %}

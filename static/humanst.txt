@@ -1,0 +1,50 @@
+/* TEAM */
+
+  Name: Munkhbaatar
+  Role: Web developer
+  Codeforces: gmunkhbaatarmn
+  Topcoder: gmunkhbaatarmn
+
+
+/* BEST CONTRIBUTORS */
+
+  Name: Даариймаа
+
+  Name: Sugardorj
+  Facebook: https://www.facebook.com/sugardorj.chagnaadorj
+  Codeforces: Ulziisaihan
+  Topcoder: oyu
+
+  Name: Бат-Од
+
+  Name: Zoljargal
+  Twitter: zoloogg
+  Codeforces: zoloogg
+  Topcoder: ZoljargalG
+
+  Name: Энхгэрэл
+
+  Name: Солонго
+
+  Name: Энхсанаа
+  Facebook: https://www.facebook.com/sanaenkh
+  Codeforces: Enkhsanaa
+  Topcoder: fikir
+
+  Name: Төрбат
+  Facebook: https://www.facebook.com/turue
+
+  Name: Энхлут
+
+  Name: Говьхүү
+  Facebook: https://www.facebook.com/govihuu
+  Codeforces: Govikhuu
+  Topcoder: goku_mt
+
+  ... Also many other contributors.
+
+
+/* SITE */
+
+  Language: Mongolia
+  Source: https://github.com/gmunkhbaatarmn/codeforces-mn

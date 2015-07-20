@@ -1,3 +1,4 @@
+#:1 macro user(handle, point)
 {% macro user(handle, point) %}
   {%   if point >= 100 %}
     {% set color = "red" %}
@@ -14,6 +15,7 @@
 {% endmacro %}
 
 
+#:1 macro cf_user(handle, rating)
 {%- macro cf_user(handle, rating) -%}
   {%   if rating >= 2200 %}
     {% set color = "red" %}
@@ -32,16 +34,22 @@
 {%- endmacro -%}
 
 
+#:1 macro cf_rating(change, contest_id, align="left")
 {%- macro cf_rating(change, contest_id, align="left") -%}
+  {% set standing_url = "http://codeforces.com/contest/" ~ contest_id ~ "/standings/friends/true" %}
+
   {% if change >= 0 %}
-    <a rel="nofollow" href="http://codeforces.com/contest/{{ contest_id }}/standings/friends/true" class="rating-up text-{{ align }}">+{{ change }}</a>
+    <a rel="nofollow" href="{{ standing_url }}" class="rating-up text-{{ align }}">+{{ change }}</a>
   {% else %}
-    <a rel="nofollow" href="http://codeforces.com/contest/{{ contest_id }}/standings/friends/true" class="rating-down text-{{ align }}">{{ change }}</a>
+    <a rel="nofollow" href="{{ standing_url }}" class="rating-down text-{{ align }}">{{ change }}</a>
   {% endif %}
 {%- endmacro -%}
 
 
-{%- macro tc_user(handle, rating, id) -%}
+#:1 macro tc_user(handle, rating, coder_id)
+{%- macro tc_user(handle, rating, coder_id) -%}
+  {% set profile_url = "http://community.topcoder.com/tc?module=MemberProfile&amp;tab=alg&amp;cr=" ~ coder_id %}
+
   {%   if rating >= 2200 %}
     {% set color = "red" %}
   {% elif rating >= 1500 %}
@@ -53,14 +61,18 @@
   {% else %}
     {% set color = "gray" %}
   {% endif %}
-  <a rel="nofollow" class="tc-user-{{ color }}" href="http://community.topcoder.com/tc?module=MemberProfile&amp;tab=alg&amp;cr={{ id }}">{{ handle }}</a>
+
+  <a rel="nofollow" class="tc-user-{{ color }}" href="{{ profile_url }}">{{ handle }}</a>
 {%- endmacro -%}
 
 
+#:1 macro tc_rating(change, contest_id, coder_id, align="left")
 {%- macro tc_rating(change, contest_id, coder_id, align="left") -%}
+  {% set profile_url = "http://community.topcoder.com/stat?c=coder_room_stats&amp;cr=" ~ coder_id ~ "&amp;rd=" ~ contest_id %}
+
   {% if change >= 0 %}
-    <a rel="nofollow" href="http://community.topcoder.com/stat?c=coder_room_stats&amp;cr={{ coder_id }}&amp;rd={{ contest_id }}" class="rating-up text-{{ align }}">+{{ change }}</a>
+    <a rel="nofollow" href="{{ profile_url }}" class="rating-up text-{{ align }}">+{{ change }}</a>
   {% else %}
-    <a rel="nofollow" href="http://community.topcoder.com/stat?c=coder_room_stats&amp;cr={{ coder_id }}&amp;rd={{ contest_id }}" class="rating-down text-{{ align }}">{{ change }}</a>
+    <a rel="nofollow" href="{{ profile_url }}" class="rating-down text-{{ align }}">{{ change }}</a>
   {% endif %}
 {%- endmacro -%}

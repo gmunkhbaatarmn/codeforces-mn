@@ -1,47 +1,51 @@
+import os
 import re
-import cgi
 import sys
-import json
 import hmac
+import json
+import jinja2
 import Cookie
 import hashlib
+import importlib
 import traceback
-from cgi import parse_qs
+from cgi import FieldStorage, parse_qs
 from time import sleep
 from logging import info, warning, error
 from datetime import datetime
 from google.appengine.ext import db
 from google.appengine.api import memcache, taskqueue
-from jinja2 import Environment, FileSystemLoader
 
 sys.path.append("./packages")
-info, taskqueue  # pyflakes fix
 
-__version__ = "0.0.7"
+info       # for `from natrix import info`
+taskqueue  # for `from natrix import taskqueue`
+
+__version__ = "0.1.0"
 
 
 # Core classes
 class Request(object):
     " Abstraction for an HTTP request "
     def __init__(self, environ):
-        self.method = environ["REQUEST_METHOD"].upper()
-        self.path = environ["PATH_INFO"]
-        self.query = environ["QUERY_STRING"]
-        self.params = parse_qs(environ["QUERY_STRING"], keep_blank_values=1)
+        self.flag = None
 
+        # Field: headers
+        " Get all `HTTP_{HEADER_NAME}` environ keys "
         self.headers = {}
         for k, v in environ.iteritems():
             if k.startswith("HTTP_"):
                 name = k[5:].lower().replace("_", "-")
                 self.headers[name] = v
 
+        # Field: params
+        self.params = parse_qs(environ["QUERY_STRING"], keep_blank_values=1)
+
         content_type = environ.get("HTTP_CONTENT_TYPE", "")
         content_type = content_type or environ.get("CONTENT_TYPE", "")
-
         if "wsgi.input" in environ:
+            wsgi_input = environ["wsgi.input"]
             if content_type.startswith("multipart/form-data"):
-                form = cgi.FieldStorage(fp=environ["wsgi.input"],
-                                        environ=environ)
+                form = FieldStorage(fp=wsgi_input, environ=environ)
                 for k in form.keys():
                     if isinstance(form[k], list):
                         field = form[k][0]  # only first item
@@ -53,11 +57,12 @@ class Request(object):
                     else:
                         self.params[k] = field
             else:
-                self.POST = parse_qs(environ["wsgi.input"].read(),
-                                     keep_blank_values=1)
-                self.params.update(self.POST)
+                params = parse_qs(wsgi_input.read(), keep_blank_values=1)
+                self.params.update(params)
 
-        # allow custom method
+        # Field: method
+        self.method = environ["REQUEST_METHOD"].upper()
+
         if self.method == "POST" and ":method" in self.params:
             method = self.params.get(":method")
             if isinstance(method, list):
@@ -65,6 +70,7 @@ class Request(object):
             else:
                 self.method = method.upper()
 
+        # Field: cookies
         cookie = Cookie.SimpleCookie()
         for c in environ.get("HTTP_COOKIE", "").split(";"):
             try:
@@ -73,48 +79,64 @@ class Request(object):
                 info("Invalid cookie: %s" % c)
         self.cookies = dict(cookie.items())
 
-        # Is X-Requested-With header present and equal to ``XMLHttpRequest``?
-        # Note: this isn't set by every XMLHttpRequest request, it is only set
-        # if you are using a Javascript library that sets it (or you set the
-        # header yourself manually).
-        # Currently Prototype and jQuery are known to set this header.
+        # Field: is_xhr
         if environ.get("HTTP_X_REQUESTED_WITH", "") == "XMLHttpRequest":
             self.is_xhr = True
         else:
             self.is_xhr = False
 
+        # Field: remote_addr
         self.remote_addr = environ.get("REMOTE_ADDR", None)
+        # endfold
 
-        self.host = environ.get("HTTP_HOST", "")
-        self.domain = self.host.split(":", 1)[0]
+        " Example: http://foo.example.com:8000/path/page.html?x=y&z "
+        # Field: scheme     | http
+        self.scheme = environ.get("wsgi.url_scheme", "http")
 
-        self.url = self.host + self.path
+        # Field: host       | foo.example.com:8000
+        self.host = ensure_unicode(environ.get("HTTP_HOST", ""))
+
+        # Field: domain     | foo.example.com
+        self.domain = ensure_unicode(self.host.split(":", 1)[0])
+
+        # Field: port       | 8000
+        if ":" in self.host:
+            self.port = int(self.host.split(":")[1])
+        else:
+            self.port = 80
+
+        # Field: query      | x=y&z
+        self.query = ensure_unicode(environ["QUERY_STRING"])
+
+        # Field: path       | /path/page.html
+        self.path = ensure_unicode(environ["PATH_INFO"])
+
+        # Field: path_query | /path=page.html?x=y&z
+        self.path_query = self.path
         if self.query:
-            self.url += "?" + self.query
+            self.path_query += "?%s" % self.query
 
-        # unicode
-        self.host = ensure_unicode(self.host)
-        self.path = ensure_unicode(self.path)
-        self.domain = ensure_unicode(self.domain)
-        self.url = ensure_unicode(self.url)
-        self.query = ensure_unicode(self.query)
+        # Field: host_url   | http://foo.example.com:8000/
+        self.host_url = u"%s://%s/" % (self.scheme, self.host)
+
+        # Field: path_url   | http://foo.example.com:8000/path/page.html
+        self.path_url = u"%s://%s%s" % (self.scheme, self.host, self.path)
+
+        # Field: url        | http://foo.example.com:8000/path/page.html?x=y&z
+        self.url = self.path_url
+        if self.query:
+            self.url += "?%s" % self.query
+        # endfold
 
     def __getitem__(self, name):
-        " Example: self.request[:name] "
-        value = ""
-        if name in self.params:
-            value = self.params.get(name)
+        " Usage: x.request[name] "
+        value = self.params.get(name, "")
 
         # not list, individual value
-        if isinstance(value, list) and len(value) == 1:
+        if isinstance(value, list):
             value = value[0]
 
-        try:
-            value = ensure_unicode(value)
-        except UnicodeDecodeError:
-            pass
-
-        return value
+        return ensure_unicode(value)
 
 
 class Response(object):
@@ -122,8 +144,6 @@ class Response(object):
     def __init__(self, code=None):
         self.code = code or 200
         self.body = ""
-
-        # Default headers
         self.headers = {
             "Content-Type": "text/plain; charset=utf-8",
         }
@@ -139,10 +159,12 @@ class Response(object):
             self.headers["Content-Type"] = "application/json"
 
         self.body += ensure_ascii("%s" % value)
+    # endfold
 
     @property
     def status(self):
         http_status = {
+            # 1xx
             100: "100 Continue",
             101: "101 Switching Protocols",
             102: "102 Processing",
@@ -207,9 +229,11 @@ class Response(object):
             506: "506 Variant Also Negotiates",
             510: "501 Not Extended",
             511: "511 Network Authentication Required",
+            # endfold
         }
 
         return http_status[self.code]
+    # endfold
 
     class Sent(Exception):
         " Response sent "
@@ -244,44 +268,60 @@ class Handler(object):
 
         self.session = Session(session)
 
-    @property
-    def flash(self):
-        return self.session.pop(":flash", None)
-
-    @flash.setter
-    def flash(self, value):
-        self.session[":flash"] = value
-
     def render(self, template, *args, **kwargs):
         self.response.headers["Content-Type"] = "text/html; charset=UTF-8"
         self.response.write(self.render_string(template, *args, **kwargs))
         raise self.response.Sent
 
     def render_string(self, template, context=None, **kwargs):
-        template_path = self.config.get("template-path") or "./templates"
-        env = Environment(loader=FileSystemLoader(template_path),
-                          extensions=["jinja2.ext.loopcontrols"])
+        loader = self.config.get("template-loader")
+        if not loader:
+            template_path = self.config.get("template-path") or "./templates"
+            loader = jinja2.FileSystemLoader(template_path)
 
-        context_dict = {
-            "json": json,
+        env = jinja2.Environment(loader=loader,
+                                 line_comment_prefix="#:",
+                                 extensions=["jinja2.ext.loopcontrols"])
+
+        # default context
+        final_context = {
             "dir": dir,
             "int": int,
+            "bool": bool,
+            "float": float,
+            "reversed": reversed,
+            "sorted": sorted,
+            "max": max,
+            "min": min,
+
+            "json": json,
             "now": datetime.now(),
 
-            "debug": self.config.get("debug"),
             "request": self.request,
             "session": self.session,
             "flash": self.flash,
+            "config": self.config,
+            "environ": os.environ,
         }
-        context_dict.update(self.config["context"](self))
-        context_dict.update(context or {})
-        context_dict.update(kwargs)
 
-        env.filters.update(context_dict)
+        # context from app.config
+        config_context = self.config["context"]
+        if callable(config_context):
+            config_context = config_context(self)
 
-        return env.get_template(template).render(context_dict)
+        final_context.update(config_context)
+        final_context.update(context or {})
+        final_context.update(kwargs)
 
-    def redirect(self, url, permanent=False, code=302, delay=0):
+        # context functions can be jinja filter
+        env.filters.update(final_context)
+
+        return env.get_template(template).render(final_context)
+
+    def redirect(self, url=None, permanent=False, code=302, delay=0):
+        if not url:
+            url = self.request.path_query
+
         if permanent:
             code = 301
 
@@ -304,6 +344,27 @@ class Handler(object):
 
         raise self.response.Sent
 
+    def _save_session(self):
+        if self.session == self.session.initial:
+            return
+
+        cookie = cookie_encode(self.config["session-key"], self.session)
+        cookie_value = "session=%s; path=/;" % cookie
+        self.response.headers["Set-Cookie"] = cookie_value
+
+        cookie = Cookie.SimpleCookie()
+        cookie.load(cookie_value)
+        self.request.cookies = dict(cookie.items())
+    # endfold
+
+    @property
+    def flash(self):
+        return self.session.pop(":flash", None)
+
+    @flash.setter
+    def flash(self, value):
+        self.session[":flash"] = value
+
 
 class Application(object):
     """ Generate the WSGI application function
@@ -314,7 +375,12 @@ class Application(object):
     Returns WSGI app function
     """
     def __init__(self, routes=None, config=None):
-        self.routes = routes or []
+        self.routes = []
+        for r in (routes or []):
+            if len(r) == 2:
+                r = (r[0], 0, r[1])
+            self.routes.append(r)
+
         self.config = config or {}  # none to dict
 
     def __call__(self, environ, start_response):
@@ -332,64 +398,71 @@ class Application(object):
         response = Response()
 
         try:
-            " before "
-            before, args = self.get_before(request.path, request.method)
-            if before:
+            # Before
+            for rule, _, before_handler in self.routes:
+                if rule != ":before":
+                    continue
+
                 x = Handler(request, response, self.config)
-                try:
-                    before(x, *args)
-                except response.Sent:
-                    pass
 
-                # save session
-                if x.session != x.session.initial:
-                    session_cookie = cookie_encode(x.config["session-key"],
-                                                   x.session)
-                    cookie_value = "session=%s; path=/;" % session_cookie
+                self._handler_call(before_handler, x, args=[])
 
-                    cookie = Cookie.SimpleCookie()
-                    cookie.load(cookie_value)
-                    x.request.cookies = dict(cookie.items())
-                    x.response.headers["Set-Cookie"] = cookie_value
-
+                x._save_session()
                 request = x.request
                 response = x.response
 
                 if response.body or response.code != 200:
-                    start_response(response.status,
-                                   response.headers.items())
-                    return [response.body]
+                    raise self.DoneException
+            # endfold
 
-            " handler "
             x = Handler(request, response, self.config)
-            x.not_found = self.get_error_404()
-            x.internal_error = self.get_error_500()
+            x.not_found = self.get_error_404()  # for x.abort()
 
             handler, args = self.get_handler(request.path, request.method)
             if handler:
-                try:
-                    handler(x, *args)
-                except Response.Sent404:
-                    not_found = self.get_error_404()
-                    x.response.code = 404
-                    try:
-                        not_found(x)
-                    except response.Sent:
-                        pass
-                    response = x.response
-                except Response.Sent:
-                    pass
+                # Handler
+                self._handler_call(handler, x, args)
 
-                # save session
-                if x.session != x.session.initial:
-                    cookie = cookie_encode(x.config["session-key"],
-                                           x.session)
-                    x.response.headers["Set-Cookie"] = \
-                        "session=%s; path=/;" % cookie
-
+                x._save_session()
                 request = x.request
                 response = x.response
+                # endfold
             else:
+                # Unhandled alternative URL support
+                # redirect "/path/" -> "/path"
+                if request.path.endswith("/"):
+                    request_path = request.path[:-1]
+                    handler, _ = self.get_handler(request_path, request.method)
+                    if handler:
+                        # redirect to request_path
+                        location = request_path
+                        if request.query:
+                            location += "?%s" % request.query
+
+                        response.headers["Location"] = location
+                        response.code = 301  # permanent
+                        response.body = ""
+
+                        raise self.DoneException
+
+                # redirect "/path"  -> "/path/"
+                if not request.path.endswith("/"):
+                    request_path = request.path + "/"
+                    handler, _ = self.get_handler(request_path, request.method)
+                    if handler:
+                        # redirect to request_path
+                        location = request_path
+                        if request.query:
+                            location += "?%s" % request.query
+
+                        response.headers["Location"] = location
+                        response.code = 301  # permanent
+                        response.body = ""
+
+                        raise self.DoneException
+                # endfold
+
+                # Not found
                 not_found = self.get_error_404()
                 x.response.code = 404
                 try:
@@ -397,48 +470,49 @@ class Application(object):
                 except response.Sent:
                     pass
                 response = x.response
-
+                # endfold
+        except self.DoneException:
+            pass
         except Exception as ex:
+            # Exception
             x = Handler(request, response, self.config)
             x.exception = ex
             x.response.code = 500
 
             # logging to console
-            message = ("Error occured. Params:\n"
+            message = ("Error occured. %s Params:\n"
                        "---------------------------------------------------\n"
                        "%s\n"
                        "===================================================\n")
-            error(message % request.params, exc_info=True)
+            error(message % (x.request.url, str(request.params)[:3000]),
+                  exc_info=True)
 
             internal_error = self.get_error_500()
             try:
                 internal_error(x)
             except response.Sent:
                 pass
-            response = x.response
 
-        # Response headers must be str not unicode
+            request = x.request
+            response = x.response
+            # endfold
+
+        # response headers must be str not unicode
         for k in response.headers:
             response.headers[k] = ensure_ascii(response.headers[k])
-
         start_response(response.status, response.headers.items())
         return [response.body]
-        # threadsafe support needed
-
-    def route(self, route):
-        def func(handler):
-            self.routes.append((route, handler))
-            return handler
-
-        return func
+    # endfold
 
     def get_handler(self, request_path, request_method):
         " Returns (handler, args) or (none, none) "
-        for rule, handler in self.routes:
+        for rule, _, handler in self.routes:
             rule = ensure_unicode(rule)
             rule = rule.replace("<int>", "(int:\d+)")
             rule = rule.replace("<string>", "([^/]+)")
-            for k, v in self.config.get("route-shortcut", {}).items():
+            shortcuts = self.config.get("route-shortcut", {})
+
+            for k, v in sorted(shortcuts.items(), key=lambda x: - len(x[1])):
                 rule = rule.replace(k, v)
 
             " route method. route rule: /path/to#method "
@@ -482,19 +556,12 @@ class Application(object):
 
         return None, None
 
-    def get_before(self, request_path, request_method):
-        for rule, handler in self.routes:
-            if rule == ":before":
-                return handler, tuple([])
-
-        return None, None
-
     def get_error_404(self):
         def _not_found(x):
             x.response.code = 404
             x.response.body = "Error 404"
 
-        for rule, handler in self.routes:
+        for rule, _, handler in self.routes:
             if rule == ":error-404":
                 return handler
 
@@ -507,11 +574,73 @@ class Application(object):
             x.response.headers["Content-Type"] = "text/plain;error"
             x.response.body = "".join(lines)
 
-        for rule, handler in self.routes:
+        for rule, _, handler in self.routes:
             if rule == ":error-500":
                 return handler
 
         return _internal_error
+    # endfold
+
+    def _handler_call(self, handler, x, args):
+        try:
+            handler(x, *args)
+        except x.response.Sent:
+            pass
+        except x.response.Sent404:
+            not_found = self.get_error_404()
+            x.response.code = 404
+            try:
+                not_found(x)
+            except x.response.Sent:
+                pass
+
+    def route(self, route, handler_path=None, order=0):
+        """ Initialize and add route
+
+            Usage 1. Decorator method
+            _________________________
+
+        >>> @route("/")
+        >>> def handler(x):
+        >>>     x.response("Hello")
+
+            Usage 2. Includer method
+            ________________________
+
+        >>> route("/", "path.handler")
+        """
+        # 1. Decorator
+        # `route("/")(handler)` <=> `func(handler)`
+        # need to return `func`
+        if handler_path is None:
+            def func(handler):
+                self.routes += [(route, order, handler)]
+                self.routes = sorted(self.routes)
+
+                return handler
+            return func
+
+        # 2. Includer
+        # `route("/", "path.handler")`
+        controller, name = handler_path.split(".")
+        module = importlib.import_module("controllers.%s" % controller)
+        handler = getattr(module, name)
+
+        self.routes += [(route, order, handler)]
+        self.routes = sorted(self.routes)
+
+        return handler
+        # endfold
+
+    def include(self, controller):
+        """ Usage:
+
+        >>> app.include("general")
+        """
+        __import__("controllers.%s" % controller)
+
+    class DoneException(Exception):
+        pass
 
 
 # Helpers
@@ -549,30 +678,46 @@ def cookie_decode(key, value, max_age=None):
     # Cookie must be formatted in `data|timestamp|signature`
     if not value or value.count("|") != 2:
         return None
+    # endfold
 
     encoded_value, timestamp, signature = value.split("|")
 
-    # Validate signature
+    # Validate: signature
     if signature != cookie_signature(key, encoded_value, timestamp):
         warning("Invalid cookie signature: %r" % value)
         return None
 
-    # Validate session age. Session is expired or not
+    # Validate: session age. Session is expired or not
     now = int(datetime.now().strftime("%s"))
     if max_age is not None and int(timestamp) < now - max_age:
         warning("Expired cookie: %r" % value)
         return None
+    # endfold
 
-    # Decode cookie value
+    # Decode: must be a correct base64
     try:
-        return json.loads(encoded_value.decode("base64"))
-    except Exception:
-        warning("Cookie value not decoded: %r" % encoded_value)
+        json_value = encoded_value.decode("base64")
+    except:
+        warning("Incorrect base64 string: %r" % encoded_value, exc_info=True)
+        return None
+
+    # Decode: must be a correct json
+    try:
+        return json.loads(json_value)
+    except:
+        warning("Incorrect json string: %r" % json_value, exc_info=True)
         return None
 
 
 def cookie_signature(key, value, timestamp):
-    " Generates an HMAC signature "
+    """ Generates an HMAC signature
+
+    key - key string used in cookie signature
+    value - value to be signed
+    timestamp - signature timestamp
+
+    Returns signed string
+    """
     signature = hmac.new(key, digestmod=hashlib.sha1)
     signature.update("%s|%s" % (value, timestamp))
 
@@ -581,7 +726,11 @@ def cookie_signature(key, value, timestamp):
 
 def ensure_unicode(string):
     if isinstance(string, str):
-        string = string.decode("utf-8")
+        try:
+            string = string.decode("utf-8")
+        except UnicodeDecodeError:
+            string = string.decode("unicode-escape")
+
     return string
 
 
@@ -596,14 +745,45 @@ class ModelMixin(object):
     @property
     def id(self):
         return self.key().id()
+    # endfold
+
+    def delete(self, complete=False):
+        super(Model, self).delete()
+
+        if complete is False:
+            return
+
+        while self.__class__.get_by_id(self.id):
+            sleep(0.01)
+
+    def save(self, complete=False):
+        super(ModelMixin, self).save()
+
+        if complete is False:
+            return
+
+        while True:
+            entity = self.__class__.get_by_id(self.id)
+            for field in self.fields().keys():
+                old_value = getattr(self, field)
+                new_value = getattr(entity, field)
+
+                if old_value != new_value:
+                    break  # for loop
+            else:
+                break  # while loop
+
+            # little delay
+            sleep(0.01)
+    # endfold
 
     @classmethod
     def find(cls, *args, **kwargs):
-        q = cls.all()
-        for k, v in kwargs.items():
-            q.filter("%s =" % k, v)
+        query = cls.all()
+        for name, value in kwargs.items():
+            query.filter("%s =" % name, value)
 
-        return q.get()
+        return query.get()
 
     @classmethod
     def find_or_404(cls, *args, **kwargs):
@@ -620,11 +800,11 @@ class ModelMixin(object):
         return entity
 
 
-class Model(db.Model, ModelMixin):
+class Model(ModelMixin, db.Model):
     pass
 
 
-class Expando(db.Model, ModelMixin):
+class Expando(ModelMixin, db.Expando):
     pass
 
 
@@ -640,10 +820,12 @@ class Data(db.Model):
         value = memcache.get(name)
         if value:
             return json.loads(value)
-        c = cls.all().filter("name =", name).get()
-        if c:
-            memcache.set(name, c.value)
-            return json.loads(c.value)
+
+        entity = cls.all().filter("name =", name).get()
+        if entity:
+            memcache.set(name, entity.value)
+            return json.loads(entity.value)
+
         return default
 
     @classmethod
@@ -651,9 +833,9 @@ class Data(db.Model):
         data = json.dumps(value)
         memcache.set(name, data)
 
-        c = cls.all().filter("name =", name).get() or cls(name=name)
-        c.value = data
-        c.save()
+        entity = cls.all().filter("name =", name).get() or cls(name=name)
+        entity.value = data
+        entity.save()
 
     @classmethod
     def erase(cls, name):

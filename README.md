@@ -1,5 +1,5 @@
-[![Build Status](https://img.shields.io/travis/gmunkhbaatarmn/codeforces-mn.svg?style=flat-square)](https://travis-ci.org/gmunkhbaatarmn/codeforces-mn)
-[![Issues](https://img.shields.io/github/issues/gmunkhbaatarmn/codeforces-mn.svg?style=flat-square)](https://github.com/gmunkhbaatarmn/codeforces-mn/issues)
+[![Build][build-img]][build-url]
+[![Issue][issue-img]][issue-url]
 
 Mongolian translation of [codeforces.com](http://www.codeforces.com/).
 Runs live on [codeforces.mn](http://www.codeforces.mn/)
@@ -22,3 +22,9 @@ See [Open Issues](https://github.com/gmunkhbaatarmn/codeforces-mn/issues).
 
 - If you found any problems, please report on issues page.
 - If you made any change, send me pull request.
+
+[build-img]: https://img.shields.io/travis/gmunkhbaatarmn/codeforces-mn.svg
+[build-url]: https://travis-ci.org/gmunkhbaatarmn/codeforces-mn
+
+[issue-img]: https://img.shields.io/github/issues/gmunkhbaatarmn/codeforces-mn.svg
+[issue-url]: https://github.com/gmunkhbaatarmn/codeforces-mn/issues

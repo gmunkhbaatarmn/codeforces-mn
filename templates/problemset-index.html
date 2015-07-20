@@ -9,9 +9,9 @@
   <div class="table-container">
     <table>
       <tr>
-        <th style="width:4em">#</th>
+        <th class="w05">#</th>
         <th class="border-right-none">Бодлогын нэр</th>
-        <th style="width:16em"></th>
+        <th class="w20"></th>
       </tr>
       {% for t in problems %}
         <tr {{- loop.cycle(' class="dark"', "")|safe }}>
@@ -19,17 +19,17 @@
             {# translated #}
             <td class="text-center"><a href="{{ t.link }}">{{ t.code.replace("-", "") }}</a></td>
             <td class="border-right-none"><a href="{{ t.link }}">{{ t.title }}</a></td>
-            <td style="text-align:right; color:#666; font-size:11px">{{ t.credits }}</td>
+            <td class="text-right" style="color:#666; font-size:11px">{{ t.credits }}</td>
           {% elif t.credits == "[орчуулагдаж байгаа]" %}
             {# translating #}
             <td class="text-center"><a href="{{ t.link }}">{{ t.code.replace("-", "") }}</a></td>
             <td class="border-right-none">{{ t.title }}</td>
-            <td style="text-align:right; color:#666; font-size:11px">{{ t.credits }}</td>
+            <td class="text-right" style="color:#666; font-size:11px">{{ t.credits }}</td>
           {% else %}
             {# not yet translated #}
             <td class="text-center"><a href="{{ t.link }}">{{ t.code.replace("-", "") }}</a></td>
             <td class="border-right-none">{{ t.title }}</td>
-            <td style="text-align:right; color:#666; font-size:11px"><a href="{{ t.link }}/edit">Орчуулах</a></td>
+            <td class="text-right" style="color:#666; font-size:11px"><a href="{{ t.link }}/edit">Орчуулах</a></td>
           {% endif %}
         </tr>
       {% endfor %}
@@ -38,8 +38,9 @@
 
   <div class="pagination">
     <ul>
-      {% for p in range(1, int(count_all / 100) + int(count_all % 100 > 0)) %}
-        <li {{- ' class="active"'|safe if int(page) == p }}><a href="/problemset/page/{{ p }}">{{ p }}</a></li>{#
+      {% set pages = (count_all / 100) + (count_all % 100 > 0) %}
+      {% for p in range(1, pages + 1) %}
+        <li {{- ' class="active"'|safe if page == p }}><a href="/problemset/page/{{ p }}">{{ p }}</a></li>{#
       #}{% endfor %}
     </ul>
   </div>

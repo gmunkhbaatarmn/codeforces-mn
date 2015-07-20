@@ -9,6 +9,10 @@ class Suggestion(Model):
     credits = db.StringProperty(default="")
     added = db.DateTimeProperty(auto_now=True)
 
+    @property
+    def problem_link(self):
+        return "/problemset/problem/%s" % self.code.replace("-", "/").strip()
+
 
 class Problem(Model):
     code = db.StringProperty()
