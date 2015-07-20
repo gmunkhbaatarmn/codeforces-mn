@@ -543,8 +543,3 @@ def setup(x):
 
     info("Executed seconds: %.1f" % (time.time() - start_time))
     x.response("Executed seconds: %.1f" % (time.time() - start_time))
-
-
-@route("/humans\.txt")
-def humans_txt(x):
-    x.response(x.render_string("humans.txt"))
