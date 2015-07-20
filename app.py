@@ -3,8 +3,8 @@ import re
 import json
 import time
 import parse
-from datetime import datetime
 from hashlib import md5
+from datetime import datetime
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, taskqueue, memcache
 from parse import codeforces_ratings, topcoder_ratings, date_format, relative
