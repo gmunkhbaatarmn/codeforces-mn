@@ -6,7 +6,7 @@
 
 
 {% block content %}
-  #:1 Suggestions
+  #:1 Орчуулгын саналууд
   <h1 class="table-title">Орчуулгын саналууд ({{ suggestions.count() }})</h1>
 
   <div class="table-container">
@@ -24,7 +24,7 @@
           <td data-sort-value="{{ s.code }}" class="text-center"><a href="/suggestion/{{ s.id }}">{{ s.code }}</a></td>
           <td data-sort-value="{{ s.title }}" class="border-right-none">
             <a href="/suggestion/{{ s.id }}">{{ s.title }}</a>
-            <span style="color:#888">({{ relative(s.added.strftime("%s")) }})</span>
+            <span style="color:#888">({{ s.added|relative }})</span>
           </td>
           <td class="text-right">{{ s.credits }}</td>
         </tr>
@@ -37,28 +37,23 @@
     </table>
   </div>
 
-  #:1 Last updated problems
+  #:1 Сүүлд шинэчлэгдсэн бодлогууд
   <br><br>
   <h1 class="table-title">Сүүлд шинэчлэгдсэн бодлогууд</h1>
 
   <div class="table-container">
     <table>
       <tr>
-        <th class="w03">#</th>
-        <th class="w15 text-left  border-right-none">Бодлогын нэр</th>
-        <th class="w15 text-right border-right-none">Нийтлэгдсэн</th>
-        <th class="w13 text-right">Орчуулсан</th>
+        <th class="w04">#</th>
+        <th class="w55 text-left  border-right-none">Бодлогын нэр</th>
+        <th class="text-right">Орчуулсан</th>
       </tr>
       {% for s in submissions|reverse %}
       <tr {{- ' class="recent"' if (int(now.strftime("%s")) - s.published_at < 3600 * 24) else '' }}>
-        <td class="text-center"><a href="/problemset/problem/{{ s.code.strip().replace("-", "/")}}">{{ s.code.strip() }}</a></td>
+        <td class="text-center"><a href="{{ s.problem_link }}">{{ s.code }}</a></td>
         <td class="border-right-none">
-          <a href="/problemset/problem/{{ s.code.strip().replace("-", "/")}}">{{ s.title }}</a>
-          <span style="border-right:0; text-align:right; color:#888">({{ relative(s.created_at) }})</span>
-        </td>
-        <td>
-          {# s.moderator #}
-          <div style="border-right:0; text-align:right; color:#888">{{ relative(s.published_at) }}</div>
+          <a href="{{ s.problem_link }}">{{ s.title }}</a>
+          <span style="color:#888">({{ s.published_at|relative }})</span>
         </td>
         <td class="text-right">{{ s.credits }}</td>
       </tr>
@@ -77,6 +72,7 @@
       Санал болгосон орчуулгуудыг хянагч шалгаж үзээд нийтлэх буюу татгалзаж болно.
     </div>
   </div>
+
   #:1 Хянагчийн булан
   <div class="box">
     {% if session.moderator %}

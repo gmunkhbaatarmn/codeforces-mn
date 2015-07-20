@@ -311,6 +311,9 @@ def relative(timestamp):
     if not timestamp:
         return "N/A"
 
+    if isinstance(timestamp, datetime.datetime):
+        timestamp = int(timestamp.strftime("%s"))
+
     seconds = int(datetime.datetime.now().strftime("%s")) - int(timestamp)
 
     # Just now

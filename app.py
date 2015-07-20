@@ -186,7 +186,7 @@ def suggestion_index(x):
         x.session.pop("moderator", None)
 
     suggestions = Suggestion.all().order("-added")
-    submissions = data.fetch("submissions", [])
+    submissions = data.fetch("submissions", [])[50:]
     x.render("suggestion-index.html", **locals())
 
 
