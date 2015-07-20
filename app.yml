@@ -6,7 +6,8 @@ api_version: 1
 threadsafe: true
 
 handlers:
-- url: /(favicon\.ico|robots\.txt)
+# todo: renew humans.txt
+- url: /(favicon\.ico|robots\.txt|humans\.txt)
   static_files: static/\1
   upload: static/.*
 
