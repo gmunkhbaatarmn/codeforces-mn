@@ -20,7 +20,7 @@ sys.path.append("./packages")
 info       # for `from natrix import info`
 taskqueue  # for `from natrix import taskqueue`
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 # Core classes
@@ -748,7 +748,7 @@ class ModelMixin(object):
     # endfold
 
     def delete(self, complete=False):
-        super(Model, self).delete()
+        super(ModelMixin, self).delete()
 
         if complete is False:
             return
@@ -765,6 +765,12 @@ class ModelMixin(object):
         while True:
             entity = self.__class__.get_by_id(self.id)
             for field in self.fields().keys():
+                if getattr(self.fields()[field], "auto_now", ""):
+                    continue
+
+                if getattr(self.fields()[field], "auto_now_add", ""):
+                    continue
+
                 old_value = getattr(self, field)
                 new_value = getattr(entity, field)
 
