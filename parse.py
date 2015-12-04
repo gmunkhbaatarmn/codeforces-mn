@@ -121,8 +121,8 @@ def contest_history(page=1):
         assert r.code == 200
         assert r.url == "http://codeforces.com/contests/page/%s" % page
     except (AssertionError, HTTPException):
-        # Reason: Active contest running
-        # Reason: Codeforces is temporary unavailable
+        # reason: Active contest running
+        # reason: Codeforces is temporary unavailable
         return []
 
     tree = lxml.html.fromstring(r.read())
@@ -162,7 +162,7 @@ def codeforces_user(handle):
 
 
 def codeforces_ratings():
-    # - List of Mongolians
+    # List of Mongolians
     info("CodeForces: List of Mongolians")
     try:
         r = url_open("http://codeforces.com/ratings/country/Mongolia")
@@ -251,7 +251,12 @@ def topcoder_ratings():
 # helper functions
 def date_format(date):
     " Sep/07/2014 -> 2014/09/07 "
-    month, day, year = date.split("/")
+    try:
+        month, day, year = date.split("/")
+    except:
+        # todo: seems problem in contest parsing.
+        warning("Invalid date: %r" % date, exc_info=True)
+        return ""
 
     month = {
         "Jan": "01",
@@ -338,7 +343,7 @@ def mock_problem():
     has_credits = random.choice([True, False])
     has_note = random.choice([True, False, False])
 
-    # - lorem paragraphs
+    # Lorem paragraphs
     lorem_paragraphs = [
         ("Lorem ipsum dolor sit amet, usu te atqui persequeris neglegentur,"
          " quaeque tacimates an qui. Ad ipsum comprehensam vis, cum deserunt"
@@ -401,6 +406,7 @@ def mock_problem():
          " molestiae ea vim, adipisci salutatus expetendis cum cu. In movet"
          " denique recusabo duo. Eum atqui labore option at."),
     ]
+    # endfold
 
     content = ""
     for i in range(random.randint(3, 5)):
