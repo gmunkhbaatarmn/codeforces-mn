@@ -1131,6 +1131,12 @@ table th {
   font-weight: bold;
   text-decoration: none;
 }
+.user-cyan,
+.cf-user-cyan {
+  color: #03A89E !important;
+  font-weight: bold;
+  text-decoration: none;
+}
 .user-green,
 .cf-user-green,
 .tc-user-green {
