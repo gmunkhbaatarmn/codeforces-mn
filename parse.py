@@ -202,7 +202,9 @@ def topcoder_user(handle, id):
                     "&c=dd_rating_history&cr=%s" % id).read()
 
     row_list = lxml.etree.fromstring(data).xpath("//dd_rating_history/row")
-
+    # if empty exclude
+    if not row_list:
+        return {"active": False}
     # find most recent round
     recent = max(row_list, key=lambda row: row.find("date").text)
     new_rating = int(recent.find("new_rating").text)
