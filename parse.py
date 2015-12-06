@@ -8,8 +8,74 @@ import random
 import html2text as h2t
 from logging import warning, info
 from httplib import HTTPException
+from google.appengine.api import urlfetch
 from google.appengine.runtime.apiproxy_errors import DeadlineExceededError
 from lxml import etree
+
+class codeforcesAPI:
+    API_URL = "http://codeforces.com/api"
+
+    def contest_problems(self, **kwargs):
+        # Returns all problems of specific contest contest_problems
+        kwargs['from'] = 1
+        kwargs['count'] = 1
+        kwargs['showUnofficial'] = True
+        result = self.__make_request('contest.standings', **kwargs)
+        return result['problems']
+
+    def problemset_problems(self):
+        """ Returns all problems from problemset"""
+        return self.__make_request('problemset.problems')
+
+    def contest_list(self):
+        # Returns all contests
+        return self.__make_request('contest.list')
+
+    def user_rating(self, **kwargs):
+        # Returns ratings change object
+        return self.__make_request('user.rating', **kwargs)
+
+    def codeforces_ratings(self, activeOnly=True, **kwargs):
+        #  Returns all users from mongolia
+        kwargs['activeOnly'] = activeOnly
+        users = self.__make_request('user.ratedList', **kwargs)
+
+        result = []
+
+        for user in users:
+            # If user is from Mongolia
+            if ('country' in user and user['country'] == "Mongolia"):
+                # All participated contests array
+                user['ratings'] = self.user_rating(handle=user['handle'])
+
+                # Check if user participated in some contest
+                # If so populate user with rank change and contest_id
+                ratings_len = len(user['ratings'])
+                if (ratings_len):
+                    Lcont = user['ratings'][ratings_len-1]
+                    user['change'] = Lcont['newRating'] - Lcont['oldRating']
+                    user['contest_id'] = Lcont['contestId']
+                else:
+                    user['change'] = 0
+                    user['contest_id'] = 0
+
+                result.append(user)
+
+        return result
+
+    def __make_url(self, methodName, *args, **kwargs):
+        return self.API_URL + '/' + methodName + \
+            '?' + urllib.urlencode(kwargs.items())
+
+    def __make_request(self, methodName, *args, **kwargs):
+        URL = self.__make_url(methodName, *args, **kwargs)
+        info("Requesting: "+URL)
+        r = urlfetch.fetch(URL, deadline=60)
+        info("Response from: "+URL)
+        result = json.loads(r.content)
+        if (result['status'] == "FAILED"):
+            raise Exception("Request failed")
+        return result['result']
 
 
 # parse from codeforces.com
@@ -133,67 +199,6 @@ def contest_history(page=1):
     start = map(lambda x: x.xpath("./td[2]")[0].text.strip(), rows)
 
     return map(lambda a, b, c: [a] + [b] + [c], index, names, start)
-
-
-# rating update
-def codeforces_user(handle):
-    info("CodeForces: %s" % handle)
-
-    content = url_open("http://codeforces.com/profile/%s" % handle).read()
-    assert "Codeforces is temporary unavailable" not in content
-
-    try:
-        data = content.split("data.push(")[1].split(");")[0]
-    except Exception:
-        warning("codeforces_user(%s): %s" % (handle, content), exc_info=True)
-        raise AssertionError
-
-    log = json.loads(data)[-1]
-    now = int(datetime.datetime.now().strftime("%s"))
-
-    return {
-        "handle": handle,
-        "rating": log[1],
-        "change": log[5],
-        "active": (now < log[0] / 1000 + 180 * 24 * 3600),
-        "contest_at": log[0],
-        "contest_id": log[2],
-    }
-
-
-def codeforces_ratings():
-    # List of Mongolians
-    info("CodeForces: List of Mongolians")
-    try:
-        r = url_open("http://codeforces.com/ratings/country/Mongolia")
-
-        assert r.code == 200
-        assert r.url == "http://codeforces.com/ratings/country/Mongolia"
-    except:
-        warning("CodeForces: list of all mongolia coders", exc_info=True)
-        return
-    # endfold
-
-    tree = lxml.html.document_fromstring(r.read())
-    handles = []
-    for a in tree.xpath("//*[@class='datatable']//table//tr//td[2]/a[2]"):
-        handles.append(a.text.strip())
-
-    # Fetch each user and exclude inactives
-    try:
-        users = [codeforces_user(handle) for handle in handles]
-        users = filter(lambda u: u["active"], users)
-        assert len(users), "Active users must be found"
-    except AssertionError:
-        warning("parse.codeforces_user(%s) failed", exc_info=True)
-        return
-
-    # Mark recent rating updates
-    recent_contest = max(users, key=lambda u: u["contest_at"])["contest_at"]
-    for i in range(len(users)):
-        users[i]["recent"] = (recent_contest == users[i]["contest_at"])
-
-    return sorted(users, key=lambda u: -u["rating"])
 
 
 def topcoder_user(handle, id):

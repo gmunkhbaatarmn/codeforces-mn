@@ -7,7 +7,7 @@ from hashlib import md5
 from datetime import datetime
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, taskqueue, memcache
-from parse import codeforces_ratings, topcoder_ratings, date_format, relative
+from parse import codeforcesAPI, topcoder_ratings, date_format, relative
 from models import Problem, Contest, Suggestion
 
 
@@ -27,6 +27,7 @@ app.config["context"] = lambda x: {
 app.config["route-shortcut"] = {
     "<code>": "(\w+)",
 }
+CF = codeforcesAPI()
 # endfold
 
 
@@ -161,7 +162,7 @@ def ratings_update(x):
 def ratings_update_task(x):
     start = time.time()
 
-    ratings = codeforces_ratings()
+    ratings = CF.codeforces_ratings()
     if ratings:
         data.write("Rating:codeforces", ratings)
 
@@ -497,7 +498,7 @@ def setup(x):
     data.write("moderators", {"123": "Admin"})
 
     # - Ratings
-    data.write("Rating:codeforces", codeforces_ratings())
+    data.write("Rating:codeforces", CF.codeforces_ratings())
     data.write("Rating:topcoder", topcoder_ratings())
     # - Contests
     for page in range(3, 0, -1):
