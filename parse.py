@@ -113,7 +113,7 @@ def problem(code):
     result = {
         # meta fields
         "time": tree.xpath("//div[@class='time-limit']/text()")[0],
-        "memory": tree.xpath("//div[@class='memory-limit']/text()")[0],
+        "memory": tree.xpath("//div[@class='memory-limit']/text()|//div[@class='memory-limit']/span[@class='tex-font-style-bf']/text()")[0],
         "input": tree.xpath("//div[@class='input-file']/text()")[0],
         "output": tree.xpath("//div[@class='output-file']/text()")[0],
         "tests": zip(map(lambda e: sample_test(e), inputs),
