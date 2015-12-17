@@ -25,7 +25,7 @@ class codeforcesAPI:
 
     def problemset_problems(self):
         """ Returns all problems from problemset"""
-        return self.__make_request('problemset.problems')
+        return self.__make_request('problemset.problems')['problems']
 
     def contest_list(self):
         # Returns all contests
