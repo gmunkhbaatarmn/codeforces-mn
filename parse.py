@@ -80,6 +80,7 @@ class codeforcesAPI:
 
 # parse from codeforces.com
 def problem(code):
+
     info("Problem: %s" % code)
     r = url_open("http://codeforces.com/problemset/problem/" +
                  code.strip().replace("-", "/"))
@@ -88,7 +89,7 @@ def problem(code):
     tree = lxml.html.fromstring(source)
 
     if not tree.xpath("//div[@class='problem-statement']"):
-        warning("%s unexpected response:\n%s" % (code, source))
+        warning("%s unexpected response:\n%s" % (code, source.decode('utf-8')))
         return
 
     inputs = tree.xpath("//div[@class='input']/pre")
@@ -256,31 +257,9 @@ def topcoder_ratings():
 
 
 # helper functions
-def date_format(date):
-    " Sep/07/2014 -> 2014/09/07 "
-    try:
-        month, day, year = date.split("/")
-    except:
-        # todo: seems problem in contest parsing.
-        warning("Invalid date: %r" % date, exc_info=True)
-        return ""
-
-    month = {
-        "Jan": "01",
-        "Feb": "02",
-        "Mar": "03",
-        "Apr": "04",
-        "May": "05",
-        "Jun": "06",
-        "Jul": "07",
-        "Aug": "08",
-        "Sep": "09",
-        "Oct": "10",
-        "Nov": "11",
-        "Dec": "12",
-    }[month]
-
-    return "%s/%s/%s" % (year, month, day)
+def date_format(date, format="%Y/%m/%d"):
+    utc_date = datetime.datetime.utcfromtimestamp(int(date))
+    return utc_date.strftime(format)
 
 
 def url_open(url, retry=0):
