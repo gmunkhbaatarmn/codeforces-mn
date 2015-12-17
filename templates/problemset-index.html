@@ -38,7 +38,7 @@
 
   <div class="pagination">
     <ul>
-      {% set pages = int(count_all / 100) + int(count_all % 100 > 0) %}
+      {% set pages = (count_all + 99) // 100 %}
       {% for p in range(1, pages + 1) %}
         <li {{- ' class="active"'|safe if page == p }}><a href="/problemset/page/{{ p }}">{{ p }}</a></li>{#
       #}{% endfor %}
