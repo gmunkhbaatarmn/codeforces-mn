@@ -83,7 +83,7 @@
 {%- macro contest_time(time) -%}
   {% set day = 60 * 60 * 24 %}
   {% if time > 2 * day %}
-    <b>{{ time // day }} өдөрын дараа</b>
+    <b>{{ time // day }} өдөрийн дараа</b>
   {% else %}
     {% set hour = "00" ~ time // 3600 %}
     {% set minute = '00' ~ (time % 3600) // 60 %}
