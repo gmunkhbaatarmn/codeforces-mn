@@ -1,4 +1,4 @@
-{%- from "Macros.html" import user, cf_user, cf_rating, tc_user, tc_rating -%}
+{%- from "Macros.html" import user, cf_user, cf_rating, tc_user, tc_rating, contest_time -%}
 <!DOCTYPE html>
 <html lang="mn">
 <head>
@@ -45,6 +45,24 @@
   {% if sidebar != "no" %}
     <div id="sidebar">
       {% block sidebar %} {% endblock %}
+      #:0 Ойрд болох тэмцээнүүд
+      <div class="box">
+        <h2>Тэмцээнүүд</h2>
+        <div class="text">
+          <table>
+            {% for contest in upcoming_contests %}
+              <tr>
+                <td>
+                  <a href="">{{ contest.name }}</a>
+                  <br/>
+                  {{ contest_time(contest.till_start) }}
+                </td>
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+
       #:1 Plugin суулгана уу
       <div class="box">
         <h2>Plugin суулгана уу</h2>
@@ -161,6 +179,38 @@
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
   <script src="/static/jquery.stupidtable.js"></script>
+  #:1 script countdown timer
+  <script>
+    $(function() {
+      var timer = setInterval(function(){
+        if ($('.countDownTimer').length == 0) {
+          clearInterval(timer);
+          return;
+        }
+        $('.countDownTimer').each(function(){
+          data = $( this ).html().split(':');
+          hour = parseInt(data[0]);
+          minute = parseInt(data[1]);
+          seconds = parseInt(data[2]);
+
+          total_seconds = hour * 3600 + minute * 60 + seconds - 1;
+          new_hour = parseInt( total_seconds / 3600 );
+          new_minute = parseInt( (total_seconds % 3600) / 60 );
+          new_seconds = total_seconds % 60;
+
+          new_time = ("00" + new_hour).slice(-2)
+             + ":" + ("00" + new_minute).slice(-2)
+             + ":" + ("00" + new_seconds).slice(-2);
+          if (new_time == "00:00:00"){
+            $( this ).removeClass("countDownTimer");
+            $( this ).html('Тэмцээн эхэлсэн');
+          } else {
+            $( this ).html(new_time);
+          }
+        });
+      }, 1000);
+    });
+  </script>
   #:1 script: mathjax
   <script>
     $(function() {

@@ -78,3 +78,16 @@
     <a rel="nofollow" href="{{ profile_url }}" class="rating-down text-{{ align }}">{{ change }}</a>
   {% endif %}
 {%- endmacro -%}
+
+#:1 macro contest_time(time)
+{%- macro contest_time(time) -%}
+  {% set day = 60 * 60 * 24 %}
+  {% if time > 2 * day %}
+    <b>{{ time // day }} өдөрын дараа</b>
+  {% else %}
+    {% set hour = "00" ~ time // 3600 %}
+    {% set minute = '00' ~ (time % 3600) // 60 %}
+    {% set seconds = '00' ~ time % 60 %}
+    <b><span class="countDownTimer" contestId='{{ contest_id }}'>{{ hour[-2:] }}:{{ minute[-2:] }}:{{ seconds[-2:] }}</span></b>
+  {% endif %}
+{%- endmacro -%}
