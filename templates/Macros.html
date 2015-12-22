@@ -83,11 +83,11 @@
 {%- macro contest_time(time) -%}
   {% set day = 60 * 60 * 24 %}
   {% if time > 2 * day %}
-    <b>{{ time // day }} өдөрийн дараа</b>
+    {{ time // day }} өдөрийн дараа
   {% else %}
     {% set hour = "00" ~ time // 3600 %}
     {% set minute = '00' ~ (time % 3600) // 60 %}
     {% set seconds = '00' ~ time % 60 %}
-    <b><span class="countDownTimer" contestId='{{ contest_id }}'>{{ hour[-2:] }}:{{ minute[-2:] }}:{{ seconds[-2:] }}</span></b>
+    <span class="countDownTimer" contestId='{{ contest_id }}'>{{ hour[-2:] }}:{{ minute[-2:] }}:{{ seconds[-2:] }}</span>
   {% endif %}
 {%- endmacro -%}
