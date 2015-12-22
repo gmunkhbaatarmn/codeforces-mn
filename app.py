@@ -23,7 +23,9 @@ app.config["context"] = lambda x: {
     "count_all": data.fetch("count_all"),
     "count_done": data.fetch("count_done"),
     "relative": relative,
-    "upcoming_contests": Contest.all().filter('start >', str(time.time())).order('-start'),
+    "upcoming_contests": Contest.all().filter(
+        'start >', str(time.time())
+    ).order('start')
 }
 app.config["route-shortcut"] = {
     "<code>": "(\w+)",
