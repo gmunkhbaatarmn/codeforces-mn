@@ -258,8 +258,10 @@ def topcoder_ratings():
 
 # helper functions
 def date_format(date, format="%Y/%m/%d"):
-    utc_date = datetime.datetime.utcfromtimestamp(int(date))
-    return utc_date.strftime(format)
+    if date.isdigit():
+        utc_date = datetime.datetime.utcfromtimestamp(int(date))
+        return utc_date.strftime(format)
+    return date
 
 
 def url_open(url, retry=0):
