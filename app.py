@@ -7,7 +7,7 @@ from hashlib import md5
 from datetime import datetime
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, taskqueue, memcache
-from parse import codeforces_ratings, topcoder_ratings, date_format, relative
+from parse import codeforcesAPI, topcoder_ratings, date_format, relative
 from models import Problem, Contest, Suggestion
 
 
@@ -23,10 +23,14 @@ app.config["context"] = lambda x: {
     "count_all": data.fetch("count_all"),
     "count_done": data.fetch("count_done"),
     "relative": relative,
+    "upcoming_contests": Contest.all().filter(
+        'start >', str(time.time())
+    ).order('start')
 }
 app.config["route-shortcut"] = {
     "<code>": "(\w+)",
 }
+CF = codeforcesAPI()
 # endfold
 
 
@@ -161,7 +165,7 @@ def ratings_update(x):
 def ratings_update_task(x):
     start = time.time()
 
-    ratings = codeforces_ratings()
+    ratings = CF.codeforces_ratings()
     if ratings:
         data.write("Rating:codeforces", ratings)
 
@@ -406,25 +410,22 @@ def extension_problem(x, contest_id, index):
 @route("/update")
 def update(x):
     " new contests, new problems "
-
-    # Check problemset first page
+    start_time = time.time()
+    # Check for new problems
     new_problems = 0
-    for code, title in parse.problemset(1):
-        if not re.search("^\d+[A-Z]$", code):
-            info("SKIPPED: %s" % code)
-            continue
-        code = "%3s-%s" % (code[:-1], code[-1])
+    all_problems = CF.problemset_problems()
+    for problem in all_problems:
+        code = "%s-%s" % (str(problem['contestId']), problem['index'])
+        info(code)
         if code in ["524-A", "524-B"]:
             info("SKIPPED: %s" % code)
             continue
 
         p = Problem.find(code=code) or Problem(code=code)
-        p.title = p.title or title
         if p.content:
             continue
 
         # new problem found
-        new_problems += 1
         meta = parse.problem(p.code)
         if not meta:
             warning("Problem (%s) parsing failed" % p.code)
@@ -437,28 +438,35 @@ def update(x):
             warning("Duplicated problem. %s is copy of %s" % (p.code, f.code))
             continue
 
+        p.title = problem['name']
         p.content = meta.pop("content")
         p.note = meta.pop("note")
         p.meta_json = json.dumps(meta)
         p.identifier = md5(json.dumps(meta["tests"])).hexdigest()
         p.save()
+        new_problems+=1
 
-    # Check contests first page
-    for id, name, start in parse.contest_history(1):
+    # Check for new contest
+    for contest in CF.contest_list():
         # read only contest
-        if id in [419]:
+        if contest['id'] in [419]:
             continue
 
-        c = Contest.find(id=int(id)) or Contest(id=int(id))
-        if c.name:
+        c = Contest.find(id=int(contest['id'])) or Contest(id=int(contest['id']))
+        if c.problems:
             continue
 
-        info("new contest found: %s" % id)
-        c.name = name
-        c.start = start
+        info("new contest found: %s" % contest['id'])
+        c.name = contest['name']
+        c.start = str(contest['startTimeSeconds'])
+
+        if contest['startTimeSeconds'] >= start_time:
+            info('Contest %s: Not started' % (str(contest['id'])))
+            c.save()
+            continue
         problems = {}
-        for letter, _ in parse.contest(c.id)["problems"]:
-            code = "%3s-%s" % (c.id, letter)
+        for problem in CF.contest_problems(contestId=contest['id']):
+            code = "%3s-%s" % (problem['contestId'], problem['index'])
             if code in ["524-A", "524-B"]:
                 info("SKIPPED: %s" % code)
                 continue
@@ -473,7 +481,7 @@ def update(x):
             if not p:
                 warning("Problem not found: %s" % code)
                 continue
-            problems[letter] = p.code
+            problems[problem['index']] = p.code
         c.problems_json = json.dumps(problems)
         c.save()
 
@@ -497,7 +505,7 @@ def setup(x):
     data.write("moderators", {"123": "Admin"})
 
     # - Ratings
-    data.write("Rating:codeforces", codeforces_ratings())
+    data.write("Rating:codeforces", CF.codeforces_ratings())
     data.write("Rating:topcoder", topcoder_ratings())
     # - Contests
     for page in range(3, 0, -1):
@@ -507,7 +515,6 @@ def setup(x):
             c.name = name
             c.start = start
             c.save()
-    # - Problemset
     for page in range(3, 0, -1):
         info("Problemset page: %s" % page)
         datas = parse.problemset(page)

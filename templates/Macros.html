@@ -17,14 +17,16 @@
 
 #:1 macro cf_user(handle, rating)
 {%- macro cf_user(handle, rating) -%}
-  {%   if rating >= 2200 %}
+  {%   if rating >= 2400 %}
     {% set color = "red" %}
-  {% elif rating >= 1900 %}
+  {% elif rating >= 2200 %}
     {% set color = "orange" %}
-  {% elif rating >= 1700 %}
+  {% elif rating >= 1900 %}
     {% set color = "purple" %}
-  {% elif rating >= 1500 %}
+  {% elif rating >= 1600 %}
     {% set color = "blue" %}
+  {% elif rating >= 1400 %}
+    {% set color = "cyan" %}
   {% elif rating >= 1200 %}
     {% set color = "green" %}
   {% else %}
@@ -74,5 +76,18 @@
     <a rel="nofollow" href="{{ profile_url }}" class="rating-up text-{{ align }}">+{{ change }}</a>
   {% else %}
     <a rel="nofollow" href="{{ profile_url }}" class="rating-down text-{{ align }}">{{ change }}</a>
+  {% endif %}
+{%- endmacro -%}
+
+#:1 macro contest_time(time)
+{%- macro contest_time(time) -%}
+  {% set day = 60 * 60 * 24 %}
+  {% if time > 2 * day %}
+    {{ time // day }} өдрийн дараа
+  {% else %}
+    {% set hour = "00" ~ time // 3600 %}
+    {% set minute = '00' ~ (time % 3600) // 60 %}
+    {% set seconds = '00' ~ time % 60 %}
+    <span class="countDownTimer" contestId='{{ contest_id }}'>{{ hour[-2:] }}:{{ minute[-2:] }}:{{ seconds[-2:] }}</span>
   {% endif %}
 {%- endmacro -%}

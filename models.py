@@ -1,3 +1,4 @@
+import time
 from natrix import Model, db, json, warning
 
 
@@ -49,6 +50,11 @@ class Contest(Model):
     start = db.StringProperty()
     problems_json = db.StringProperty()
     translated_count = db.IntegerProperty(default=0)
+
+    @property
+    def till_start(self):
+        now = time.time()
+        return int(int(self.start) - now)
 
     @property
     def problems(self):
