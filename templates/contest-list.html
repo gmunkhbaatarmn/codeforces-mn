@@ -15,6 +15,9 @@
         <th style="width:9em"></th>
       </tr>
       {% for c in contests %}
+        {% if c.problems|length == 0 %}
+          {% continue %}
+        {% endif %}
         <tr {{- loop.cycle(' class="dark"', "")|safe }}>
           <td class="text-center"><a href="/contest/{{ c.id }}">{{ c.name }}</a></td>
           <td class="text-center">{{ date_format(c.start) }}</td>
