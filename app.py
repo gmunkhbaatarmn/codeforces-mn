@@ -23,9 +23,7 @@ app.config["context"] = lambda x: {
     "count_all": data.fetch("count_all"),
     "count_done": data.fetch("count_done"),
     "relative": relative,
-    "upcoming_contests": Contest.all().filter(
-        'start >', str(time.time())
-    ).order('start')
+    "upcoming_contests": [],  # Contest.all().filter('start >', str(time.time())).order('start')
 }
 app.config["route-shortcut"] = {
     "<code>": "(\w+)",
@@ -410,6 +408,11 @@ def extension_problem(x, contest_id, index):
 @route("/update")
 def update(x):
     " new contests, new problems "
+    taskqueue.add(url="/update")
+
+
+@route("/update#post")
+def update_post(x):
     start_time = time.time()
     # Check for new problems
     new_problems = 0
@@ -493,6 +496,7 @@ def update(x):
         data.write("count_all", data.fetch("count_all") + new_problems)
     # endfold
 
+    info("OK")
     x.response("OK")
 
 
