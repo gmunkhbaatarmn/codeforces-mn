@@ -53,6 +53,7 @@ class Contest(Model):
 
     @property
     def till_start(self):
+        return -1
         now = time.time()
         return int(int(self.start) - now)
 
