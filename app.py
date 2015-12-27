@@ -418,7 +418,7 @@ def update_post(x):
     new_problems = 0
     all_problems = CF.problemset_problems()
     for problem in all_problems:
-        code = "%s-%s" % (str(problem['contestId']), problem['index'])
+        code = "%s-%s" % (str(problem["contestId"]), problem["index"])
         info(code)
         if code in ["524-A", "524-B"]:
             info("SKIPPED: %s" % code)
@@ -441,7 +441,7 @@ def update_post(x):
             warning("Duplicated problem. %s is copy of %s" % (p.code, f.code))
             continue
 
-        p.title = problem['name']
+        p.title = problem["name"]
         p.content = meta.pop("content")
         p.note = meta.pop("note")
         p.meta_json = json.dumps(meta)
@@ -452,24 +452,24 @@ def update_post(x):
     # Check for new contest
     for contest in CF.contest_list():
         # read only contest
-        if contest['id'] in [419]:
+        if contest["id"] in [419]:
             continue
 
-        c = Contest.find(id=int(contest['id'])) or Contest(id=int(contest['id']))
+        c = Contest.find(id=int(contest["id"])) or Contest(id=int(contest["id"]))
         if c.problems:
             continue
 
-        info("new contest found: %s" % contest['id'])
-        c.name = contest['name']
-        c.start = str(contest['startTimeSeconds'])
+        info("new contest found: %s" % contest["id"])
+        c.name = contest["name"]
+        c.start = str(contest["startTimeSeconds"])
 
-        if contest['startTimeSeconds'] >= start_time:
-            info('Contest %s: Not started' % (str(contest['id'])))
+        if contest["startTimeSeconds"] >= start_time:
+            info("Contest %s: Not started" % (str(contest["id"])))
             c.save()
             continue
         problems = {}
-        for problem in CF.contest_problems(contestId=contest['id']):
-            code = "%3s-%s" % (problem['contestId'], problem['index'])
+        for problem in CF.contest_problems(contestId=contest["id"]):
+            code = "%3s-%s" % (problem["contestId"], problem["index"])
             if code in ["524-A", "524-B"]:
                 info("SKIPPED: %s" % code)
                 continue
@@ -484,7 +484,7 @@ def update_post(x):
             if not p:
                 warning("Problem not found: %s" % code)
                 continue
-            problems[problem['index']] = p.code
+            problems[problem["index"]] = p.code
         c.problems_json = json.dumps(problems)
         c.save()
 

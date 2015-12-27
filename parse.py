@@ -17,55 +17,55 @@ class codeforcesAPI:
 
     def contest_problems(self, **kwargs):
         # Returns all problems of specific contest contest_problems
-        kwargs['from'] = 1
-        kwargs['count'] = 1
-        kwargs['showUnofficial'] = True
-        result = self.__make_request('contest.standings', **kwargs)
-        return result['problems']
+        kwargs["from"] = 1
+        kwargs["count"] = 1
+        kwargs["showUnofficial"] = True
+        result = self.__make_request("contest.standings", **kwargs)
+        return result["problems"]
 
     def problemset_problems(self):
         """ Returns all problems from problemset"""
-        return self.__make_request('problemset.problems')['problems']
+        return self.__make_request("problemset.problems")["problems"]
 
     def contest_list(self):
         # Returns all contests
-        return self.__make_request('contest.list')
+        return self.__make_request("contest.list")
 
     def user_rating(self, **kwargs):
         # Returns ratings change object
-        return self.__make_request('user.rating', **kwargs)
+        return self.__make_request("user.rating", **kwargs)
 
     def codeforces_ratings(self, activeOnly=True, **kwargs):
         #  Returns all users from mongolia
-        kwargs['activeOnly'] = activeOnly
-        users = self.__make_request('user.ratedList', **kwargs)
+        kwargs["activeOnly"] = activeOnly
+        users = self.__make_request("user.ratedList", **kwargs)
 
         result = []
 
         for user in users:
             # If user is from Mongolia
-            if ('country' in user and user['country'] == "Mongolia"):
+            if ("country" in user and user["country"] == "Mongolia"):
                 # All participated contests array
-                user['ratings'] = self.user_rating(handle=user['handle'])
+                user["ratings"] = self.user_rating(handle=user["handle"])
 
                 # Check if user participated in some contest
                 # If so populate user with rank change and contest_id
-                ratings_len = len(user['ratings'])
+                ratings_len = len(user["ratings"])
                 if (ratings_len):
-                    Lcont = user['ratings'][ratings_len-1]
-                    user['change'] = Lcont['newRating'] - Lcont['oldRating']
-                    user['contest_id'] = Lcont['contestId']
+                    Lcont = user["ratings"][ratings_len-1]
+                    user["change"] = Lcont["newRating"] - Lcont["oldRating"]
+                    user["contest_id"] = Lcont["contestId"]
                 else:
-                    user['change'] = 0
-                    user['contest_id'] = 0
+                    user["change"] = 0
+                    user["contest_id"] = 0
 
                 result.append(user)
 
         return result
 
     def __make_url(self, methodName, *args, **kwargs):
-        return self.API_URL + '/' + methodName + \
-            '?' + urllib.urlencode(kwargs.items())
+        return self.API_URL + "/" + methodName + \
+            "?" + urllib.urlencode(kwargs.items())
 
     def __make_request(self, methodName, *args, **kwargs):
         URL = self.__make_url(methodName, *args, **kwargs)
@@ -73,9 +73,9 @@ class codeforcesAPI:
         r = urlfetch.fetch(URL, deadline=60)
         info("Response from: "+URL)
         result = json.loads(r.content)
-        if (result['status'] == "FAILED"):
+        if (result["status"] == "FAILED"):
             raise Exception("Request failed")
-        return result['result']
+        return result["result"]
 
 
 # parse from codeforces.com
@@ -89,7 +89,7 @@ def problem(code):
     tree = lxml.html.fromstring(source)
 
     if not tree.xpath("//div[@class='problem-statement']"):
-        warning("%s unexpected response:\n%s" % (code, source.decode('utf-8')))
+        warning("%s unexpected response:\n%s" % (code, source.decode("utf-8")))
         return
 
     inputs = tree.xpath("//div[@class='input']/pre")
