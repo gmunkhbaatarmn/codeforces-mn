@@ -25,11 +25,11 @@ class codeforcesAPI:
 
     def problemset_problems(self):
         """ Returns all problems from problemset"""
-        return self.__make_request("problemset.problems")["problems"]
+        return self.__make_request("problemset.problems", deadline=60)["problems"]
 
     def contest_list(self):
         # Returns all contests
-        return self.__make_request("contest.list")
+        return self.__make_request("contest.list", deadline=60)
 
     def user_rating(self, **kwargs):
         # Returns ratings change object
@@ -38,7 +38,7 @@ class codeforcesAPI:
     def codeforces_ratings(self, activeOnly=True, **kwargs):
         #  Returns all users from mongolia
         kwargs["activeOnly"] = activeOnly
-        users = self.__make_request("user.ratedList", **kwargs)
+        users = self.__make_request("user.ratedList", deadline=180, **kwargs)
 
         result = []
 
@@ -67,10 +67,10 @@ class codeforcesAPI:
         return self.API_URL + "/" + methodName + \
             "?" + urllib.urlencode(kwargs.items())
 
-    def __make_request(self, methodName, *args, **kwargs):
+    def __make_request(self, methodName, deadline=None, *args, **kwargs):
         URL = self.__make_url(methodName, *args, **kwargs)
         info("Requesting: "+URL)
-        r = urlfetch.fetch(URL, deadline=60)
+        r = urlfetch.fetch(URL, deadline=deadline)
         info("Response from: "+URL)
         result = json.loads(r.content)
         if (result["status"] == "FAILED"):
