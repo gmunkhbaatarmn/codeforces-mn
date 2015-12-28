@@ -1,5 +1,6 @@
 # coding: utf-8
 import re
+import time
 import json
 import urllib
 import datetime
@@ -35,29 +36,41 @@ class codeforcesAPI:
         # Returns ratings change object
         return self.__make_request("user.rating", **kwargs)
 
-    def codeforces_ratings(self, activeOnly=True, **kwargs):
+    def codeforces_ratings(self, **kwargs):
         #  Returns all users from mongolia
-        kwargs["activeOnly"] = activeOnly
         users = self.__make_request("user.ratedList", deadline=180, **kwargs)
 
         result = []
-
+        now = time.time()
+        six_month = 6 * 30 * 24 * 60 * 60
         for user in users:
             # If user is from Mongolia
             if ("country" in user and user["country"] == "Mongolia"):
                 # All participated contests array
-                user["ratings"] = self.user_rating(handle=user["handle"])
-
-                # Check if user participated in some contest
-                # If so populate user with rank change and contest_id
-                ratings_len = len(user["ratings"])
-                if (ratings_len):
-                    Lcont = user["ratings"][ratings_len-1]
-                    user["change"] = Lcont["newRating"] - Lcont["oldRating"]
-                    user["contest_id"] = Lcont["contestId"]
+                for i in range(3):
+                    try:
+                        ratings = self.user_rating(handle=user["handle"])
+                        break
+                    except DeadlineExceededError, e:
+                        warning("Failed fetching ratings of user: %s" % user["handle"])
                 else:
-                    user["change"] = 0
-                    user["contest_id"] = 0
+                    warning("Skipping user: %s (Deadline Exceeded)" % user["handle"])
+
+                # Skip if not competed in contest
+                if not ratings:
+                    info("Skipping user: %s (Not competed in contest)" % user["handle"])
+                    continue
+
+                # Skip if not active in last 180 day
+                last_contest = ratings[-1]
+                diff = now - last_contest["ratingUpdateTimeSeconds"]
+                if diff > six_month:
+                    info("Skipping user: %s (Not active last 180 days)" % user["handle"])
+                    continue
+
+                # Populate with change and contest_id from last_contest
+                user["change"] = last_contest["newRating"] - last_contest["oldRating"]
+                user["contest_id"] = last_contest["contestId"]
 
                 result.append(user)
 
