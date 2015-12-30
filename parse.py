@@ -13,7 +13,7 @@ from google.appengine.api import urlfetch
 from google.appengine.runtime.apiproxy_errors import DeadlineExceededError
 from lxml import etree
 
-class codeforcesAPI:
+class codeforcesAPI(object):
     API_URL = "http://codeforces.com/api"
 
     def contest_problems(self, **kwargs):
