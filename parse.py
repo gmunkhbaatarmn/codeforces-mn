@@ -17,29 +17,29 @@ from lxml import etree
 class codeforcesAPI(object):
     API_URL = "http://codeforces.com/api"
 
+    # Returns all problems of specific contest contest_problems
     def contest_problems(self, **kwargs):
-        # Returns all problems of specific contest contest_problems
         kwargs["from"] = 1
         kwargs["count"] = 1
         kwargs["showUnofficial"] = True
         result = self.__make_request("contest.standings", **kwargs)
         return result["problems"]
 
+    # Returns all problems from problemset
     def problemset_problems(self):
-        """ Returns all problems from problemset"""
         result = self.__make_request("problemset.problems", deadline=60)
         return result["problems"]
 
+    # Returns all contests
     def contest_list(self):
-        # Returns all contests
         return self.__make_request("contest.list", deadline=60)
 
+    # Returns ratings change object
     def user_rating(self, **kwargs):
-        # Returns ratings change object
         return self.__make_request("user.rating", **kwargs)
 
+    #  Returns all users from mongolia
     def codeforces_ratings(self, **kwargs):
-        #  Returns all users from mongolia
         users = self.__make_request("user.ratedList", deadline=180, **kwargs)
 
         result = []
@@ -78,12 +78,12 @@ class codeforcesAPI(object):
 
         return result
 
-    def __make_url(self, methodName, *args, **kwargs):
+    def __make_url(self, methodName, **kwargs):
         return self.API_URL + "/" + methodName + \
             "?" + urllib.urlencode(kwargs.items())
 
-    def __make_request(self, methodName, deadline=None, *args, **kwargs):
-        URL = self.__make_url(methodName, *args, **kwargs)
+    def __make_request(self, methodName, deadline=None, **kwargs):
+        URL = self.__make_url(methodName, **kwargs)
         info("Requesting: "+URL)
         r = urlfetch.fetch(URL, deadline=deadline)
         info("Response from: "+URL)
