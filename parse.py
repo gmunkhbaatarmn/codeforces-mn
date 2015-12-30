@@ -13,6 +13,7 @@ from google.appengine.api import urlfetch
 from google.appengine.runtime.apiproxy_errors import DeadlineExceededError
 from lxml import etree
 
+
 class codeforcesAPI(object):
     API_URL = "http://codeforces.com/api"
 
@@ -26,7 +27,8 @@ class codeforcesAPI(object):
 
     def problemset_problems(self):
         """ Returns all problems from problemset"""
-        return self.__make_request("problemset.problems", deadline=60)["problems"]
+        result = self.__make_request("problemset.problems", deadline=60)
+        return result["problems"]
 
     def contest_list(self):
         # Returns all contests
@@ -51,21 +53,21 @@ class codeforcesAPI(object):
                     try:
                         ratings = self.user_rating(handle=user["handle"])
                         break
-                    except DeadlineExceededError, e:
-                        warning("Failed fetching ratings of user: %s" % user["handle"])
+                    except DeadlineExceededError:
+                        warning("Failed fetching user: %s" % user["handle"])
                 else:
-                    warning("Skipping user: %s (Deadline Exceeded)" % user["handle"])
+                    warning("Skipping user: %s ( Timeout )" % user["handle"])
 
                 # Skip if not competed in contest
                 if not ratings:
-                    info("Skipping user: %s (Not competed in contest)" % user["handle"])
+                    info("Skipping user: %s ( Not ranked )" % user["handle"])
                     continue
 
                 # Skip if not active in last 180 day
                 last_contest = ratings[-1]
                 diff = now - last_contest["ratingUpdateTimeSeconds"]
                 if diff > six_month:
-                    info("Skipping user: %s (Not active last 180 days)" % user["handle"])
+                    info("Skipping user: %s ( Not active )" % user["handle"])
                     continue
 
                 # Populate with change and contest_id from last_contest
