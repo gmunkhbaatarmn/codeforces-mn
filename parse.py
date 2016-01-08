@@ -155,28 +155,6 @@ def html(e):
     return etree.tostring(e).split(">", 1)[1].rsplit("</", 1)[0]
 
 
-def contest(id):
-    " Returns contest dict by contest id. {name, problems} "
-    r = url_open("http://codeforces.com/contest/%s" % id)
-
-    try:
-        assert r.code == 200
-        assert r.url == "http://codeforces.com/contest/%s" % id
-    except AssertionError:
-        warning("Contest %s not reachable" % id)
-        return
-
-    re_name = "<title>Dashboard - (.+) - Codeforces</title>"
-    re_problem = '<option value="(\w+)" >\w+ - (.+)</option>'
-
-    data = r.read()
-
-    return {
-        "name": re.search(re_name, data).group(1),
-        "problems": re.findall(re_problem, data),
-    }
-
-
 def problemset(page=1):
     " Returns list of problems. Example item: (001-A, Theatre Square) "
     try:
