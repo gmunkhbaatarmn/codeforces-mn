@@ -2,7 +2,14 @@ import nose
 import parse as _
 from nose.tools import eq_ as eq
 from nose.plugins.attrib import attr
+from google.appengine.api import urlfetch_stub
+from google.appengine.api import apiproxy_stub_map
 
+# Must have config if calling urlfetch outside dev_appserver
+apiproxy_stub_map.apiproxy = apiproxy_stub_map.APIProxyStubMap()
+apiproxy_stub_map.apiproxy.RegisterStub('urlfetch',
+urlfetch_stub.URLFetchServiceStub())
+# End of config
 
 def test_contest():
     pass
