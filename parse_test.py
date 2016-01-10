@@ -1,22 +1,29 @@
 import nose
 import parse as _
 from nose.tools import eq_ as eq
+from nose.tools import ok_ as ok
 from nose.plugins.attrib import attr
 from google.appengine.api import urlfetch_stub
 from google.appengine.api import apiproxy_stub_map
 
+cf = _.codeforcesAPI()
 # Must have config if calling urlfetch outside dev_appserver
 apiproxy_stub_map.apiproxy = apiproxy_stub_map.APIProxyStubMap()
 apiproxy_stub_map.apiproxy.RegisterStub('urlfetch',
-urlfetch_stub.URLFetchServiceStub())
+                                        urlfetch_stub.URLFetchServiceStub())
 # End of config
 
 def test_contest():
-    pass
+    contests = cf.contest_list()
+    ok(all(['id' in c for c in contests]))
+    ok(all(['name' in c for c in contests]))
+    ok(all(['startTimeSeconds' in c for c in contests]))
 
 def test_problemset():
-    eq(_.problemset(23)[-1], ["1A", "Theatre Square"])
-
+    problems = cf.problemset_problems()
+    ok([all(['index' in p for p in problems])])
+    ok([all(['name' in p for p in problems])])
+    ok([all(['contestId' in p for p in problems])])
 
 def test_problem():
     p = _.problem("10-A")
@@ -28,7 +35,6 @@ def test_problem():
     eq(p["tests"][1], ("2 8 4 2 5 10\n20 30\n50 100\n", "570"))
 
 
-@attr("focus")
 def test_problem_sample_test():
     " Parse sample test "
     import cgi
@@ -56,7 +62,6 @@ if __name__ == "__main__":
         "--stop",         # stop on first fail
         "--nocapture",    # `print` immediately. (useful for debugging)
         "--quiet",        # disable dotted progress indicator
-        "--attr=focus",   # run focused tests
     ]
 
     nose.main(argv=argv)
