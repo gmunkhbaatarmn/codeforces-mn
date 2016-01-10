@@ -84,10 +84,10 @@ class codeforcesAPI(object):
 
     def __make_request(self, methodName, deadline=None, **kwargs):
         URL = self.__make_url(methodName, **kwargs)
-        info("Requesting: "+URL)
+
         r = urlfetch.fetch(URL, deadline=deadline)
-        info("Response from: "+URL)
         result = json.loads(r.content)
+
         if (result["status"] == "FAILED"):
             raise Exception("Request failed")
         return result["result"]
