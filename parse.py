@@ -85,6 +85,7 @@ class codeforcesAPI(object):
     def __make_request(self, methodName, deadline=None, **kwargs):
         URL = self.__make_url(methodName, **kwargs)
 
+        info("Request : " + URL)
         r = urlfetch.fetch(URL, deadline=deadline)
         result = json.loads(r.content)
 
@@ -153,25 +154,6 @@ def sample_test(e):
 def html(e):
     " inner html "
     return etree.tostring(e).split(">", 1)[1].rsplit("</", 1)[0]
-
-
-def problemset(page=1):
-    " Returns list of problems. Example item: (001-A, Theatre Square) "
-    try:
-        r = url_open("http://codeforces.com/problemset/page/%s" % page)
-        assert r.code == 200
-        assert r.url == "http://codeforces.com/problemset/page/%s" % page
-    except (AssertionError, HTTPException):
-        warning("Problemset page %s not reachable" % page, exc_info=True)
-        return []
-
-    tree = lxml.html.fromstring(r.read())
-    rows = tree.xpath("//table[@class='problems']/tr")[1:]
-
-    codes = map(lambda x: x.xpath("./td[1]/a")[0].text.strip(), rows)
-    names = map(lambda x: x.xpath("./td[2]/div[1]/a")[0].text.strip(), rows)
-
-    return map(lambda a, b: [a] + [b], codes, names)
 
 
 def contest_history(page=1):

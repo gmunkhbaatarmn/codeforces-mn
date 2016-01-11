@@ -415,7 +415,6 @@ def update(x):
 def update_post(x):
     start_time = time.time()
     # Check for new problems
-    new_problems = 0
     all_problems = CF.problemset_problems()
     for problem in all_problems:
         code = "%s-%s" % (str(problem["contestId"]), problem["index"])
@@ -447,7 +446,6 @@ def update_post(x):
         p.meta_json = json.dumps(meta)
         p.identifier = md5(json.dumps(meta["tests"])).hexdigest()
         p.save()
-        new_problems+=1
 
     # Check for new contest
     for contest in CF.contest_list():
@@ -492,8 +490,7 @@ def update_post(x):
         data.write("count:contest-all", Contest.all().count())
 
     # Update problems count
-    if new_problems > 0:
-        data.write("count_all", data.fetch("count_all") + new_problems)
+    data.write("count_all", Problem.all().count())
     # endfold
 
     info("OK")
@@ -502,55 +499,5 @@ def update_post(x):
 
 @route("/setup")
 def setup(x):
-    if "localhost" not in x.request.host:
-        x.response("Deny: Only for development")
-
-    start_time = time.time()
-    data.write("moderators", {"123": "Admin"})
-
-    # - Ratings
-    data.write("Rating:codeforces", CF.codeforces_ratings())
-    data.write("Rating:topcoder", topcoder_ratings())
-    # - Contests
-    for page in range(3, 0, -1):
-        info("Contests page: %s" % page)
-        for id, name, start in parse.contest_history(page):
-            c = Contest.find(id=id) or Contest(id=id)
-            c.name = name
-            c.start = start
-            c.save()
-    for page in range(3, 0, -1):
-        info("Problemset page: %s" % page)
-        datas = parse.problemset(page)
-
-        for code, title in datas:
-            if not re.search("^\d+[A-Z]$", code):
-                warning("SKIPPED: %s" % code)
-                continue
-
-            code = "%3s-%s" % (code[:-1], code[-1])
-
-            p = Problem.find(code=code) or Problem(code=code)
-            p.title = title
-            # fill with fake data
-            p.content, p.note, p.credits, p.meta_json = parse.mock_problem()
-            p.save()
-    # - Contribution point from datastore
-    contribution = {}
-    for p in Problem.all().filter("credits !=", ""):
-        translators = p.credits.split(", ")
-        for t in translators:
-            point = (p.meta.get("credit_point") or 1.0) / len(translators)
-            contribution[t] = contribution.get(t, 0.0) + point
-    contribution = sorted(contribution.items(), key=lambda t: -t[1])
-    data.write("Rating:contribution", contribution)
-
-    # count query
-    count_all = Problem.all().count(3000)
-    count_done = Problem.all().filter("credits >", "").count(3000)
-    data.write("count_all", count_all)
-    data.write("count_done", count_done)
-    # endfold
-
-    info("Executed seconds: %.1f" % (time.time() - start_time))
-    x.response("Executed seconds: %.1f" % (time.time() - start_time))
+    taskqueue.add(url="/ratings/update")
+    taskqueue.add(url="/update")
