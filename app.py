@@ -23,7 +23,8 @@ app.config["context"] = lambda x: {
     "count_all": data.fetch("count_all"),
     "count_done": data.fetch("count_done"),
     "relative": relative,
-    "upcoming_contests": [],  # Contest.all().filter('start >', str(time.time())).order('start')
+    "upcoming_contests": data.fetch("upcoming_contests", []),
+    "now": int(time.time()),
 }
 app.config["route-shortcut"] = {
     "<code>": "(\w+)",
@@ -492,6 +493,15 @@ def update_post(x):
     # Update problems count
     data.write("count_all", Problem.all().count())
     # endfold
+
+    # Update upcoming contest
+    cq = Contest.all().filter('start >', str(time.time())).order('start')
+    upcoming_contests = [{
+        'id': c.id,
+        'name': c.name,
+        'start': int(c.start)
+    } for c in cq]
+    data.write("upcoming_contests", upcoming_contests)
 
     info("OK")
     x.response("OK")
