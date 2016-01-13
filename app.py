@@ -23,7 +23,8 @@ app.config["context"] = lambda x: {
     "count_all": data.fetch("count_all"),
     "count_done": data.fetch("count_done"),
     "relative": relative,
-    "upcoming_contests": [],  # Contest.all().filter('start >', str(time.time())).order('start')
+    "upcoming_contests": data.fetch("upcoming_contests", []),
+    "now": int(time.time()),
 }
 app.config["route-shortcut"] = {
     "<code>": "(\w+)",
@@ -415,10 +416,9 @@ def update(x):
 def update_post(x):
     start_time = time.time()
     # Check for new problems
-    new_problems = 0
     all_problems = CF.problemset_problems()
     for problem in all_problems:
-        code = "%s-%s" % (str(problem['contestId']), problem['index'])
+        code = "%s-%s" % (str(problem["contestId"]), problem["index"])
         info(code)
         if code in ["524-A", "524-B"]:
             info("SKIPPED: %s" % code)
@@ -441,35 +441,34 @@ def update_post(x):
             warning("Duplicated problem. %s is copy of %s" % (p.code, f.code))
             continue
 
-        p.title = problem['name']
+        p.title = problem["name"]
         p.content = meta.pop("content")
         p.note = meta.pop("note")
         p.meta_json = json.dumps(meta)
         p.identifier = md5(json.dumps(meta["tests"])).hexdigest()
         p.save()
-        new_problems+=1
 
     # Check for new contest
     for contest in CF.contest_list():
         # read only contest
-        if contest['id'] in [419]:
+        if contest["id"] in [419]:
             continue
 
-        c = Contest.find(id=int(contest['id'])) or Contest(id=int(contest['id']))
+        c = Contest.find(id=int(contest["id"])) or Contest(id=int(contest["id"]))
         if c.problems:
             continue
 
-        info("new contest found: %s" % contest['id'])
-        c.name = contest['name']
-        c.start = str(contest['startTimeSeconds'])
+        info("new contest found: %s" % contest["id"])
+        c.name = contest["name"]
+        c.start = str(contest["startTimeSeconds"])
 
-        if contest['startTimeSeconds'] >= start_time:
-            info('Contest %s: Not started' % (str(contest['id'])))
+        if contest["startTimeSeconds"] >= start_time:
+            info("Contest %s: Not started" % (str(contest["id"])))
             c.save()
             continue
         problems = {}
-        for problem in CF.contest_problems(contestId=contest['id']):
-            code = "%3s-%s" % (problem['contestId'], problem['index'])
+        for problem in CF.contest_problems(contestId=contest["id"]):
+            code = "%3s-%s" % (problem["contestId"], problem["index"])
             if code in ["524-A", "524-B"]:
                 info("SKIPPED: %s" % code)
                 continue
@@ -484,7 +483,7 @@ def update_post(x):
             if not p:
                 warning("Problem not found: %s" % code)
                 continue
-            problems[problem['index']] = p.code
+            problems[problem["index"]] = p.code
         c.problems_json = json.dumps(problems)
         c.save()
 
@@ -492,9 +491,17 @@ def update_post(x):
         data.write("count:contest-all", Contest.all().count())
 
     # Update problems count
-    if new_problems > 0:
-        data.write("count_all", data.fetch("count_all") + new_problems)
+    data.write("count_all", Problem.all().count())
     # endfold
+
+    # Update upcoming contest
+    cq = Contest.all().filter('start >', str(time.time())).order('start')
+    upcoming_contests = [{
+        'id': c.id,
+        'name': c.name,
+        'start': int(c.start)
+    } for c in cq]
+    data.write("upcoming_contests", upcoming_contests)
 
     info("OK")
     x.response("OK")
@@ -502,55 +509,5 @@ def update_post(x):
 
 @route("/setup")
 def setup(x):
-    if "localhost" not in x.request.host:
-        x.response("Deny: Only for development")
-
-    start_time = time.time()
-    data.write("moderators", {"123": "Admin"})
-
-    # - Ratings
-    data.write("Rating:codeforces", CF.codeforces_ratings())
-    data.write("Rating:topcoder", topcoder_ratings())
-    # - Contests
-    for page in range(3, 0, -1):
-        info("Contests page: %s" % page)
-        for id, name, start in parse.contest_history(page):
-            c = Contest.find(id=id) or Contest(id=id)
-            c.name = name
-            c.start = start
-            c.save()
-    for page in range(3, 0, -1):
-        info("Problemset page: %s" % page)
-        datas = parse.problemset(page)
-
-        for code, title in datas:
-            if not re.search("^\d+[A-Z]$", code):
-                warning("SKIPPED: %s" % code)
-                continue
-
-            code = "%3s-%s" % (code[:-1], code[-1])
-
-            p = Problem.find(code=code) or Problem(code=code)
-            p.title = title
-            # fill with fake data
-            p.content, p.note, p.credits, p.meta_json = parse.mock_problem()
-            p.save()
-    # - Contribution point from datastore
-    contribution = {}
-    for p in Problem.all().filter("credits !=", ""):
-        translators = p.credits.split(", ")
-        for t in translators:
-            point = (p.meta.get("credit_point") or 1.0) / len(translators)
-            contribution[t] = contribution.get(t, 0.0) + point
-    contribution = sorted(contribution.items(), key=lambda t: -t[1])
-    data.write("Rating:contribution", contribution)
-
-    # count query
-    count_all = Problem.all().count(3000)
-    count_done = Problem.all().filter("credits >", "").count(3000)
-    data.write("count_all", count_all)
-    data.write("count_done", count_done)
-    # endfold
-
-    info("Executed seconds: %.1f" % (time.time() - start_time))
-    x.response("Executed seconds: %.1f" % (time.time() - start_time))
+    taskqueue.add(url="/ratings/update")
+    taskqueue.add(url="/update")

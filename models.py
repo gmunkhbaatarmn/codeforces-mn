@@ -52,12 +52,6 @@ class Contest(Model):
     translated_count = db.IntegerProperty(default=0)
 
     @property
-    def till_start(self):
-        return -1
-        now = time.time()
-        return int(int(self.start) - now)
-
-    @property
     def problems(self):
         # list of tuple (letter, problemset code)
         result = []

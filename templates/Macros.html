@@ -32,7 +32,11 @@
   {% else %}
     {% set color = "gray" %}
   {% endif %}
-  <a rel="nofollow" class="cf-user-{{ color }}" href="http://codeforces.com/profile/{{ handle }}">{{ handle }}</a>
+  {% if handle|length <= 18 %}
+    <a rel="nofollow" class="cf-user-{{ color }}" href="http://codeforces.com/profile/{{ handle }}">{{ handle }}</a>
+  {% else %}
+    <a rel="nofollow" title="{{ handle }}" class="cf-user-{{ color }}" href="http://codeforces.com/profile/{{ handle }}">{{ handle[:12] }}...</a>
+  {% endif %}
 {%- endmacro -%}
 
 

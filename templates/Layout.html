@@ -55,7 +55,7 @@
                 <td>
                   <a href="" style="text-decoration: underline">{{ contest.name }}</a>
                   <br/>
-                  {{ contest_time(contest.till_start) }}
+                  {{ contest_time(contest.start - now) }}
                 </td>
               </tr>
             {% endfor %}

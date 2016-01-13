@@ -1,5 +1,6 @@
 # coding: utf-8
 import re
+import time
 import json
 import urllib
 import datetime
@@ -12,70 +13,85 @@ from google.appengine.api import urlfetch
 from google.appengine.runtime.apiproxy_errors import DeadlineExceededError
 from lxml import etree
 
-class codeforcesAPI:
+
+class codeforcesAPI(object):
     API_URL = "http://codeforces.com/api"
 
+    # Returns all problems of specific contest contest_problems
     def contest_problems(self, **kwargs):
-        # Returns all problems of specific contest contest_problems
-        kwargs['from'] = 1
-        kwargs['count'] = 1
-        kwargs['showUnofficial'] = True
-        result = self.__make_request('contest.standings', **kwargs)
-        return result['problems']
+        kwargs["from"] = 1
+        kwargs["count"] = 1
+        kwargs["showUnofficial"] = True
+        result = self.__make_request("contest.standings", **kwargs)
+        return result["problems"]
 
+    # Returns all problems from problemset
     def problemset_problems(self):
-        """ Returns all problems from problemset"""
-        return self.__make_request('problemset.problems')['problems']
+        result = self.__make_request("problemset.problems", deadline=60)
+        return result["problems"]
 
+    # Returns all contests
     def contest_list(self):
-        # Returns all contests
-        return self.__make_request('contest.list')
+        return self.__make_request("contest.list", deadline=60)
 
+    # Returns ratings change object
     def user_rating(self, **kwargs):
-        # Returns ratings change object
-        return self.__make_request('user.rating', **kwargs)
+        return self.__make_request("user.rating", **kwargs)
 
-    def codeforces_ratings(self, activeOnly=True, **kwargs):
-        #  Returns all users from mongolia
-        kwargs['activeOnly'] = activeOnly
-        users = self.__make_request('user.ratedList', **kwargs)
+    #  Returns all users from mongolia
+    def codeforces_ratings(self, **kwargs):
+        users = self.__make_request("user.ratedList", deadline=180, **kwargs)
 
         result = []
-
+        now = time.time()
+        six_month = 6 * 30 * 24 * 60 * 60
         for user in users:
             # If user is from Mongolia
-            if ('country' in user and user['country'] == "Mongolia"):
+            if ("country" in user and user["country"] == "Mongolia"):
                 # All participated contests array
-                user['ratings'] = self.user_rating(handle=user['handle'])
-
-                # Check if user participated in some contest
-                # If so populate user with rank change and contest_id
-                ratings_len = len(user['ratings'])
-                if (ratings_len):
-                    Lcont = user['ratings'][ratings_len-1]
-                    user['change'] = Lcont['newRating'] - Lcont['oldRating']
-                    user['contest_id'] = Lcont['contestId']
+                for i in range(3):
+                    try:
+                        ratings = self.user_rating(handle=user["handle"])
+                        break
+                    except DeadlineExceededError:
+                        warning("Failed fetching user: %s" % user["handle"])
                 else:
-                    user['change'] = 0
-                    user['contest_id'] = 0
+                    warning("Skipping user: %s ( Timeout )" % user["handle"])
+
+                # Skip if not competed in contest
+                if not ratings:
+                    info("Skipping user: %s ( Not ranked )" % user["handle"])
+                    continue
+
+                # Skip if not active in last 180 day
+                last_contest = ratings[-1]
+                diff = now - last_contest["ratingUpdateTimeSeconds"]
+                if diff > six_month:
+                    info("Skipping user: %s ( Not active )" % user["handle"])
+                    continue
+
+                # Populate with change and contest_id from last_contest
+                user["change"] = last_contest["newRating"] - last_contest["oldRating"]
+                user["contest_id"] = last_contest["contestId"]
 
                 result.append(user)
 
         return result
 
-    def __make_url(self, methodName, *args, **kwargs):
-        return self.API_URL + '/' + methodName + \
-            '?' + urllib.urlencode(kwargs.items())
+    def __make_url(self, methodName, **kwargs):
+        return self.API_URL + "/" + methodName + \
+            "?" + urllib.urlencode(kwargs.items())
 
-    def __make_request(self, methodName, *args, **kwargs):
-        URL = self.__make_url(methodName, *args, **kwargs)
-        info("Requesting: "+URL)
-        r = urlfetch.fetch(URL, deadline=60)
-        info("Response from: "+URL)
+    def __make_request(self, methodName, deadline=None, **kwargs):
+        URL = self.__make_url(methodName, **kwargs)
+
+        info("Request : " + URL)
+        r = urlfetch.fetch(URL, deadline=deadline)
         result = json.loads(r.content)
-        if (result['status'] == "FAILED"):
+
+        if (result["status"] == "FAILED"):
             raise Exception("Request failed")
-        return result['result']
+        return result["result"]
 
 
 # parse from codeforces.com
@@ -89,7 +105,7 @@ def problem(code):
     tree = lxml.html.fromstring(source)
 
     if not tree.xpath("//div[@class='problem-statement']"):
-        warning("%s unexpected response:\n%s" % (code, source.decode('utf-8')))
+        warning("%s unexpected response:\n%s" % (code, source.decode("utf-8")))
         return
 
     inputs = tree.xpath("//div[@class='input']/pre")
@@ -138,47 +154,6 @@ def sample_test(e):
 def html(e):
     " inner html "
     return etree.tostring(e).split(">", 1)[1].rsplit("</", 1)[0]
-
-
-def contest(id):
-    " Returns contest dict by contest id. {name, problems} "
-    r = url_open("http://codeforces.com/contest/%s" % id)
-
-    try:
-        assert r.code == 200
-        assert r.url == "http://codeforces.com/contest/%s" % id
-    except AssertionError:
-        warning("Contest %s not reachable" % id)
-        return
-
-    re_name = "<title>Dashboard - (.+) - Codeforces</title>"
-    re_problem = '<option value="(\w+)" >\w+ - (.+)</option>'
-
-    data = r.read()
-
-    return {
-        "name": re.search(re_name, data).group(1),
-        "problems": re.findall(re_problem, data),
-    }
-
-
-def problemset(page=1):
-    " Returns list of problems. Example item: (001-A, Theatre Square) "
-    try:
-        r = url_open("http://codeforces.com/problemset/page/%s" % page)
-        assert r.code == 200
-        assert r.url == "http://codeforces.com/problemset/page/%s" % page
-    except (AssertionError, HTTPException):
-        warning("Problemset page %s not reachable" % page, exc_info=True)
-        return []
-
-    tree = lxml.html.fromstring(r.read())
-    rows = tree.xpath("//table[@class='problems']/tr")[1:]
-
-    codes = map(lambda x: x.xpath("./td[1]/a")[0].text.strip(), rows)
-    names = map(lambda x: x.xpath("./td[2]/div[1]/a")[0].text.strip(), rows)
-
-    return map(lambda a, b: [a] + [b], codes, names)
 
 
 def contest_history(page=1):
