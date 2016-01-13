@@ -1,5 +1,3 @@
-# coding: utf-8
-import re
 import json
 import time
 import parse
@@ -24,7 +22,6 @@ app.config["context"] = lambda x: {
     "count_done": data.fetch("count_done"),
     "relative": relative,
     "upcoming_contests": data.fetch("upcoming_contests", []),
-    "now": int(time.time()),
 }
 app.config["route-shortcut"] = {
     "<code>": "(\w+)",
@@ -454,7 +451,9 @@ def update_post(x):
         if contest["id"] in [419]:
             continue
 
-        c = Contest.find(id=int(contest["id"])) or Contest(id=int(contest["id"]))
+        c = Contest.find(id=int(contest["id"])) or \
+            Contest(id=int(contest["id"]))
+
         if c.problems:
             continue
 
@@ -495,13 +494,15 @@ def update_post(x):
     # endfold
 
     # Update upcoming contest
+    # todo: run this queries when only `Contest` model values changed
     cq = Contest.all().filter('start >', str(time.time())).order('start')
     upcoming_contests = [{
-        'id': c.id,
-        'name': c.name,
-        'start': int(c.start)
-    } for c in cq]
+        'id': contest.id,
+        'name': contest.name,
+        'start': int(contest.start)
+    } for contest in cq]
     data.write("upcoming_contests", upcoming_contests)
+    # endfold
 
     info("OK")
     x.response("OK")

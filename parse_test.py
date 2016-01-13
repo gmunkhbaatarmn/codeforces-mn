@@ -2,7 +2,6 @@ import nose
 import parse as _
 from nose.tools import eq_ as eq
 from nose.tools import ok_ as ok
-from nose.plugins.attrib import attr
 from google.appengine.api import urlfetch_stub
 from google.appengine.api import apiproxy_stub_map
 
@@ -13,17 +12,20 @@ apiproxy_stub_map.apiproxy.RegisterStub('urlfetch',
                                         urlfetch_stub.URLFetchServiceStub())
 # End of config
 
+
 def test_contest():
     contests = cf.contest_list()
     ok(all(['id' in c for c in contests]))
     ok(all(['name' in c for c in contests]))
     ok(all(['startTimeSeconds' in c for c in contests]))
 
+
 def test_problemset():
     problems = cf.problemset_problems()
     ok([all(['index' in p for p in problems])])
     ok([all(['name' in p for p in problems])])
     ok([all(['contestId' in p for p in problems])])
+
 
 def test_problem():
     p = _.problem("10-A")

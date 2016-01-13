@@ -1,4 +1,3 @@
-import time
 from natrix import Model, db, json, warning
 
 
