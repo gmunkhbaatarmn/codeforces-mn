@@ -492,6 +492,7 @@ def update_post(x):
     # endfold
 
     # Update upcoming contest
+    # todo: run this queries when only `Contest` model values changed
     cq = Contest.all().filter('start >', str(time.time())).order('start')
     upcoming_contests = [{
         'id': contest.id,
@@ -499,6 +500,7 @@ def update_post(x):
         'start': int(contest.start)
     } for contest in cq]
     data.write("upcoming_contests", upcoming_contests)
+    # endfold
 
     info("OK")
     x.response("OK")
