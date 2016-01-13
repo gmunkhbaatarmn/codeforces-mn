@@ -2,7 +2,6 @@ import nose
 import parse as _
 from nose.tools import eq_ as eq
 from nose.tools import ok_ as ok
-from nose.plugins.attrib import attr
 from google.appengine.api import urlfetch_stub
 from google.appengine.api import apiproxy_stub_map
 

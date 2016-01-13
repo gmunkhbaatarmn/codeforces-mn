@@ -1,5 +1,3 @@
-# coding: utf-8
-import re
 import json
 import time
 import parse
@@ -497,10 +495,10 @@ def update_post(x):
     # Update upcoming contest
     cq = Contest.all().filter('start >', str(time.time())).order('start')
     upcoming_contests = [{
-        'id': c.id,
-        'name': c.name,
-        'start': int(c.start)
-    } for c in cq]
+        'id': contest.id,
+        'name': contest.name,
+        'start': int(contest.start)
+    } for contest in cq]
     data.write("upcoming_contests", upcoming_contests)
 
     info("OK")
