@@ -70,7 +70,8 @@ class codeforcesAPI(object):
                     continue
 
                 # Populate with change and contest_id from last_contest
-                user["change"] = last_contest["newRating"] - last_contest["oldRating"]
+                user["change"] = last_contest["newRating"] - \
+                    last_contest["oldRating"]
                 user["contest_id"] = last_contest["contestId"]
 
                 result.append(user)
@@ -129,7 +130,9 @@ def problem(code):
     result = {
         # meta fields
         "time": tree.xpath("//div[@class='time-limit']/text()")[0],
-        "memory": tree.xpath("//div[@class='memory-limit']/text()|//div[@class='memory-limit']/span[@class='tex-font-style-bf']/text()")[0],
+        "memory": tree.xpath("//div[@class='memory-limit']/text()|"
+                             "//div[@class='memory-limit']/"
+                             "span[@class='tex-font-style-bf']/text()")[0],
         "input": tree.xpath("//div[@class='input-file']/text()")[0],
         "output": tree.xpath("//div[@class='output-file']/text()")[0],
         "tests": zip(map(lambda e: sample_test(e), inputs),

@@ -451,7 +451,9 @@ def update_post(x):
         if contest["id"] in [419]:
             continue
 
-        c = Contest.find(id=int(contest["id"])) or Contest(id=int(contest["id"]))
+        c = Contest.find(id=int(contest["id"])) or \
+            Contest(id=int(contest["id"]))
+
         if c.problems:
             continue
 
