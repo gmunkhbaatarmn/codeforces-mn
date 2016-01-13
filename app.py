@@ -22,7 +22,6 @@ app.config["context"] = lambda x: {
     "count_done": data.fetch("count_done"),
     "relative": relative,
     "upcoming_contests": data.fetch("upcoming_contests", []),
-    "now": int(time.time()),
 }
 app.config["route-shortcut"] = {
     "<code>": "(\w+)",
