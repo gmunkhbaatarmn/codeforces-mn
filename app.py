@@ -1,3 +1,4 @@
+# coding: utf-8
 import json
 import time
 import parse
@@ -412,6 +413,8 @@ def update(x):
 @route("/update#post")
 def update_post(x):
     start_time = time.time()
+    new_problems = 0
+
     # Check for new problems
     all_problems = CF.problemset_problems()
     for problem in all_problems:
@@ -444,8 +447,10 @@ def update_post(x):
         p.meta_json = json.dumps(meta)
         p.identifier = md5(json.dumps(meta["tests"])).hexdigest()
         p.save()
+        new_problems += 1
 
     # Check for new contest
+    upcoming_contests = []
     for contest in CF.contest_list():
         # read only contest
         if contest["id"] in [419]:
@@ -463,8 +468,14 @@ def update_post(x):
 
         if contest["startTimeSeconds"] >= start_time:
             info("Contest %s: Not started" % (str(contest["id"])))
+            upcoming_contests.append({
+                'id': contest['id'],
+                'name': contest['name'],
+                'start': contest['startTimeSeconds'],
+            })
             c.save()
             continue
+
         problems = {}
         for problem in CF.contest_problems(contestId=contest["id"]):
             code = "%3s-%s" % (problem["contestId"], problem["index"])
@@ -486,21 +497,15 @@ def update_post(x):
         c.problems_json = json.dumps(problems)
         c.save()
 
-        # update contest count
-        data.write("count:contest-all", Contest.all().count())
+    # update contest count
+    data.write("count:contest-all", Contest.all().count())
 
     # Update problems count
-    data.write("count_all", Problem.all().count())
+    if new_problems > 0:
+        data.write("count_all", data.fetch("count_all", 0) + new_problems)
     # endfold
 
     # Update upcoming contest
-    # todo: run this queries when only `Contest` model values changed
-    cq = Contest.all().filter('start >', str(time.time())).order('start')
-    upcoming_contests = [{
-        'id': contest.id,
-        'name': contest.name,
-        'start': int(contest.start)
-    } for contest in cq]
     data.write("upcoming_contests", upcoming_contests)
     # endfold
 

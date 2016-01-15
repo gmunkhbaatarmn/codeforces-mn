@@ -51,13 +51,15 @@
         <div class="text">
           <table>
             {% for contest in upcoming_contests %}
-              <tr>
-                <td>
-                  <a href="" style="text-decoration: underline">{{ contest.name }}</a>
-                  <br/>
-                  {{ contest_time(contest.start - int(now.strftime("%s"))) }}
-                </td>
-              </tr>
+              {% if contest.start > int(now.strftime("%s")) %}
+                <tr>
+                  <td>
+                    <a href="" style="text-decoration: underline">{{ contest.name }}</a>
+                    <br/>
+                    {{ contest_time(contest.start - int(now.strftime("%s"))) }}
+                  </td>
+                </tr>
+              {% endif %}
             {% endfor %}
           </table>
         </div>
