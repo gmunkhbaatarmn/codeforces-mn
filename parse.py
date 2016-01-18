@@ -179,6 +179,51 @@ def contest_history(page=1):
     return map(lambda a, b, c: [a] + [b] + [c], index, names, start)
 
 
+def topcoder_contests():
+    data = url_open("http://api.topcoder.com/v2/"
+                    "dataScience/challenges/upcoming")
+
+    result = json.loads(data.read())["data"]
+    contests = []
+
+    for c in result:
+        # Skip if Marathon
+        if c['challengeType'] == "Marathon":
+            continue
+
+        # Registration starts 4 hour before contest start
+        # EST = UTC-05, ESD = UTC-04
+        start = c["registrationStartDate"]
+        if start[-3:] == "EST":
+            df = datetime.timedelta(hours=9)
+        elif start[-3:] == "ESD":
+            df = datetime.timedelta(hours=8)
+        else:
+            warning(c["challengeName"] + " unexpected datetime: " + start)
+            continue
+
+        # 2016-02-22 17:00 EST -> 2016-02-22 17:00 UTC -> unixtimestamp
+        try:
+            start = start[:-4]
+            start = datetime.datetime.strptime(start, "%Y-%m-%d %H:%M") + df
+            start = time.mktime(start.timetuple())
+            two_week = 14 * 24 * 60 * 60
+            # Skip if not in next 2 week
+            if start - time.time() > two_week:
+                continue
+        except Exception:
+            warning(c["challengeName"] + " unexpected behaviour: " + start)
+            continue
+
+        contests.append({
+            "id": c["challengeId"],
+            "name": c["challengeName"],
+            "start": int(start),
+        })
+
+    return contests
+
+
 def topcoder_user(handle, id):
     info("TopCoder: %s" % handle)
     data = url_open("http://community.topcoder.com/tc?module=BasicData"

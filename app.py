@@ -6,7 +6,8 @@ from hashlib import md5
 from datetime import datetime
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, taskqueue, memcache
-from parse import codeforcesAPI, topcoder_ratings, date_format, relative
+from parse import codeforcesAPI, topcoder_ratings, date_format, \
+    relative, topcoder_contests
 from models import Problem, Contest, Suggestion
 
 
@@ -23,6 +24,7 @@ app.config["context"] = lambda x: {
     "count_done": data.fetch("count_done"),
     "relative": relative,
     "upcoming_contests": data.fetch("upcoming_contests", []),
+    "topcoder_contests": data.fetch("topcoder_contests", []),
 }
 app.config["route-shortcut"] = {
     "<code>": "(\w+)",
@@ -507,6 +509,7 @@ def update_post(x):
 
     # Update upcoming contest
     data.write("upcoming_contests", upcoming_contests)
+    data.write("topcoder_contests", topcoder_contests())
     # endfold
 
     info("OK")
