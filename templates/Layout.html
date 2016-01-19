@@ -54,7 +54,7 @@
               {% if contest.start > int(now.strftime("%s")) %}
                 <tr>
                   <td>
-                    <a href="http://codeforces.com/contests" style="text-decoration: underline">{{ contest.name }}</a>
+                    <a href="http://codeforces.com/contests/{{ contest.id }}" target="_blank" style="text-decoration: underline">{{ contest.name }}</a>
                     <br/>
                     {{ contest_time(contest.start - int(now.strftime("%s"))) }}
                   </td>
