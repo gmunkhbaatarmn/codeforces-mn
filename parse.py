@@ -39,7 +39,7 @@ class codeforcesAPI(object):
 
     #  Returns all users from mongolia
     def codeforces_ratings(self, **kwargs):
-        users = self.__make_request("user.ratedList", deadline=180, **kwargs)
+        users = self.__make_request("user.ratedList", deadline=240, **kwargs)
 
         result = []
         now = time.time()
