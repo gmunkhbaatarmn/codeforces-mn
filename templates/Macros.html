@@ -90,8 +90,8 @@
     {{ time // day }} өдрийн дараа
   {% else %}
     {% set hour = "00" ~ time // 3600 %}
-    {% set minute = '00' ~ (time % 3600) // 60 %}
-    {% set seconds = '00' ~ time % 60 %}
-    <span class="countDownTimer" contestId='{{ contest_id }}'>{{ hour[-2:] }}:{{ minute[-2:] }}:{{ seconds[-2:] }}</span>
+    {% set minute = "00" ~ (time % 3600) // 60 %}
+    {% set seconds = "00" ~ time % 60 %}
+    <span class="countDownTimer" contestId="{{ contest_id }}">{{ hour[-2:] }}:{{ minute[-2:] }}:{{ seconds[-2:] }}</span>
   {% endif %}
 {%- endmacro -%}

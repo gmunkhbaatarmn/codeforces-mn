@@ -47,15 +47,35 @@
       {% block sidebar %} {% endblock %}
       #:0 Ойрд болох тэмцээнүүд
       <div class="box">
-        <h2>Тэмцээнүүд</h2>
+        <h2>Codeforces ( тэмцээн )</h2>
         <div class="text">
           <table>
             {% for contest in upcoming_contests %}
               {% if contest.start > int(now.strftime("%s")) %}
                 <tr>
                   <td>
-                    <a href="" style="text-decoration: underline">{{ contest.name }}</a>
+                    <a href="http://codeforces.com/contests/{{ contest.id }}" target="_blank" style="text-decoration: underline">{{ contest.name }}</a>
                     <br/>
+                    {{ contest_time(contest.start - int(now.strftime("%s"))) }}
+                  </td>
+                </tr>
+              {% endif %}
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Topcoder&#8482; ( тэмцээн )</h2>
+        <div class="text">
+          <table>
+            {% for contest in topcoder_contests %}
+              {% if contest.start > int(now.strftime("%s")) %}
+                <tr>
+                  <td>
+                    <a href="https://community.topcoder.com/tc?module=MatchDetails&rd={{ contest.id }}" target="_blank" style="text-decoration: underline">{{ contest.name }}</a>
+                  </td>
+                  <td>
                     {{ contest_time(contest.start - int(now.strftime("%s"))) }}
                   </td>
                 </tr>
@@ -185,12 +205,12 @@
   <script>
     $(function() {
       var timer = setInterval(function(){
-        if ($('.countDownTimer').length == 0) {
+        if ($(".countDownTimer").length == 0) {
           clearInterval(timer);
           return;
         }
-        $('.countDownTimer').each(function(){
-          data = $( this ).html().split(':');
+        $(".countDownTimer").each(function(){
+          data = $( this ).html().split(":");
           hour = parseInt(data[0]);
           minute = parseInt(data[1]);
           seconds = parseInt(data[2]);
@@ -205,7 +225,7 @@
              + ":" + ("00" + new_seconds).slice(-2);
           if (new_time == "00:00:00"){
             $( this ).removeClass("countDownTimer");
-            $( this ).html('Тэмцээн эхэлсэн');
+            $( this ).html("Тэмцээн эхэлсэн");
           } else {
             $( this ).html(new_time);
           }
