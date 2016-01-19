@@ -471,9 +471,9 @@ def update_post(x):
         if contest["startTimeSeconds"] >= start_time:
             info("Contest %s: Not started" % (str(contest["id"])))
             upcoming_contests.append({
-                'id': contest['id'],
-                'name': contest['name'],
-                'start': contest['startTimeSeconds'],
+                "id": contest["id"],
+                "name": contest["name"],
+                "start": contest["startTimeSeconds"],
             })
             c.save()
             continue

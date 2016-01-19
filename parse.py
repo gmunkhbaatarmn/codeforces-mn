@@ -188,7 +188,7 @@ def topcoder_contests():
 
     for c in result:
         # Skip if Marathon
-        if c['challengeType'] == "Marathon":
+        if c["challengeType"] == "Marathon":
             continue
 
         # Registration starts 4 hour before contest start

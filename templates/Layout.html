@@ -205,12 +205,12 @@
   <script>
     $(function() {
       var timer = setInterval(function(){
-        if ($('.countDownTimer').length == 0) {
+        if ($(".countDownTimer").length == 0) {
           clearInterval(timer);
           return;
         }
-        $('.countDownTimer').each(function(){
-          data = $( this ).html().split(':');
+        $(".countDownTimer").each(function(){
+          data = $( this ).html().split(":");
           hour = parseInt(data[0]);
           minute = parseInt(data[1]);
           seconds = parseInt(data[2]);
@@ -225,7 +225,7 @@
              + ":" + ("00" + new_seconds).slice(-2);
           if (new_time == "00:00:00"){
             $( this ).removeClass("countDownTimer");
-            $( this ).html('Тэмцээн эхэлсэн');
+            $( this ).html("Тэмцээн эхэлсэн");
           } else {
             $( this ).html(new_time);
           }

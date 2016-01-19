@@ -8,23 +8,23 @@ from google.appengine.api import apiproxy_stub_map
 cf = _.codeforcesAPI()
 # Must have config if calling urlfetch outside dev_appserver
 apiproxy_stub_map.apiproxy = apiproxy_stub_map.APIProxyStubMap()
-apiproxy_stub_map.apiproxy.RegisterStub('urlfetch',
+apiproxy_stub_map.apiproxy.RegisterStub("urlfetch",
                                         urlfetch_stub.URLFetchServiceStub())
 # End of config
 
 
 def test_contest():
     contests = cf.contest_list()
-    ok(all(['id' in c for c in contests]))
-    ok(all(['name' in c for c in contests]))
-    ok(all(['startTimeSeconds' in c for c in contests]))
+    ok(all(["id" in c for c in contests]))
+    ok(all(["name" in c for c in contests]))
+    ok(all(["startTimeSeconds" in c for c in contests]))
 
 
 def test_problemset():
     problems = cf.problemset_problems()
-    ok([all(['index' in p for p in problems])])
-    ok([all(['name' in p for p in problems])])
-    ok([all(['contestId' in p for p in problems])])
+    ok([all(["index" in p for p in problems])])
+    ok([all(["name" in p for p in problems])])
+    ok([all(["contestId" in p for p in problems])])
 
 
 def test_problem():
