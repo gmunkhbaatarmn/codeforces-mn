@@ -219,6 +219,7 @@ def topcoder_contests():
             "id": c["challengeId"],
             "name": c["challengeName"],
             "start": int(start),
+            "site": "topcoder",
         })
 
     return contests

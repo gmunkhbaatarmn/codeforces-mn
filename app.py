@@ -474,6 +474,7 @@ def update_post(x):
                 "id": contest["id"],
                 "name": contest["name"],
                 "start": contest["startTimeSeconds"],
+                "site": "codeforces",
             })
             c.save()
             continue
