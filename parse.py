@@ -158,27 +158,6 @@ def html(e):
     return etree.tostring(e).split(">", 1)[1].rsplit("</", 1)[0]
 
 
-def contest_history(page=1):
-    " Returns list of contest "
-    try:
-        r = url_open("http://codeforces.com/contests/page/%s" % page)
-        assert r.code == 200
-        assert r.url == "http://codeforces.com/contests/page/%s" % page
-    except (AssertionError, HTTPException):
-        # reason: Active contest running
-        # reason: Codeforces is temporary unavailable
-        return []
-
-    tree = lxml.html.fromstring(r.read())
-    rows = tree.xpath("//div[@class='contests-table']//table/tr")[1:]
-
-    index = map(lambda x: int(x.attrib["data-contestid"]), rows)
-    names = map(lambda x: x.xpath("./td[1]")[0].text.strip(), rows)
-    start = map(lambda x: x.xpath("./td[2]")[0].text.strip(), rows)
-
-    return map(lambda a, b, c: [a] + [b] + [c], index, names, start)
-
-
 def topcoder_contests():
     data = url_open("http://api.topcoder.com/v2/"
                     "dataScience/challenges/upcoming")
