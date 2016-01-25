@@ -8,90 +8,77 @@ import random
 import html2text as h2t
 from logging import warning, info
 from httplib import HTTPException
-from google.appengine.api import urlfetch
 from google.appengine.runtime.apiproxy_errors import DeadlineExceededError
 from lxml import etree
 
 
-class codeforcesAPI(object):
-    API_URL = "http://codeforces.com/api"
+# Returns all problems from problemset
+def problemset_problems():
+    result = cf_api("problemset.problems")
+    return result["problems"]
 
-    # Returns all problems of specific contest contest_problems
-    def contest_problems(self, **kwargs):
-        kwargs["from"] = 1
-        kwargs["count"] = 1
-        kwargs["showUnofficial"] = True
-        result = self.__make_request("contest.standings", **kwargs)
-        return result["problems"]
 
-    # Returns all problems from problemset
-    def problemset_problems(self):
-        result = self.__make_request("problemset.problems", deadline=60)
-        return result["problems"]
+# Returns all problems of specific contest contest_problems
+def contest_problems(contestId):
+    result = cf_api("contest.standings", **{
+        "from": 1,
+        "count": 1,
+        "contestId": contestId,
+    })
+    return result["problems"]
 
-    # Returns all contests
-    def contest_list(self):
-        return self.__make_request("contest.list", deadline=60)
 
-    # Returns ratings change object
-    def user_rating(self, **kwargs):
-        return self.__make_request("user.rating", **kwargs)
+# Returns all codeforces contests
+def all_contests():
+    result = cf_api("contest.list")
+    return result
 
-    #  Returns all users from mongolia
-    def codeforces_ratings(self, **kwargs):
-        users = self.__make_request("user.ratedList", deadline=240, **kwargs)
 
-        result = []
-        now = time.time()
-        six_month = 6 * 30 * 24 * 60 * 60
-        for user in users:
-            # If user is from Mongolia
-            if ("country" in user and user["country"] == "Mongolia"):
-                # All participated contests array
-                for i in range(3):
-                    try:
-                        ratings = self.user_rating(handle=user["handle"])
-                        break
-                    except DeadlineExceededError:
-                        warning("Failed fetching user: %s" % user["handle"])
-                else:
-                    warning("Skipping user: %s ( Timeout )" % user["handle"])
+# Returns ratings change object of users
+def user_rating(handle):
+    return cf_api("user.rating", handle=handle)
 
-                # Skip if not competed in contest
-                if not ratings:
-                    info("Skipping user: %s ( Not ranked )" % user["handle"])
-                    continue
 
-                # Skip if not active in last 180 day
-                last_contest = ratings[-1]
-                diff = now - last_contest["ratingUpdateTimeSeconds"]
-                if diff > six_month:
-                    info("Skipping user: %s ( Not active )" % user["handle"])
-                    continue
+# Codeforces users from mongolia
+def codeforces_ratings():
+    users = cf_api("user.ratedList", activeOnly=True)
 
-                # Populate with change and contest_id from last_contest
-                user["change"] = last_contest["newRating"] - \
-                    last_contest["oldRating"]
-                user["contest_id"] = last_contest["contestId"]
+    result = []
+    now = time.time()
+    six_month = 6 * 30 * 24 * 60 * 60
+    for user in users:
+        # If user is from Mongolia
+        if ("country" in user and user["country"] == "Mongolia"):
+            # All participated contests array
+            for i in range(3):
+                try:
+                    ratings = user_rating(handle=user["handle"])
+                    break
+                except DeadlineExceededError:
+                    warning("Failed fetching user: %s" % user["handle"])
+            else:
+                warning("Skipping user: %s ( Timeout )" % user["handle"])
 
-                result.append(user)
+            # Skip if not competed in contest
+            if not ratings:
+                info("Skipping user: %s ( Not ranked )" % user["handle"])
+                continue
 
-        return result
+            # Skip if not active in last 180 day
+            last_contest = ratings[-1]
+            diff = now - last_contest["ratingUpdateTimeSeconds"]
+            if diff > six_month:
+                info("Skipping user: %s ( Not active )" % user["handle"])
+                continue
 
-    def __make_url(self, methodName, **kwargs):
-        return self.API_URL + "/" + methodName + \
-            "?" + urllib.urlencode(kwargs.items())
+            # Populate with change and contest_id from last_contest
+            user["change"] = last_contest["newRating"] - \
+                last_contest["oldRating"]
+            user["contest_id"] = last_contest["contestId"]
 
-    def __make_request(self, methodName, deadline=None, **kwargs):
-        URL = self.__make_url(methodName, **kwargs)
+            result.append(user)
 
-        info("Request : " + URL)
-        r = urlfetch.fetch(URL, deadline=deadline)
-        result = json.loads(r.content)
-
-        if (result["status"] == "FAILED"):
-            raise Exception("Request failed")
-        return result["result"]
+    return result
 
 
 # parse from codeforces.com
@@ -271,7 +258,7 @@ def cf_api(methodName, **kwargs):
     URL = "http://codeforces.com/api/" + methodName
     URL = URL + "?" + urllib.urlencode(kwargs.items())
 
-    data = url_open(URL, retry=3).read()
+    data = url_open(URL).read()
     info(data)
     data = json.loads(data)
     return data["result"]

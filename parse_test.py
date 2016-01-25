@@ -2,26 +2,17 @@ import nose
 import parse as _
 from nose.tools import eq_ as eq
 from nose.tools import ok_ as ok
-from google.appengine.api import urlfetch_stub
-from google.appengine.api import apiproxy_stub_map
-
-cf = _.codeforcesAPI()
-# Must have config if calling urlfetch outside dev_appserver
-apiproxy_stub_map.apiproxy = apiproxy_stub_map.APIProxyStubMap()
-apiproxy_stub_map.apiproxy.RegisterStub("urlfetch",
-                                        urlfetch_stub.URLFetchServiceStub())
-# End of config
 
 
 def test_contest():
-    contests = cf.contest_list()
+    contests = _.all_contests()
     ok(all(["id" in c for c in contests]))
     ok(all(["name" in c for c in contests]))
     ok(all(["startTimeSeconds" in c for c in contests]))
 
 
 def test_problemset():
-    problems = cf.problemset_problems()
+    problems = _.problemset_problems()
     ok([all(["index" in p for p in problems])])
     ok([all(["name" in p for p in problems])])
     ok([all(["contestId" in p for p in problems])])
