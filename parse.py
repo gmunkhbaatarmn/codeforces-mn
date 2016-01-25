@@ -281,8 +281,9 @@ def topcoder_ratings():
 
 # helper functions
 def date_format(date, format="%Y/%m/%d"):
-    if date.isdigit():
+    if str(date).isdigit():
         utc_date = datetime.datetime.utcfromtimestamp(int(date))
+        utc_date = utc_date + datetime.timedelta(hours=8)
         return utc_date.strftime(format)
     return date
 
