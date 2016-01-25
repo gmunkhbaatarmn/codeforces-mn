@@ -267,6 +267,16 @@ def date_format(date, format="%Y/%m/%d"):
     return date
 
 
+def cf_api(methodName, **kwargs):
+    URL = "http://codeforces.com/api/" + methodName
+    URL = URL + "?" + urllib.urlencode(kwargs.items())
+
+    data = url_open(URL, retry=3).read()
+    info(data)
+    data = json.loads(data)
+    return data["result"]
+
+
 def url_open(url, retry=0):
     try:
         return urllib.urlopen(url)
