@@ -5,7 +5,7 @@ from nose.tools import ok_ as ok
 
 
 def test_contest():
-    contests = _.all_contests()
+    contests = _.cf_api("contest.list")
     ok(all(["id" in c for c in contests]))
     ok(all(["name" in c for c in contests]))
     ok(all(["startTimeSeconds" in c for c in contests]))

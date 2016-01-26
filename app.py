@@ -7,7 +7,7 @@ from datetime import datetime
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, taskqueue, memcache
 from parse import topcoder_ratings, date_format, relative, topcoder_contests, \
-    problemset_problems, contest_problems, codeforces_ratings, all_contests
+    problemset_problems, contest_problems, codeforces_ratings, cf_api
 from models import Problem, Contest, Suggestion
 
 
@@ -452,7 +452,7 @@ def update_post(x):
 
     # Check for new contest
     upcoming_contests = []
-    for contest in all_contests():
+    for contest in cf_api("contest.list"):
         # read only contest
         if contest["id"] in [419]:
             continue

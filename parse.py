@@ -28,55 +28,55 @@ def contest_problems(contestId):
     return result["problems"]
 
 
-# Returns all codeforces contests
-def all_contests():
-    result = cf_api("contest.list")
-    return result
-
-
-# Returns ratings change object of users
-def user_rating(handle):
-    return cf_api("user.rating", handle=handle)
-
-
 # Codeforces users from mongolia
 def codeforces_ratings():
-    users = cf_api("user.ratedList", activeOnly=True)
+    # List of Mongolians
+    info("CodeForces: List of Mongolians")
+    try:
+        r = url_open("http://codeforces.com/ratings/country/Mongolia")
 
+        assert r.code == 200
+        assert r.url == "http://codeforces.com/ratings/country/Mongolia"
+    except:
+        warning("CodeForces: list of all mongolia coders", exc_info=True)
+        return
+
+    tree = lxml.html.document_fromstring(r.read())
+
+    handles = []
+    for a in tree.xpath("//div[@class='datatable ratingsDatatable']"
+                        "//table//tr//td[2]//a"):
+        handles.append(a.text.strip())
+    # endfold
+
+    users = cf_api("user.info", handles=";".join(handles))
     result = []
+
     now = time.time()
     six_month = 6 * 30 * 24 * 60 * 60
+
     for user in users:
-        # If user is from Mongolia
-        if ("country" in user and user["country"] == "Mongolia"):
-            # All participated contests array
-            for i in range(3):
-                try:
-                    ratings = user_rating(handle=user["handle"])
-                    break
-                except DeadlineExceededError:
-                    warning("Failed fetching user: %s" % user["handle"])
-            else:
-                warning("Skipping user: %s ( Timeout )" % user["handle"])
+        try:
+            ratings = cf_api("user.rating", handle=user["handle"])
+        except Exception:
+            warning("Failed fetching user rating: %s" % user["handle"])
+            continue
 
-            # Skip if not competed in contest
-            if not ratings:
-                info("Skipping user: %s ( Not ranked )" % user["handle"])
-                continue
+        # Skip if not competed
+        if not ratings:
+            info("Skipping user: %s ( Not ranked )" % user["handle"])
+            continue
 
-            # Skip if not active in last 180 day
-            last_contest = ratings[-1]
-            diff = now - last_contest["ratingUpdateTimeSeconds"]
-            if diff > six_month:
-                info("Skipping user: %s ( Not active )" % user["handle"])
-                continue
+        # Active or not
+        last_contest = ratings[-1]
+        diff = now - last_contest["ratingUpdateTimeSeconds"]
+        user["active"] = diff < six_month
 
-            # Populate with change and contest_id from last_contest
-            user["change"] = last_contest["newRating"] - \
-                last_contest["oldRating"]
-            user["contest_id"] = last_contest["contestId"]
-
-            result.append(user)
+        # Rating change
+        user["change"] = last_contest["newRating"] - \
+            last_contest["oldRating"]
+        user["contest_id"] = last_contest["contestId"]
+        result.append(user)
 
     return result
 
@@ -92,7 +92,7 @@ def problem(code):
     tree = lxml.html.fromstring(source)
 
     if not tree.xpath("//div[@class='problem-statement']"):
-        warning("%s unexpected response:\n%s" % (code, source.decode("utf-8")))
+        warning("Unexpected response problem: %s" % code)
         return
 
     inputs = tree.xpath("//div[@class='input']/pre")
@@ -259,7 +259,6 @@ def cf_api(methodName, **kwargs):
     URL = URL + "?" + urllib.urlencode(kwargs.items())
 
     data = url_open(URL).read()
-    info(data)
     data = json.loads(data)
     return data["result"]
 
