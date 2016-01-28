@@ -117,7 +117,7 @@
             <th class="w14">Нэр</th>
             <th colspan="2">Чансаа</th>
           </tr>
-          {% for u in codeforces %}
+          {% for u in codeforces if u.active %}
             {% set cls = "hidden" if loop.index > 10 else ""  %}
             {% set cls = cls ~ " recent" if u.recent else cls %}
             <tr {{- (' class="%s"' % cls)|safe if cls.strip() else ""  }}>
