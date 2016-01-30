@@ -1,5 +1,48 @@
+import json
 import lxml.html
+from datetime import datetime
 from utils import get_url
+
+
+def upcoming_contests():
+    " Returns list of {site, link, start_at} "
+    result = []
+
+    r = get_url("http://api.topcoder.com/v2/dataScience/challenges/upcoming")
+
+    assert r.status_code == 200, r.status_code  # validate: ok response
+    assert r.final_url is None, r.final_url     # validate: no redirect
+
+    result = []
+    for c in json.loads(r.content)["data"]:
+        # Skip: marathon (long) contents
+        if c["challengeType"] == "Marathon":
+            continue
+        # endfold
+
+        # Parse: start_at
+        start_at = c["registrationStartDate"]
+        start_at = datetime.strptime(start_at, "%Y-%m-%d %H:%M EST")
+
+        # timezone "EST" is mean "UTC-05"
+        start_at += 3600 * 5
+
+        # registration starts 4 hour before contest start
+        start_at += 3600 * 4
+
+        # Parse: link
+        link = "https://community.topcoder.com/tc?module=MatchDetails&rd=%s"
+        link = link % c["challengeId"]
+        # endfold
+
+        result.append({
+            "site": "topcoder",
+            "name": c["challengeName"],
+            "link": link,
+            "start_at": start_at,
+        })
+
+    return result
 
 
 def mongolians():

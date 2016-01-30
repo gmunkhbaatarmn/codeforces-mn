@@ -71,12 +71,12 @@ def test_codeforces_problem():
     progress("codeforces.problem\n")
 
 
-@attr("focus")
 def test_codeforces_upcoming_contests():
     progress("codeforces.upcoming_contests")
 
     for i in codeforces.upcoming_contests():
         ok(isinstance(i["site"], basestring))
+        ok(isinstance(i["name"], basestring))
         ok(isinstance(i["link"], basestring))
         ok(isinstance(i["start_at"], int))
 
@@ -108,6 +108,19 @@ def test_topcoder_user_info():
     ok(isinstance(u["old_rating"], int))
 
     progress("topcoder.user_info\n")
+
+
+@attr("focus")
+def test_topcoder_upcoming_contests():
+    progress("topcoder.upcoming_contests")
+
+    for i in codeforces.upcoming_contests():
+        ok(isinstance(i["site"], basestring))
+        ok(isinstance(i["name"], basestring))
+        ok(isinstance(i["link"], basestring))
+        ok(isinstance(i["start_at"], int))
+
+    progress("topcoder.upcoming_contests\n")
 
 
 if __name__ == "__main__":
