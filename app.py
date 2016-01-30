@@ -1,14 +1,12 @@
 # coding: utf-8
 import json
 import time
-import parse
 import topcoder
 import codeforces
-from hashlib import md5
 from datetime import datetime
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, memcache
-from parse import date_format, relative, topcoder_contests
+from parse import date_format, relative, html2text
 from models import Problem, Contest, Suggestion
 
 
@@ -25,7 +23,6 @@ app.config["context"] = lambda x: {
     "count_done": data.fetch("count_done"),
     "relative": relative,
     "upcoming_contests": data.fetch("upcoming_contests", []),
-    "topcoder_contests": data.fetch("topcoder_contests", []),
 }
 app.config["route-shortcut"] = {
     "<code>": "(\w+)",
@@ -146,7 +143,7 @@ def problemset_translate(x, contest_id, index):
     index = index.upper()
     problem = Problem.find_or_404(code="%3s-%s" % (contest_id, index))
 
-    x.render("problemset-translate.html", locals())
+    x.render("problemset-translate.html", locals(), html2text=html2text)
 
 
 # Rating
@@ -446,107 +443,127 @@ def extension_problem(x, contest_id, index):
 @route("/update")
 def update(x):
     " new contests, new problems "
-    start_time = time.time()
-    new_problems = 0
+    start_t = time.time()
+    complete_update = "complete" in x.request.query
 
-    # Check for new problems
+    # Check: new problems
+    updated = False
+    limit = 50  # check only latest few problems, and it can enough
     for problem in codeforces.api("problemset.problems")["problems"]:
-        code = "%s-%s" % (str(problem["contestId"]), problem["index"])
-        info(code)
-        if code in ["524-A", "524-B"]:
-            info("SKIPPED: %s" % code)
-            continue
+        # Stop: if reach the limit
+        limit -= 1
+        if not complete_update and limit <= 0:
+            break
+        # endfold
 
+        code = "%3s-%s" % (problem["contestId"], problem["index"])
         p = Problem.find(code=code) or Problem(code=code)
+
+        # Skip: already added problem
         if p.content:
             continue
+        # endfold
 
-        # new problem found
-        meta = parse.problem(p.code)
-        if not meta:
-            warning("Problem (%s) parsing failed" % p.code)
+        info("Adding problem: %s" % code)
+        meta = codeforces.problem(p.code)
+
+        # Skip: if problem parsing failed
+        if not meta.get("content"):
             continue
 
-        # it's duplicated problem
-        identifier = md5(json.dumps(meta["tests"])).hexdigest()
-        f = Problem.find(identifier=identifier)
-        if f:
-            warning("Duplicated problem. %s is copy of %s" % (p.code, f.code))
+        # Skip: already added problem (by smart duplication detect)
+        original = Problem.find(identifier=meta["identifier"])
+        if original:
+            warning("Can't add problem: %s" % p.code)
+            warning("Because it's copy of %s" % original.code)
             continue
+        # endfold
 
         p.title = problem["name"]
         p.content = meta.pop("content")
         p.note = meta.pop("note")
+        p.identifier = meta.pop("identifier")
         p.meta_json = json.dumps(meta)
-        p.identifier = md5(json.dumps(meta["tests"])).hexdigest()
         p.save()
-        new_problems += 1
 
-    # Check for new contest
-    upcoming_contests = []
+        updated = True
+
+    if updated:
+        data.write("count_all", Problem.all(keys_only=True).count(9999))
+
+    # Check: new contests
+    updated = False
+    limit = 10  # check only latest few contests, and it can enough
     for contest in codeforces.api("contest.list"):
-        # read only contest
-        if contest["id"] in [419]:
+        # Stop: if reach the limit
+        limit -= 1
+        if not complete_update and limit <= 0:
+            break
+        # endfold
+
+        # Skip: if not allow submission
+        if contest["id"] in [562, 541]:
             continue
 
-        c = Contest.find(id=int(contest["id"])) or \
-            Contest(id=int(contest["id"]))
-
-        if c.problems:
+        if contest["id"] in [537, 532, 419, 326, 324, 308, 247, 211, 206, 170]:
             continue
 
-        info("new contest found: %s" % contest["id"])
-        c.name = contest["name"]
-        c.start = str(contest["startTimeSeconds"])
-
-        if contest["startTimeSeconds"] >= start_time:
-            info("Contest %s: Not started" % (str(contest["id"])))
-            upcoming_contests.append({
-                "id": contest["id"],
-                "name": contest["name"],
-                "start": contest["startTimeSeconds"],
-                "site": "codeforces",
-            })
-            c.save()
+        # Skip: if not yet started
+        if contest["phase"] == "BEFORE":
             continue
+        # endfold
 
+        c = Contest.find(id=contest["id"]) or Contest(id=contest["id"])
+
+        # Skip: if already added
+        if c.name:
+            continue
+        # endfold
+
+        info("Adding contest: %s" % contest["id"])
+
+        # Connect problem index to problemset problem code
         problems = {}
         params = {
+            "contestId": contest["id"],
             "from": 1,
             "count": 1,
-            "contestId": contest["id"],
         }
-        for problem in codeforces.api("contest.standings", **params)["problems"]:
-            code = "%3s-%s" % (problem["contestId"], problem["index"])
-            if code in ["524-A", "524-B"]:
-                info("SKIPPED: %s" % code)
-                continue
+        for p in codeforces.api("contest.standings", **params)["problems"]:
+            code = "%3s-%s" % (p["contestId"], p["index"])
+            meta = codeforces.problem(code)
 
-            meta = parse.problem(code)
+            # skip: if problem parsing failed
             if not meta:
-                warning("Can't parse: %s" % code)
                 continue
 
-            i = md5(json.dumps(meta["tests"])).hexdigest()
-            p = Problem.find(identifier=i)
-            if not p:
-                warning("Problem not found: %s" % code)
+            # find: original problem from problemset
+            original = Problem.find(identifier=meta["identifier"])
+            if not original:
+                warning("Contest's problem not listed in problemset %s" % code)
                 continue
-            problems[problem["index"]] = p.code
+
+            problems[p["index"]] = original.code
+        # endfold
+
+        c.name = contest["name"]
+        c.start_at = contest["startTimeSeconds"]
         c.problems_json = json.dumps(problems)
         c.save()
 
-    # update contest count
-    data.write("count:contest-all", Contest.all().count())
+        updated = True
 
-    # Update problems count
-    if new_problems > 0:
-        data.write("count_all", data.fetch("count_all", 0) + new_problems)
+    if updated:
+        data.write("count:contest-all", Contest.all(keys_only=True).count(999))
     # endfold
-    # Update upcoming contest
+
+    # Check: upcoming contests
+    upcoming_contests = codeforces.upcoming_contests()
+    upcoming_contests += topcoder.upcoming_contests()
+    upcoming_contests = sorted(upcoming_contests, key=lambda i: i["start_at"])
+
     data.write("upcoming_contests", upcoming_contests)
-    data.write("topcoder_contests", topcoder_contests())
     # endfold
 
-    info("OK")
-    x.response("OK")
+    info("Executed seconds: %.1f" % (time.time() - start_t))
+    x.response("Executed seconds: %.1f" % (time.time() - start_t))

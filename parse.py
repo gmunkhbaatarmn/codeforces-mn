@@ -3,7 +3,6 @@ import time
 import json
 import urllib
 import datetime
-import lxml.html
 import html2text as h2t
 from logging import warning, info
 from httplib import HTTPException
@@ -12,55 +11,6 @@ from lxml import etree
 
 
 # parse from codeforces.com
-def problem(code):
-    info("Problem: %s" % code)
-    r = url_open("http://codeforces.com/problemset/problem/" +
-                 code.strip().replace("-", "/"))
-    source = r.read()
-
-    tree = lxml.html.fromstring(source)
-
-    if not tree.xpath("//div[@class='problem-statement']"):
-        warning("Unexpected response problem: %s" % code)
-        return
-
-    inputs = tree.xpath("//div[@class='input']/pre")
-    outputs = tree.xpath("//div[@class='output']/pre")
-
-    content = html(tree.xpath("//div[@class='problem-statement']/div")[1])
-    input_text = html(tree.xpath("//div[@class='input-specification']")[0])
-    input_text = input_text.replace('<div class="section-title">Input</div>',
-                                    "<h2>Оролт</h2>")
-    content += input_text
-
-    output_t = html(tree.xpath("//div[@class='output-specification']")[0])
-    output_t = output_t.replace('<div class="section-title">Output</div>',
-                                "<h2>Гаралт</h2>")
-    content += output_t
-
-    note = ""
-    if tree.xpath("//div[@class='note']"):
-        note = html(tree.xpath("//div[@class='note']")[0])
-        note = note.replace('<div class="section-title">Note</div>', "")
-
-    result = {
-        # meta fields
-        "time": tree.xpath("//div[@class='time-limit']/text()")[0],
-        "memory": tree.xpath("//div[@class='memory-limit']/text()|"
-                             "//div[@class='memory-limit']/"
-                             "span[@class='tex-font-style-bf']/text()")[0],
-        "input": tree.xpath("//div[@class='input-file']/text()")[0],
-        "output": tree.xpath("//div[@class='output-file']/text()")[0],
-        "tests": zip(map(lambda e: sample_test(e), inputs),
-                     map(lambda e: sample_test(e), outputs)),
-        # statement fields
-        "content": html2text(content),
-        "note": html2text(note),
-    }
-
-    return result
-
-
 def sample_test(e):
     source = html(e).replace("<br/>", "\n")
     source = source.replace('<span class="tex-span">', "")
@@ -85,6 +35,9 @@ def topcoder_contests():
         # Skip if Marathon
         if c["challengeType"] == "Marathon":
             continue
+
+        print datetime.strptime(c["registrationStartDate"], "%Y-%m-%d %H:%M:%S")
+        return
 
         # Registration starts 4 hour before contest start
         # EST = UTC-05, ESD = UTC-04
@@ -143,7 +96,8 @@ def url_open(url, retry=0):
 
 
 def html2text(string):
-    string = string.decode("utf-8")
+    if isinstance(string, str):
+        string = string.decode("utf-8")
 
     string = string.replace("<i>", "")
     string = string.replace("</i>", "")

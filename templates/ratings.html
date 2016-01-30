@@ -17,7 +17,7 @@
           <th style="width:5em">Чансаа</th>
           <th style="width:5em">Өөрчлөлт</th>
         </tr>
-        {% for u in codeforces %}
+        {% for u in codeforces if u.active %}
           <tr {{- ' class="recent"'|safe if u.recent }}>
             <td class="text-center">{{ loop.index }}</td>
             <td>{{ cf_user(u.handle, u.rating)|safe }}</td>

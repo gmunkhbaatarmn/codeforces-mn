@@ -20,7 +20,7 @@
         {% endif %}
         <tr {{- loop.cycle(' class="dark"', "")|safe }}>
           <td class="text-center"><a href="/contest/{{ c.id }}">{{ c.name }}</a></td>
-          <td class="text-center">{{ date_format(c.start) }}</td>
+          <td class="text-center">{{ date_format(c.start_at) }}</td>
           <td style="text-align:center {{- "; background:#e6ffdb" if c.translated_count == c.problems|length }}">{{ c.translated_count }} / {{ c.problems|length }}</td>
           <td class="text-center"><a href="http://codeforces.com/contest/{{ c.id }}/standings/friends/true" class="external">Эцсийн дүн</a></td>
         </tr>

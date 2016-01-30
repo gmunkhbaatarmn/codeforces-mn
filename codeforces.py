@@ -32,6 +32,7 @@ def upcoming_contests():
 
         result.append({
             "site": "codeforces",
+            "name": contest["name"],
             "link": "http://codeforces.com/contests/%s" % contest["id"],
             "start_at": contest["startTimeSeconds"],
         })
@@ -74,7 +75,7 @@ def problem(code):
     # Parse: time limit
     time_limit = tree.xpath("//div[@class='time-limit']/text()")[0]
     time_limit = time_limit.replace("seconds", "")
-    time_limit = int(time_limit.replace("second", "").strip())
+    time_limit = time_limit.replace("second", "").strip()
 
     # Parse: memory limit
     memory_limit = tree.xpath("string(//div[@class='memory-limit'])")
@@ -113,6 +114,7 @@ def problem(code):
     content = to_html(tree.xpath("//div[@class='problem-statement']/div")[1])
     content += input_t
     content += output_t
+    content = ensure_unicode(content)
 
     # Parse: note
     if tree.xpath("//div[@class='note']"):
@@ -155,3 +157,9 @@ def to_html(element):
     html_source = html_source.split(">", 1)[1].rsplit("</", 1)[0]
 
     return html_source
+
+
+def ensure_unicode(string):
+    if isinstance(string, str):
+        string = string.decode("utf-8")
+    return string

@@ -23,6 +23,7 @@ def upcoming_contests():
         # Parse: start_at
         start_at = c["registrationStartDate"]
         start_at = datetime.strptime(start_at, "%Y-%m-%d %H:%M EST")
+        start_at = int(start_at.strftime("%s"))
 
         # timezone "EST" is mean "UTC-05"
         start_at += 3600 * 5

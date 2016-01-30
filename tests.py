@@ -66,6 +66,7 @@ def test_codeforces_problem():
     progress("codeforces.problem")
 
     codeforces.problem(" 51-B")
+    codeforces.problem("575-I")
     codeforces.problem("576-E")
 
     progress("codeforces.problem\n")
@@ -114,7 +115,7 @@ def test_topcoder_user_info():
 def test_topcoder_upcoming_contests():
     progress("topcoder.upcoming_contests")
 
-    for i in codeforces.upcoming_contests():
+    for i in topcoder.upcoming_contests():
         ok(isinstance(i["site"], basestring))
         ok(isinstance(i["name"], basestring))
         ok(isinstance(i["link"], basestring))
