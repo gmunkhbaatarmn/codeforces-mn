@@ -31,7 +31,6 @@ def contest_problems(contestId):
 
 # parse from codeforces.com
 def problem(code):
-
     info("Problem: %s" % code)
     r = url_open("http://codeforces.com/problemset/problem/" +
                  code.strip().replace("-", "/"))
@@ -161,36 +160,6 @@ def topcoder_user(handle, id):
         "active": True,
         "contest_id": int(recent.find("round_id").text),
     }
-
-
-def topcoder_ratings():
-    # - List of Mongolians
-    info("TopCoder: List of Mongolians")
-    try:
-        r = url_open("http://community.topcoder.com/tc?module=AlgoRank&cc=496")
-        assert r.code == 200
-    except:
-        warning("TopCoder: List of all Mongolian coders", exc_info=True)
-        return
-    # endfold
-
-    tree = lxml.html.document_fromstring(r.read())
-    handle_ids = []
-    for a in tree.xpath("//*[@class='stat']//tr/td[2]/a"):
-        id = a.attrib["href"].split("cr=")[1].split("&tab=")[0]
-        handle = a.text.strip()
-        handle_ids.append([handle, id])
-
-    # Fetch each user and exclude inactives
-    users = [topcoder_user(a, b) for a, b in handle_ids]
-    users = filter(lambda u: u["active"], users)
-
-    # Mark recent rating updates
-    recent_contest = max(users, key=lambda u: u["contest_id"])["contest_id"]
-    for i in range(len(users)):
-        users[i]["recent"] = (recent_contest == users[i]["contest_id"])
-
-    return sorted(users, key=lambda u: -u["rating"])
 
 
 # helper functions
