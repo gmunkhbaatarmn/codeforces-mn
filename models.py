@@ -46,7 +46,9 @@ class Problem(Model):
 class Contest(Model):
     id = db.IntegerProperty()
     name = db.StringProperty()
-    start = db.StringProperty()
+    # todo: delete `contest.start`
+    # start = db.StringProperty()
+    start_at = db.IntegerProperty()
     problems_json = db.StringProperty()
     translated_count = db.IntegerProperty(default=0)
 
