@@ -32,6 +32,7 @@ def upcoming_contests():
 
         result.append({
             "site": "codeforces",
+            "name": contest["name"],
             "link": "http://codeforces.com/contests/%s" % contest["id"],
             "start_at": contest["startTimeSeconds"],
         })
