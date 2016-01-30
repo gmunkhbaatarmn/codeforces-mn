@@ -63,7 +63,6 @@ def test_codeforces_mongolians():
 
 
 # Module: topcoder
-@attr("focus")
 def test_topcoder_mongolians():
     progress("topcoder.mongolians")
 
@@ -75,6 +74,20 @@ def test_topcoder_mongolians():
         ok(isinstance(id, int))
 
     progress("topcoder.mongolians\n")
+
+
+@attr("focus")
+def test_topcoder_user_info():
+    progress("topcoder.user_info")
+
+    u = topcoder.user_info(22833617)
+
+    ok(isinstance(u["active"], bool))
+    ok(isinstance(u["contest_id"], int))
+    ok(isinstance(u["new_rating"], int))
+    ok(isinstance(u["old_rating"], int))
+
+    progress("topcoder.user_info\n")
 
 
 if __name__ == "__main__":
