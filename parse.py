@@ -1,76 +1,10 @@
 # coding: utf-8
-import time
-import json
 import urllib
 import datetime
 import html2text as h2t
-from logging import warning, info
+from logging import info
 from httplib import HTTPException
 from google.appengine.runtime import apiproxy_errors
-from lxml import etree
-
-
-# parse from codeforces.com
-def sample_test(e):
-    source = html(e).replace("<br/>", "\n")
-    source = source.replace('<span class="tex-span">', "")
-    source = source.replace("</span>", "")
-
-    return source
-
-
-def html(e):
-    " inner html "
-    return etree.tostring(e).split(">", 1)[1].rsplit("</", 1)[0]
-
-
-def topcoder_contests():
-    data = url_open("http://api.topcoder.com/v2/"
-                    "dataScience/challenges/upcoming")
-
-    result = json.loads(data.read())["data"]
-    contests = []
-
-    for c in result:
-        # Skip if Marathon
-        if c["challengeType"] == "Marathon":
-            continue
-
-        print datetime.strptime(c["registrationStartDate"], "%Y-%m-%d %H:%M:%S")
-        return
-
-        # Registration starts 4 hour before contest start
-        # EST = UTC-05, ESD = UTC-04
-        start = c["registrationStartDate"]
-        if start[-3:] == "EST":
-            df = datetime.timedelta(hours=9)
-        elif start[-3:] == "ESD":
-            df = datetime.timedelta(hours=8)
-        else:
-            warning(c["challengeName"] + " unexpected datetime: " + start)
-            continue
-
-        # 2016-02-22 17:00 EST -> 2016-02-22 17:00 UTC -> unixtimestamp
-        try:
-            start = start[:-4]
-            start = datetime.datetime.strptime(start, "%Y-%m-%d %H:%M") + df
-            start = time.mktime(start.timetuple())
-            two_week = 14 * 24 * 60 * 60
-            # Skip if not in next 2 week
-            if start - time.time() > two_week:
-                continue
-        except Exception:
-            warning(c["challengeName"] + " unexpected behaviour: " + start)
-            continue
-
-        contests.append({
-            "id": c["challengeId"],
-            "name": c["challengeName"],
-            "start": int(start),
-            "site": "topcoder",
-        })
-
-    return contests
 
 
 # helper functions

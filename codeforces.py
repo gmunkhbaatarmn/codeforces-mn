@@ -48,7 +48,7 @@ def mongolians():
     assert r.final_url is None, r.final_url     # validate: no redirect
 
     tree = lxml.html.document_fromstring(r.content)
-    selector = "//div[contains(@class,'ratingsDatatable')]//table//tr//td[2]//a"
+    selector = "//div[contains(@class,'ratingsDatatable')]//tr//td[2]//a"
 
     return [i.text.strip() for i in tree.xpath(selector)]
 
