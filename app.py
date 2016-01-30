@@ -2,12 +2,11 @@
 import json
 import time
 import parse
-import lxml.html
+import codeforces
 from hashlib import md5
 from datetime import datetime
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, taskqueue, memcache
-from parse import get_url
 from parse import topcoder_ratings, date_format, relative, topcoder_contests, \
     problemset_problems, contest_problems, cf_api
 from models import Problem, Contest, Suggestion
@@ -156,63 +155,43 @@ def ratings(x):
     x.render("ratings.html")
 
 
-@route("/ratings/update")
-def ratings_update_task(x):
-    start = time.time()
-
-    # CodeForces
-    info("CodeForces: List of Mongolians")
-    try:
-        r = get_url("http://codeforces.com/ratings/country/Mongolia")
-
-        assert r.code == 200
-        assert r.url == "http://codeforces.com/ratings/country/Mongolia"
-    except:
-        warning("CodeForces: list of all mongolia coders", exc_info=True)
-        return
-
-    tree = lxml.html.document_fromstring(r.read())
-
-    handles = []
-    for a in tree.xpath("//div[@class='datatable ratingsDatatable']"
-                        "//table//tr//td[2]//a"):
-        handles.append(a.text.strip())
-
-    users = cf_api("user.info", handles=";".join(handles))
-    result = []
-
+@route("/ratings/update-codeforces")
+def ratings_update_codeforces(x):
     now = time.time()
-    six_month = 6 * 30 * 24 * 60 * 60
+    period = 180 * 24 * 3600  # 180 days
 
-    for user in users:
-        try:
-            ratings = cf_api("user.rating", handle=user["handle"])
-        except Exception:
-            warning("Failed fetching user rating: %s" % user["handle"])
-            continue
+    result = []
+    for handle in codeforces.mongolians():
+        ratings = codeforces.api("user.rating", handle=handle)
 
-        # skip: if not competed
+        # Skip: if not competed
         if not ratings:
-            info("Skipping user: %s ( Not ranked )" % user["handle"])
+            info("Skip: %s. Reason: No rating" % handle)
             continue
+        # endfold
 
-        # active or not
-        last_contest = ratings[-1]
-        diff = now - last_contest["ratingUpdateTimeSeconds"]
-        user["active"] = diff < six_month
-
-        # rating change
-        user["change"] = last_contest["newRating"] - \
-            last_contest["oldRating"]
-        user["contest_id"] = last_contest["contestId"]
-        result.append(user)
+        result.append({
+            "handle": handle,
+            "active": (now - ratings[-1]["ratingUpdateTimeSeconds"]) < period,
+            "change": ratings[-1]["newRating"] - ratings[-1]["oldRating"],
+            "contest_id": ratings[-1]["contestId"],
+        })
 
     data.write("Rating:codeforces", result)
+
+    info("Executed seconds: %.1f" % (time.time() - now))
+    x.response("Executed seconds: %.1f" % (time.time() - now))
+
+
+@route("/ratings/update-topcoder")
+def ratings_update(x):
+    start = time.time()
 
     # Topcoder
     ratings = topcoder_ratings()
     if ratings:
         data.write("Rating:topcoder", ratings)
+    # endfold
 
     info("Executed seconds: %.1f" % (time.time() - start))
     x.response("OK")
