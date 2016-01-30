@@ -121,30 +121,6 @@ def topcoder_contests():
     return contests
 
 
-def topcoder_user(handle, id):
-    info("TopCoder: %s" % handle)
-    data = url_open("http://community.topcoder.com/tc?module=BasicData"
-                    "&c=dd_rating_history&cr=%s" % id).read()
-
-    row_list = lxml.etree.fromstring(data).xpath("//dd_rating_history/row")
-    # if empty exclude
-    if not row_list:
-        return {"active": False}
-    # find most recent round
-    recent = max(row_list, key=lambda row: row.find("date").text)
-    new_rating = int(recent.find("new_rating").text)
-    old_rating = int(recent.find("old_rating").text)
-
-    return {
-        "handle": handle,
-        "id": id,
-        "rating": new_rating,
-        "change": new_rating - old_rating,
-        "active": True,
-        "contest_id": int(recent.find("round_id").text),
-    }
-
-
 # helper functions
 def date_format(date, format="%Y/%m/%d"):
     if str(date).isdigit():
