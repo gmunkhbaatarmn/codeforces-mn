@@ -2,12 +2,13 @@
 import json
 import time
 import parse
+import topcoder
+import codeforces
 from hashlib import md5
 from datetime import datetime
 from markdown2 import markdown
-from natrix import app, route, data, info, warning, taskqueue, memcache
-from parse import topcoder_ratings, date_format, relative, topcoder_contests, \
-    problemset_problems, contest_problems, codeforces_ratings, cf_api
+from natrix import app, route, data, info, warning, memcache
+from parse import date_format, relative, topcoder_contests
 from models import Problem, Contest, Suggestion
 
 
@@ -154,25 +155,62 @@ def ratings(x):
     x.render("ratings.html")
 
 
-@route("/ratings/update")
+@route("/ratings/update-codeforces")
+def ratings_update_codeforces(x):
+    now = time.time()
+    period = 180 * 24 * 3600  # 180 days
+
+    result = []
+    for handle in codeforces.mongolians():
+        ratings = codeforces.api("user.rating", handle=handle)
+
+        # Skip: if not competed
+        if not ratings:
+            info("Skip: %s. Reason: No rating" % handle)
+            continue
+        # endfold
+
+        result.append({
+            "handle": handle,
+            "active": (now - ratings[-1]["ratingUpdateTimeSeconds"]) < period,
+            "rating": ratings[-1]["newRating"],
+            "change": ratings[-1]["newRating"] - ratings[-1]["oldRating"],
+            "contest_id": ratings[-1]["contestId"],
+        })
+
+    data.write("Rating:codeforces", result)
+
+    info("Executed seconds: %.1f" % (time.time() - now))
+    x.response("Executed seconds: %.1f" % (time.time() - now))
+
+
+@route("/ratings/update-topcoder")
 def ratings_update(x):
-    taskqueue.add(url="/ratings/update")
+    now = time.time()
 
+    result = []
+    for handle, id in topcoder.mongolians():
+        user = topcoder.user_info(id)
 
-@route("/ratings/update#post")
-def ratings_update_task(x):
-    start = time.time()
+        # Skip: if not competed
+        if not user["active"] and user["reason"] == "No history":
+            info("Skip: %s. Reason: %s" % (handle, user["reason"]))
+            continue
+        # endfold
 
-    ratings = codeforces_ratings()
-    if ratings:
-        data.write("Rating:codeforces", ratings)
+        result.append({
+            "id": id,
+            "handle": handle,
+            "active": user["active"],
+            "rating": user["new_rating"],
+            "change": user["new_rating"] - user["old_rating"],
+            "contest_id": user["contest_id"],
+        })
 
-    ratings = topcoder_ratings()
-    if ratings:
-        data.write("Rating:topcoder", ratings)
+    data.write("Rating:topcoder", result)
 
-    info("Executed seconds: %.1f" % (time.time() - start))
-    x.response("OK")
+    info("Executed seconds: %.1f" % (time.time() - now))
+    x.response("Executed seconds: %.1f" % (time.time() - now))
 
 
 # Suggestion
@@ -408,17 +446,11 @@ def extension_problem(x, contest_id, index):
 @route("/update")
 def update(x):
     " new contests, new problems "
-    taskqueue.add(url="/update")
-
-
-@route("/update#post")
-def update_post(x):
     start_time = time.time()
     new_problems = 0
 
     # Check for new problems
-    all_problems = problemset_problems()
-    for problem in all_problems:
+    for problem in codeforces.api("problemset.problems")["problems"]:
         code = "%s-%s" % (str(problem["contestId"]), problem["index"])
         info(code)
         if code in ["524-A", "524-B"]:
@@ -452,7 +484,7 @@ def update_post(x):
 
     # Check for new contest
     upcoming_contests = []
-    for contest in cf_api("contest.list"):
+    for contest in codeforces.api("contest.list"):
         # read only contest
         if contest["id"] in [419]:
             continue
@@ -479,7 +511,12 @@ def update_post(x):
             continue
 
         problems = {}
-        for problem in contest_problems(contest["id"]):
+        params = {
+            "from": 1,
+            "count": 1,
+            "contestId": contest["id"],
+        }
+        for problem in codeforces.api("contest.standings", **params)["problems"]:
             code = "%3s-%s" % (problem["contestId"], problem["index"])
             if code in ["524-A", "524-B"]:
                 info("SKIPPED: %s" % code)
@@ -506,7 +543,6 @@ def update_post(x):
     if new_problems > 0:
         data.write("count_all", data.fetch("count_all", 0) + new_problems)
     # endfold
-
     # Update upcoming contest
     data.write("upcoming_contests", upcoming_contests)
     data.write("topcoder_contests", topcoder_contests())
@@ -514,9 +550,3 @@ def update_post(x):
 
     info("OK")
     x.response("OK")
-
-
-@route("/setup")
-def setup(x):
-    taskqueue.add(url="/ratings/update")
-    taskqueue.add(url="/update")

@@ -27,7 +27,11 @@ handlers:
   script: app.app
   login: admin
 
-- url: /ratings/update
+- url: /ratings/update-codeforces
+  script: app.app
+  login: admin
+
+- url: /ratings/update-topcoder
   script: app.app
   login: admin
 
