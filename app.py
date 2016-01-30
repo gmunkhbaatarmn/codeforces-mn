@@ -2,13 +2,14 @@
 import json
 import time
 import parse
+import topcoder
 import codeforces
 from hashlib import md5
 from datetime import datetime
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, taskqueue, memcache
-from parse import topcoder_ratings, date_format, relative, topcoder_contests, \
-    problemset_problems, contest_problems, cf_api
+from parse import date_format, relative, topcoder_contests, problemset_problems
+from parse import contest_problems, cf_api
 from models import Problem, Contest, Suggestion
 
 
@@ -173,6 +174,7 @@ def ratings_update_codeforces(x):
         result.append({
             "handle": handle,
             "active": (now - ratings[-1]["ratingUpdateTimeSeconds"]) < period,
+            "rating": ratings[-1]["newRating"],
             "change": ratings[-1]["newRating"] - ratings[-1]["oldRating"],
             "contest_id": ratings[-1]["contestId"],
         })
@@ -185,16 +187,31 @@ def ratings_update_codeforces(x):
 
 @route("/ratings/update-topcoder")
 def ratings_update(x):
-    start = time.time()
+    now = time.time()
 
-    # Topcoder
-    ratings = topcoder_ratings()
-    if ratings:
-        data.write("Rating:topcoder", ratings)
-    # endfold
+    result = []
+    for handle, id in topcoder.mongolians():
+        user = topcoder.user_info(id)
 
-    info("Executed seconds: %.1f" % (time.time() - start))
-    x.response("OK")
+        # Skip: if not competed
+        if not user["active"] and user["reason"] == "No history":
+            info("Skip: %s. Reason: %s" % (handle, user["reason"]))
+            continue
+        # endfold
+
+        result.append({
+            "id": id,
+            "handle": handle,
+            "active": user["active"],
+            "rating": user["new_rating"],
+            "change": user["new_rating"] - user["old_rating"],
+            "contest_id": user["contest_id"],
+        })
+
+    data.write("Rating:topcoder", result)
+
+    info("Executed seconds: %.1f" % (time.time() - now))
+    x.response("Executed seconds: %.1f" % (time.time() - now))
 
 
 # Suggestion

@@ -31,7 +31,7 @@ def user_info(user_id):
 
     history = tree.xpath(selector)
     if len(history) == 0:
-        return {"active": False}
+        return {"active": False, "reason": "No history"}
 
     recent = max(history, key=lambda row: row.find("date").text)
     return {
