@@ -7,7 +7,7 @@ import codeforces
 from hashlib import md5
 from datetime import datetime
 from markdown2 import markdown
-from natrix import app, route, data, info, warning, taskqueue, memcache
+from natrix import app, route, data, info, warning, memcache
 from parse import date_format, relative, topcoder_contests
 from models import Problem, Contest, Suggestion
 
@@ -550,9 +550,3 @@ def update(x):
 
     info("OK")
     x.response("OK")
-
-
-@route("/setup")
-def setup(x):
-    taskqueue.add(url="/ratings/update")
-    taskqueue.add(url="/update")
