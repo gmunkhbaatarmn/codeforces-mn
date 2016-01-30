@@ -46,8 +46,6 @@ class Problem(Model):
 class Contest(Model):
     id = db.IntegerProperty()
     name = db.StringProperty()
-    # todo: delete `contest.start`
-    # start = db.StringProperty()
     start_at = db.IntegerProperty()
     problems_json = db.StringProperty()
     translated_count = db.IntegerProperty(default=0)
@@ -57,6 +55,7 @@ class Contest(Model):
         # list of tuple (letter, problemset code)
         result = []
         if not self.problems_json:
+            # todo: resolve this warning logs
             warning("Contest: %s" % self.id)
         data = json.loads(self.problems_json or "{}")
 
