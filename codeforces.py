@@ -26,4 +26,4 @@ def mongolians():
     tree = lxml.html.document_fromstring(r.content)
     selector = "//div[contains(@class,'ratingsDatatable')]//table//tr//td[2]//a"
 
-    return [a.text.strip() for a in tree.xpath(selector)]
+    return [i.text.strip() for i in tree.xpath(selector)]

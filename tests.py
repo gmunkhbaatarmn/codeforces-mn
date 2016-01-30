@@ -1,6 +1,7 @@
 import sys
 import nose
 import logging
+import topcoder
 import codeforces
 from nose.tools import ok_ as ok, eq_ as eq
 from nose.plugins.attrib import attr
@@ -42,7 +43,6 @@ def progress(message):
 
 
 # Module: codeforces
-@attr("focus")
 def test_codeforces_api():
     progress("codeforces.api")
 
@@ -60,6 +60,21 @@ def test_codeforces_mongolians():
     map(lambda i: isinstance(i, basestring), handles)
 
     progress("codeforces.mongolians\n")
+
+
+# Module: topcoder
+@attr("focus")
+def test_topcoder_mongolians():
+    progress("topcoder.mongolians")
+
+    handles = topcoder.mongolians()
+
+    ok(len(handles) > 0)
+    for handle, id in handles:
+        ok(isinstance(handle, basestring))
+        ok(isinstance(id, int))
+
+    progress("topcoder.mongolians\n")
 
 
 if __name__ == "__main__":
