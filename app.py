@@ -2,12 +2,14 @@
 import json
 import time
 import parse
+import lxml.html
 from hashlib import md5
 from datetime import datetime
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, taskqueue, memcache
+from parse import get_url
 from parse import topcoder_ratings, date_format, relative, topcoder_contests, \
-    problemset_problems, contest_problems, codeforces_ratings, cf_api
+    problemset_problems, contest_problems, cf_api
 from models import Problem, Contest, Suggestion
 
 
@@ -158,10 +160,56 @@ def ratings(x):
 def ratings_update_task(x):
     start = time.time()
 
-    ratings = codeforces_ratings()
-    if ratings:
-        data.write("Rating:codeforces", ratings)
+    # CodeForces
+    info("CodeForces: List of Mongolians")
+    try:
+        r = get_url("http://codeforces.com/ratings/country/Mongolia")
 
+        assert r.code == 200
+        assert r.url == "http://codeforces.com/ratings/country/Mongolia"
+    except:
+        warning("CodeForces: list of all mongolia coders", exc_info=True)
+        return
+
+    tree = lxml.html.document_fromstring(r.read())
+
+    handles = []
+    for a in tree.xpath("//div[@class='datatable ratingsDatatable']"
+                        "//table//tr//td[2]//a"):
+        handles.append(a.text.strip())
+
+    users = cf_api("user.info", handles=";".join(handles))
+    result = []
+
+    now = time.time()
+    six_month = 6 * 30 * 24 * 60 * 60
+
+    for user in users:
+        try:
+            ratings = cf_api("user.rating", handle=user["handle"])
+        except Exception:
+            warning("Failed fetching user rating: %s" % user["handle"])
+            continue
+
+        # skip: if not competed
+        if not ratings:
+            info("Skipping user: %s ( Not ranked )" % user["handle"])
+            continue
+
+        # active or not
+        last_contest = ratings[-1]
+        diff = now - last_contest["ratingUpdateTimeSeconds"]
+        user["active"] = diff < six_month
+
+        # rating change
+        user["change"] = last_contest["newRating"] - \
+            last_contest["oldRating"]
+        user["contest_id"] = last_contest["contestId"]
+        result.append(user)
+
+    data.write("Rating:codeforces", result)
+
+    # Topcoder
     ratings = topcoder_ratings()
     if ratings:
         data.write("Rating:topcoder", ratings)

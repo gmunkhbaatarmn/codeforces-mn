@@ -8,7 +8,8 @@ import random
 import html2text as h2t
 from logging import warning, info
 from httplib import HTTPException
-from google.appengine.runtime.apiproxy_errors import DeadlineExceededError
+from google.appengine.api import urlfetch, urlfetch_errors
+from google.appengine.runtime import apiproxy_errors
 from lxml import etree
 
 
@@ -26,59 +27,6 @@ def contest_problems(contestId):
         "contestId": contestId,
     })
     return result["problems"]
-
-
-# Codeforces users from mongolia
-def codeforces_ratings():
-    # List of Mongolians
-    info("CodeForces: List of Mongolians")
-    try:
-        r = url_open("http://codeforces.com/ratings/country/Mongolia")
-
-        assert r.code == 200
-        assert r.url == "http://codeforces.com/ratings/country/Mongolia"
-    except:
-        warning("CodeForces: list of all mongolia coders", exc_info=True)
-        return
-
-    tree = lxml.html.document_fromstring(r.read())
-
-    handles = []
-    for a in tree.xpath("//div[@class='datatable ratingsDatatable']"
-                        "//table//tr//td[2]//a"):
-        handles.append(a.text.strip())
-    # endfold
-
-    users = cf_api("user.info", handles=";".join(handles))
-    result = []
-
-    now = time.time()
-    six_month = 6 * 30 * 24 * 60 * 60
-
-    for user in users:
-        try:
-            ratings = cf_api("user.rating", handle=user["handle"])
-        except Exception:
-            warning("Failed fetching user rating: %s" % user["handle"])
-            continue
-
-        # Skip if not competed
-        if not ratings:
-            info("Skipping user: %s ( Not ranked )" % user["handle"])
-            continue
-
-        # Active or not
-        last_contest = ratings[-1]
-        diff = now - last_contest["ratingUpdateTimeSeconds"]
-        user["active"] = diff < six_month
-
-        # Rating change
-        user["change"] = last_contest["newRating"] - \
-            last_contest["oldRating"]
-        user["contest_id"] = last_contest["contestId"]
-        result.append(user)
-
-    return result
 
 
 # parse from codeforces.com
@@ -264,15 +212,50 @@ def cf_api(methodName, **kwargs):
 
 
 def url_open(url, retry=0):
+    # todo: remove `url_open` and replace with `get_url`
     try:
         return urllib.urlopen(url)
-    except (DeadlineExceededError, IOError, HTTPException):
+    except (apiproxy_errors.DeadlineExceededError, IOError, HTTPException):
         info("Delayed (%s): %s" % (retry, url))
 
     if retry < 10:
         return url_open(url, retry + 1)
 
     raise HTTPException("Network Error: %s" % url)
+
+
+def get_url(url, params=None, retry=0, headers=None, cookie=None):
+    # Build `url` from `params`
+    params = params or {}
+    if len(params) > 0 and "?" in url:
+        url = "%s&%s" % (url, urllib.urlencode(params))
+    elif len(params) > 0:
+        url = "%s?%s" % (url, urllib.urlencode(params))
+
+    # Build `headers` from `headers`, `cookie`
+    user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X)"
+    headers = headers or {}
+    headers.update({
+        "User-agent": user_agent,
+        "Accept-Language": "en-US,en;q=0.8",
+    })
+    if cookie:
+        headers["Cookie"] = cookie
+    # endfold
+
+    try:
+        return urlfetch.fetch(url=url, headers=headers, deadline=10)
+    except (urlfetch_errors.DownloadError,
+            urlfetch_errors.DeadlineExceededError,
+            urlfetch_errors.InternalTransientError,
+            apiproxy_errors.DeadlineExceededError):
+        info("URLFetch retried: %r" % url)
+
+    if retry >= 10:
+        raise Exception("Network Error: %r" % url)
+
+    time.sleep(1)
+    return get_url(url, params=params, retry=retry+1, headers=headers)
 
 
 def html2text(string):
