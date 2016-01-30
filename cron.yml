@@ -2,9 +2,11 @@ cron:
 - description: Auto add new contests
   url: /update
   schedule: every 3 hours from 00:10 to 23:59
-  target: new
 
-- description: Rating update
-  url: /ratings/update
+- description: CodeForces rating update
+  url: /ratings/update-codeforces
   schedule: every 3 hours from 00:20 to 23:59
-  target: new
+
+- description: Topcoder rating update
+  url: /ratings/update-topcoder
+  schedule: every 3 hours from 00:30 to 23:59
