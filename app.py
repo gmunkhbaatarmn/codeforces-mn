@@ -23,7 +23,6 @@ app.config["context"] = lambda x: {
     "count_done": data.fetch("count_done"),
     "relative": relative,
     "upcoming_contests": data.fetch("upcoming_contests", []),
-    "topcoder_contests": data.fetch("topcoder_contests", []),
 }
 app.config["route-shortcut"] = {
     "<code>": "(\w+)",
@@ -511,8 +510,6 @@ def update(x):
             continue
         # endfold
 
-        info("Adding contest: %s" % contest["id"])
-
         c = Contest.find(id=contest["id"]) or Contest(id=contest["id"])
 
         # Skip: if already added
@@ -520,7 +517,7 @@ def update(x):
             continue
         # endfold
 
-        info("Contest: %s" % contest["id"])
+        info("Adding contest: %s" % contest["id"])
 
         # Connect problem index to problemset problem code
         problems = {}
