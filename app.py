@@ -155,11 +155,6 @@ def ratings(x):
 
 
 @route("/ratings/update")
-def ratings_update(x):
-    taskqueue.add(url="/ratings/update")
-
-
-@route("/ratings/update#post")
 def ratings_update_task(x):
     start = time.time()
 
