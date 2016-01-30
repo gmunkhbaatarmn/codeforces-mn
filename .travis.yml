@@ -4,6 +4,7 @@ python:
 install:
   - pip install nose
   - pip install lxml
+  - pip install pyyaml
   - pip install appengine-sdk
   - pip install flake8
 script:
