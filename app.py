@@ -445,10 +445,18 @@ def extension_problem(x, contest_id, index):
 def update(x):
     " new contests, new problems "
     start_t = time.time()
+    complete_update = "complete" in x.request.query
 
     # Check: new problems
     updated = False
+    limit = 50  # check only latest few problems, and it can enough
     for problem in codeforces.api("problemset.problems")["problems"]:
+        # Stop: if reach the limit
+        limit -= 1
+        if not complete_update and limit <= 0:
+            break
+        # endfold
+
         code = "%3s-%s" % (problem["contestId"], problem["index"])
         p = Problem.find(code=code) or Problem(code=code)
 
@@ -457,10 +465,11 @@ def update(x):
             continue
         # endfold
 
+        info("Adding problem: %s" % code)
         meta = codeforces.problem(p.code)
 
         # Skip: if problem parsing failed
-        if not meta.content:
+        if not meta.get("content"):
             continue
 
         # Skip: already added problem (by smart duplication detect)
@@ -485,7 +494,14 @@ def update(x):
 
     # Check: new contests
     updated = False
+    limit = 10  # check only latest few contests, and it can enough
     for contest in codeforces.api("contest.list"):
+        # Stop: if reach the limit
+        limit -= 1
+        if not complete_update and limit <= 0:
+            break
+        # endfold
+
         # Skip: if not allow submission
         if contest["id"] in [419]:
             continue
@@ -494,6 +510,8 @@ def update(x):
         if contest["phase"] == "BEFORE":
             continue
         # endfold
+
+        info("Adding contest: %s" % contest["id"])
 
         c = Contest.find(id=contest["id"]) or Contest(id=contest["id"])
 
