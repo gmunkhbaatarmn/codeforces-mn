@@ -2,7 +2,8 @@ import sys
 import nose
 import logging
 import codeforces
-from nose.tools import ok_ as ok
+from nose.tools import ok_ as ok, eq_ as eq
+from nose.plugins.attrib import attr
 from google.appengine.ext.testbed import Testbed
 
 
@@ -41,6 +42,15 @@ def progress(message):
 
 
 # Module: codeforces
+@attr("focus")
+def test_codeforces_api():
+    progress("codeforces.api")
+
+    eq(len(codeforces.api("user.info", handles="Petr;tourist")), 2)
+
+    progress("codeforces.api\n")
+
+
 def test_codeforces_mongolians():
     progress("codeforces.mongolians")
 
@@ -60,8 +70,19 @@ if __name__ == "__main__":
         "--quiet",        # disable dotted progress indicator
     ]
 
-    # run focused test: `python tests.py --focus`
+    # Run focused tests
+    """
+    Call:
+        python tests.py --focus
+
+    Focus on test function:
+        @attr("focus")
+        def test_ensure_me():
+            ok(True)
+    """
     if len(sys.argv) > 1 and sys.argv[1] == "--focus":
         argv.append("--attr=focus")
+    attr
+    # endfold
 
     nose.main(argv=argv)

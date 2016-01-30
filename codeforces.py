@@ -1,5 +1,19 @@
+import json
+import urllib
 import lxml.html
 from utils import get_url
+
+
+def api(path, **kwargs):
+    url = "http://codeforces.com/api/" + path
+
+    if kwargs:
+        url += "?" + urllib.urlencode(kwargs.items())
+
+    response = json.loads(get_url(url).content)
+
+    assert response["status"] == "OK", response
+    return response["result"]
 
 
 def mongolians():
