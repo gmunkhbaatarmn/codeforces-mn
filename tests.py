@@ -62,6 +62,27 @@ def test_codeforces_mongolians():
     progress("codeforces.mongolians\n")
 
 
+def test_codeforces_problem():
+    progress("codeforces.problem")
+
+    codeforces.problem(" 51-B")
+    codeforces.problem("576-E")
+
+    progress("codeforces.problem\n")
+
+
+@attr("focus")
+def test_codeforces_upcoming_contests():
+    progress("codeforces.upcoming_contests")
+
+    for i in codeforces.upcoming_contests():
+        ok(isinstance(i["site"], basestring))
+        ok(isinstance(i["link"], basestring))
+        ok(isinstance(i["start_at"], int))
+
+    progress("codeforces.upcoming_contests\n")
+
+
 # Module: topcoder
 def test_topcoder_mongolians():
     progress("topcoder.mongolians")
@@ -76,7 +97,6 @@ def test_topcoder_mongolians():
     progress("topcoder.mongolians\n")
 
 
-@attr("focus")
 def test_topcoder_user_info():
     progress("topcoder.user_info")
 
