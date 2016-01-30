@@ -6,7 +6,7 @@ import codeforces
 from datetime import datetime
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, memcache
-from parse import date_format, relative
+from parse import date_format, relative, html2text
 from models import Problem, Contest, Suggestion
 
 
@@ -143,7 +143,7 @@ def problemset_translate(x, contest_id, index):
     index = index.upper()
     problem = Problem.find_or_404(code="%3s-%s" % (contest_id, index))
 
-    x.render("problemset-translate.html", locals())
+    x.render("problemset-translate.html", locals(), html2text=html2text)
 
 
 # Rating

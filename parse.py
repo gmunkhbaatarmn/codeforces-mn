@@ -96,7 +96,8 @@ def url_open(url, retry=0):
 
 
 def html2text(string):
-    string = string.decode("utf-8")
+    if isinstance(string, str):
+        string = string.decode("utf-8")
 
     string = string.replace("<i>", "")
     string = string.replace("</i>", "")
