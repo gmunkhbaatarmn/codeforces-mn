@@ -447,11 +447,6 @@ def extension_problem(x, contest_id, index):
 @route("/update")
 def update(x):
     " new contests, new problems "
-    taskqueue.add(url="/update")
-
-
-@route("/update#post")
-def update_post(x):
     start_time = time.time()
     new_problems = 0
 
