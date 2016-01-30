@@ -502,7 +502,10 @@ def update(x):
         # endfold
 
         # Skip: if not allow submission
-        if contest["id"] in [419]:
+        if contest["id"] in [562, 541]:
+            continue
+
+        if contest["id"] in [537, 532, 419, 326, 324, 308, 247, 211, 206, 170]:
             continue
 
         # Skip: if not yet started
@@ -540,7 +543,7 @@ def update(x):
                 warning("Contest's problem not listed in problemset %s" % code)
                 continue
 
-            problems[problem["index"]] = original.code
+            problems[p["index"]] = original.code
         # endfold
 
         c.name = contest["name"]
