@@ -7,7 +7,6 @@ import lxml.html
 import html2text as h2t
 from logging import warning, info
 from httplib import HTTPException
-from google.appengine.api import urlfetch, urlfetch_errors
 from google.appengine.runtime import apiproxy_errors
 from lxml import etree
 
@@ -141,40 +140,6 @@ def url_open(url, retry=0):
         return url_open(url, retry + 1)
 
     raise HTTPException("Network Error: %s" % url)
-
-
-def get_url(url, params=None, retry=0, headers=None, cookie=None):
-    # Build `url` from `params`
-    params = params or {}
-    if len(params) > 0 and "?" in url:
-        url = "%s&%s" % (url, urllib.urlencode(params))
-    elif len(params) > 0:
-        url = "%s?%s" % (url, urllib.urlencode(params))
-
-    # Build `headers` from `headers`, `cookie`
-    user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X)"
-    headers = headers or {}
-    headers.update({
-        "User-agent": user_agent,
-        "Accept-Language": "en-US,en;q=0.8",
-    })
-    if cookie:
-        headers["Cookie"] = cookie
-    # endfold
-
-    try:
-        return urlfetch.fetch(url=url, headers=headers, deadline=10)
-    except (urlfetch_errors.DownloadError,
-            urlfetch_errors.DeadlineExceededError,
-            urlfetch_errors.InternalTransientError,
-            apiproxy_errors.DeadlineExceededError):
-        info("URLFetch retried: %r" % url)
-
-    if retry >= 10:
-        raise Exception("Network Error: %r" % url)
-
-    time.sleep(1)
-    return get_url(url, params=params, retry=retry+1, headers=headers)
 
 
 def html2text(string):
