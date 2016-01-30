@@ -8,8 +8,7 @@ from hashlib import md5
 from datetime import datetime
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, taskqueue, memcache
-from parse import date_format, relative, topcoder_contests, problemset_problems
-from parse import contest_problems, cf_api
+from parse import date_format, relative, topcoder_contests
 from models import Problem, Contest, Suggestion
 
 
@@ -451,8 +450,7 @@ def update(x):
     new_problems = 0
 
     # Check for new problems
-    all_problems = problemset_problems()
-    for problem in all_problems:
+    for problem in codeforces.api("problemset.problems")["problems"]:
         code = "%s-%s" % (str(problem["contestId"]), problem["index"])
         info(code)
         if code in ["524-A", "524-B"]:
@@ -486,7 +484,7 @@ def update(x):
 
     # Check for new contest
     upcoming_contests = []
-    for contest in cf_api("contest.list"):
+    for contest in codeforces.api("contest.list"):
         # read only contest
         if contest["id"] in [419]:
             continue
@@ -513,7 +511,12 @@ def update(x):
             continue
 
         problems = {}
-        for problem in contest_problems(contest["id"]):
+        params = {
+            "from": 1,
+            "count": 1,
+            "contestId": contest["id"],
+        }
+        for problem in codeforces.api("contest.standings", **params)["problems"]:
             code = "%3s-%s" % (problem["contestId"], problem["index"])
             if code in ["524-A", "524-B"]:
                 info("SKIPPED: %s" % code)
@@ -540,7 +543,6 @@ def update(x):
     if new_problems > 0:
         data.write("count_all", data.fetch("count_all", 0) + new_problems)
     # endfold
-
     # Update upcoming contest
     data.write("upcoming_contests", upcoming_contests)
     data.write("topcoder_contests", topcoder_contests())

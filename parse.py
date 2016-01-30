@@ -13,22 +13,6 @@ from google.appengine.runtime import apiproxy_errors
 from lxml import etree
 
 
-# Returns all problems from problemset
-def problemset_problems():
-    result = cf_api("problemset.problems")
-    return result["problems"]
-
-
-# Returns all problems of specific contest contest_problems
-def contest_problems(contestId):
-    result = cf_api("contest.standings", **{
-        "from": 1,
-        "count": 1,
-        "contestId": contestId,
-    })
-    return result["problems"]
-
-
 # parse from codeforces.com
 def problem(code):
     info("Problem: %s" % code)
@@ -169,15 +153,6 @@ def date_format(date, format="%Y/%m/%d"):
         utc_date = utc_date + datetime.timedelta(hours=8)
         return utc_date.strftime(format)
     return date
-
-
-def cf_api(methodName, **kwargs):
-    URL = "http://codeforces.com/api/" + methodName
-    URL = URL + "?" + urllib.urlencode(kwargs.items())
-
-    data = url_open(URL).read()
-    data = json.loads(data)
-    return data["result"]
 
 
 def url_open(url, retry=0):
