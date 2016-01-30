@@ -12,12 +12,12 @@
       <br>
       <a href="{{ problem.link }}/edit" style="color:#a0a">энд дарж орчуулна уу</a>
     </h3>
-    <h3><strong>хугацааны хязгаарлалт</strong> {{ problem.meta.time.replace("seconds", "секунд").replace("second", "секунд") }}</h3>
-    <h3><strong>санах ойн хязгаарлалт</strong> {{ problem.meta.memory.replace("megabytes", "мегабайт") }}</h3>
-    <h3><strong>оролт</strong> {{ problem.meta.input.replace("standard input", "стандарт оролт") }}</h3>
-    <h3><strong>гаралт</strong> {{ problem.meta.output.replace("standard output", "стандарт гаралт") }}</h3>
+    <h3><strong>хугацааны хязгаарлалт</strong> {{ problem.meta.time_limit }} секунд</h3>
+    <h3><strong>санах ойн хязгаарлалт</strong> {{ problem.meta.memory_limit }} мегабайт</h3>
+    <h3><strong>оролт</strong> {{ problem.meta.input or "стандарт оролт" }}</h3>
+    <h3><strong>гаралт</strong> {{ problem.meta.output or "стандарт гаралт" }}</h3>
 
-    <div class="mathjax">{{ markdown(problem.content)|safe }}</div>
+    <div class="mathjax">{{ problem.content|safe }}</div>
 
     <h4>Жишээ тэстүүд</h4>
     {% for sample in problem.meta.tests %}
@@ -31,7 +31,7 @@
 
     {% if problem.note %}
       <h2>Тэмдэглэл</h2>
-      <div class="mathjax">{{ markdown(problem.note)|safe }}</div>
+      <div class="mathjax">{{ problem.note|safe }}</div>
     {% endif %}
   </div>
 {% endblock %}
