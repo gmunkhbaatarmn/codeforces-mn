@@ -8,90 +8,77 @@ import random
 import html2text as h2t
 from logging import warning, info
 from httplib import HTTPException
-from google.appengine.api import urlfetch
 from google.appengine.runtime.apiproxy_errors import DeadlineExceededError
 from lxml import etree
 
 
-class codeforcesAPI(object):
-    API_URL = "http://codeforces.com/api"
+# Returns all problems from problemset
+def problemset_problems():
+    result = cf_api("problemset.problems")
+    return result["problems"]
 
-    # Returns all problems of specific contest contest_problems
-    def contest_problems(self, **kwargs):
-        kwargs["from"] = 1
-        kwargs["count"] = 1
-        kwargs["showUnofficial"] = True
-        result = self.__make_request("contest.standings", **kwargs)
-        return result["problems"]
 
-    # Returns all problems from problemset
-    def problemset_problems(self):
-        result = self.__make_request("problemset.problems", deadline=60)
-        return result["problems"]
+# Returns all problems of specific contest contest_problems
+def contest_problems(contestId):
+    result = cf_api("contest.standings", **{
+        "from": 1,
+        "count": 1,
+        "contestId": contestId,
+    })
+    return result["problems"]
 
-    # Returns all contests
-    def contest_list(self):
-        return self.__make_request("contest.list", deadline=60)
 
-    # Returns ratings change object
-    def user_rating(self, **kwargs):
-        return self.__make_request("user.rating", **kwargs)
+# Codeforces users from mongolia
+def codeforces_ratings():
+    # List of Mongolians
+    info("CodeForces: List of Mongolians")
+    try:
+        r = url_open("http://codeforces.com/ratings/country/Mongolia")
 
-    #  Returns all users from mongolia
-    def codeforces_ratings(self, **kwargs):
-        users = self.__make_request("user.ratedList", deadline=240, **kwargs)
+        assert r.code == 200
+        assert r.url == "http://codeforces.com/ratings/country/Mongolia"
+    except:
+        warning("CodeForces: list of all mongolia coders", exc_info=True)
+        return
 
-        result = []
-        now = time.time()
-        six_month = 6 * 30 * 24 * 60 * 60
-        for user in users:
-            # If user is from Mongolia
-            if ("country" in user and user["country"] == "Mongolia"):
-                # All participated contests array
-                for i in range(3):
-                    try:
-                        ratings = self.user_rating(handle=user["handle"])
-                        break
-                    except DeadlineExceededError:
-                        warning("Failed fetching user: %s" % user["handle"])
-                else:
-                    warning("Skipping user: %s ( Timeout )" % user["handle"])
+    tree = lxml.html.document_fromstring(r.read())
 
-                # Skip if not competed in contest
-                if not ratings:
-                    info("Skipping user: %s ( Not ranked )" % user["handle"])
-                    continue
+    handles = []
+    for a in tree.xpath("//div[@class='datatable ratingsDatatable']"
+                        "//table//tr//td[2]//a"):
+        handles.append(a.text.strip())
+    # endfold
 
-                # Skip if not active in last 180 day
-                last_contest = ratings[-1]
-                diff = now - last_contest["ratingUpdateTimeSeconds"]
-                if diff > six_month:
-                    info("Skipping user: %s ( Not active )" % user["handle"])
-                    continue
+    users = cf_api("user.info", handles=";".join(handles))
+    result = []
 
-                # Populate with change and contest_id from last_contest
-                user["change"] = last_contest["newRating"] - \
-                    last_contest["oldRating"]
-                user["contest_id"] = last_contest["contestId"]
+    now = time.time()
+    six_month = 6 * 30 * 24 * 60 * 60
 
-                result.append(user)
+    for user in users:
+        try:
+            ratings = cf_api("user.rating", handle=user["handle"])
+        except Exception:
+            warning("Failed fetching user rating: %s" % user["handle"])
+            continue
 
-        return result
+        # Skip if not competed
+        if not ratings:
+            info("Skipping user: %s ( Not ranked )" % user["handle"])
+            continue
 
-    def __make_url(self, methodName, **kwargs):
-        return self.API_URL + "/" + methodName + \
-            "?" + urllib.urlencode(kwargs.items())
+        # Active or not
+        last_contest = ratings[-1]
+        diff = now - last_contest["ratingUpdateTimeSeconds"]
+        user["active"] = diff < six_month
 
-    def __make_request(self, methodName, deadline=None, **kwargs):
-        URL = self.__make_url(methodName, **kwargs)
+        # Rating change
+        user["change"] = last_contest["newRating"] - \
+            last_contest["oldRating"]
+        user["contest_id"] = last_contest["contestId"]
+        result.append(user)
 
-        info("Request : " + URL)
-        r = urlfetch.fetch(URL, deadline=deadline)
-        result = json.loads(r.content)
-
-        if (result["status"] == "FAILED"):
-            raise Exception("Request failed")
-        return result["result"]
+    return result
 
 
 # parse from codeforces.com
@@ -105,7 +92,7 @@ def problem(code):
     tree = lxml.html.fromstring(source)
 
     if not tree.xpath("//div[@class='problem-statement']"):
-        warning("%s unexpected response:\n%s" % (code, source.decode("utf-8")))
+        warning("Unexpected response problem: %s" % code)
         return
 
     inputs = tree.xpath("//div[@class='input']/pre")
@@ -158,27 +145,6 @@ def html(e):
     return etree.tostring(e).split(">", 1)[1].rsplit("</", 1)[0]
 
 
-def contest_history(page=1):
-    " Returns list of contest "
-    try:
-        r = url_open("http://codeforces.com/contests/page/%s" % page)
-        assert r.code == 200
-        assert r.url == "http://codeforces.com/contests/page/%s" % page
-    except (AssertionError, HTTPException):
-        # reason: Active contest running
-        # reason: Codeforces is temporary unavailable
-        return []
-
-    tree = lxml.html.fromstring(r.read())
-    rows = tree.xpath("//div[@class='contests-table']//table/tr")[1:]
-
-    index = map(lambda x: int(x.attrib["data-contestid"]), rows)
-    names = map(lambda x: x.xpath("./td[1]")[0].text.strip(), rows)
-    start = map(lambda x: x.xpath("./td[2]")[0].text.strip(), rows)
-
-    return map(lambda a, b, c: [a] + [b] + [c], index, names, start)
-
-
 def topcoder_contests():
     data = url_open("http://api.topcoder.com/v2/"
                     "dataScience/challenges/upcoming")
@@ -219,6 +185,7 @@ def topcoder_contests():
             "id": c["challengeId"],
             "name": c["challengeName"],
             "start": int(start),
+            "site": "topcoder",
         })
 
     return contests
@@ -280,10 +247,20 @@ def topcoder_ratings():
 
 # helper functions
 def date_format(date, format="%Y/%m/%d"):
-    if date.isdigit():
+    if str(date).isdigit():
         utc_date = datetime.datetime.utcfromtimestamp(int(date))
+        utc_date = utc_date + datetime.timedelta(hours=8)
         return utc_date.strftime(format)
     return date
+
+
+def cf_api(methodName, **kwargs):
+    URL = "http://codeforces.com/api/" + methodName
+    URL = URL + "?" + urllib.urlencode(kwargs.items())
+
+    data = url_open(URL).read()
+    data = json.loads(data)
+    return data["result"]
 
 
 def url_open(url, retry=0):

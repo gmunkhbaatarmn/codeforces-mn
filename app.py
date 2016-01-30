@@ -6,8 +6,8 @@ from hashlib import md5
 from datetime import datetime
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, taskqueue, memcache
-from parse import codeforcesAPI, topcoder_ratings, date_format, \
-    relative, topcoder_contests
+from parse import topcoder_ratings, date_format, relative, topcoder_contests, \
+    problemset_problems, contest_problems, codeforces_ratings, cf_api
 from models import Problem, Contest, Suggestion
 
 
@@ -29,7 +29,6 @@ app.config["context"] = lambda x: {
 app.config["route-shortcut"] = {
     "<code>": "(\w+)",
 }
-CF = codeforcesAPI()
 # endfold
 
 
@@ -164,7 +163,7 @@ def ratings_update(x):
 def ratings_update_task(x):
     start = time.time()
 
-    ratings = CF.codeforces_ratings()
+    ratings = codeforces_ratings()
     if ratings:
         data.write("Rating:codeforces", ratings)
 
@@ -418,7 +417,7 @@ def update_post(x):
     new_problems = 0
 
     # Check for new problems
-    all_problems = CF.problemset_problems()
+    all_problems = problemset_problems()
     for problem in all_problems:
         code = "%s-%s" % (str(problem["contestId"]), problem["index"])
         info(code)
@@ -453,7 +452,7 @@ def update_post(x):
 
     # Check for new contest
     upcoming_contests = []
-    for contest in CF.contest_list():
+    for contest in cf_api("contest.list"):
         # read only contest
         if contest["id"] in [419]:
             continue
@@ -474,12 +473,13 @@ def update_post(x):
                 "id": contest["id"],
                 "name": contest["name"],
                 "start": contest["startTimeSeconds"],
+                "site": "codeforces",
             })
             c.save()
             continue
 
         problems = {}
-        for problem in CF.contest_problems(contestId=contest["id"]):
+        for problem in contest_problems(contest["id"]):
             code = "%3s-%s" % (problem["contestId"], problem["index"])
             if code in ["524-A", "524-B"]:
                 info("SKIPPED: %s" % code)

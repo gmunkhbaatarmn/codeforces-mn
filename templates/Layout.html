@@ -47,35 +47,19 @@
       {% block sidebar %} {% endblock %}
       #:0 Ойрд болох тэмцээнүүд
       <div class="box">
-        <h2>Codeforces ( тэмцээн )</h2>
+        <h2>Болох тэмцээнүүд</h2>
         <div class="text">
           <table>
-            {% for contest in upcoming_contests %}
+            {% for contest in (upcoming_contests + topcoder_contests) | sort(attribute="start") %}
               {% if contest.start > int(now.strftime("%s")) %}
                 <tr>
                   <td>
-                    <a href="http://codeforces.com/contests/{{ contest.id }}" target="_blank" style="text-decoration: underline">{{ contest.name }}</a>
+                    {% if contest.site == "topcoder" %}
+                      <a href="https://community.topcoder.com/tc?module=MatchDetails&rd={{ contest.id }}" target="_blank" style="text-decoration: underline">{{ contest.name }}</a>
+                    {% else %}
+                      <a href="http://codeforces.com/contests/{{ contest.id }}" target="_blank" style="text-decoration: underline">{{ contest.name }}</a>
+                    {% endif %}
                     <br/>
-                    {{ contest_time(contest.start - int(now.strftime("%s"))) }}
-                  </td>
-                </tr>
-              {% endif %}
-            {% endfor %}
-          </table>
-        </div>
-      </div>
-
-      <div class="box">
-        <h2>Topcoder&#8482; ( тэмцээн )</h2>
-        <div class="text">
-          <table>
-            {% for contest in topcoder_contests %}
-              {% if contest.start > int(now.strftime("%s")) %}
-                <tr>
-                  <td>
-                    <a href="https://community.topcoder.com/tc?module=MatchDetails&rd={{ contest.id }}" target="_blank" style="text-decoration: underline">{{ contest.name }}</a>
-                  </td>
-                  <td>
                     {{ contest_time(contest.start - int(now.strftime("%s"))) }}
                   </td>
                 </tr>
@@ -133,7 +117,7 @@
             <th class="w14">Нэр</th>
             <th colspan="2">Чансаа</th>
           </tr>
-          {% for u in codeforces %}
+          {% for u in codeforces if u.active %}
             {% set cls = "hidden" if loop.index > 10 else ""  %}
             {% set cls = cls ~ " recent" if u.recent else cls %}
             <tr {{- (' class="%s"' % cls)|safe if cls.strip() else ""  }}>
