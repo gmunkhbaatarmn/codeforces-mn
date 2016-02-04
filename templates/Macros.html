@@ -84,10 +84,12 @@
 {%- endmacro -%}
 
 #:1 macro contest_time(time)
-{%- macro contest_time(time) -%}
+{%- macro contest_time(start_at) -%}
+  {% set time = start_at - int(now.strftime("%s")) %}
   {% set day = 60 * 60 * 24 %}
   {% if time > 2 * day %}
-    {{ time // day }} өдрийн дараа
+    <div>{{ time // day }} өдрийн дараа</div>
+    <span style="font-size: 10px">{{ date_format(start_at, "%Y-%m-%d %H:%M UTC+08 ") }}</span>
   {% else %}
     {% set hour = "00" ~ time // 3600 %}
     {% set minute = "00" ~ (time % 3600) // 60 %}
