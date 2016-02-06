@@ -18,13 +18,18 @@
     </div>
 
     <textarea id="source" style="font-family:Menlo, Consolas, 'Courier New', Courier, monospace; width:100%; height: 520px; box-sizing:border-box; resize:vertical; border:0; outline:none; border-radius:7px; margin-top:-5px">
-{{- "# " ~ problem.title }}
+      {{- "# " ~ problem.title ~ "\n" -}}
 
-{{ problem.content|html2text }}
+      {%- if problem.credits and problem.credits != "[орчуулагдаж байгаа]" -%}
+        {{- problem.content }}
+        {{- "\n\n## Тэмдэглэл\n" ~ problem.note if problem.note else "" }}
+      {%- else -%}
+        {{- problem.content|html2text }}
+        {{- "\n\n## Тэмдэглэл\n" ~ problem.note|html2text if problem.note else "" }}
+      {%- endif -%}
 
-{{- "\n\n## Тэмдэглэл\n" ~ problem.note|html2text if problem.note else "" }}
-
--- {{ problem.credits or "Орчуулагчийн нэр" }}</textarea>
+      {{ "\n\n-- " ~ (problem.credits or "Орчуулагчийн нэр") }}
+    </textarea>
   </div>
 
   <div style="border:0px solid #ddd; width:49%; float:left; min-height:420px; border-radius:7px" class="problem-statement">
@@ -42,7 +47,7 @@
 
     {% if problem.note %}
       <h2>Тэмдэглэл</h2>
-      <div id="note" class="mathjax">{{ markdown(problem.note|html2text)|safe }}</div>
+      <div id="note" class="mathjax"></div>
     {% endif %}
 
     <div style="clear:both"></div>
