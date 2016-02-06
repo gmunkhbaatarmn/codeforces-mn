@@ -8,6 +8,7 @@ from google.appengine.runtime import apiproxy_errors
 
 
 # helper functions
+# todo: merge parse.py to utils.py
 def date_format(date, format="%Y/%m/%d"):
     if str(date).isdigit():
         utc_date = datetime.datetime.utcfromtimestamp(int(date))
