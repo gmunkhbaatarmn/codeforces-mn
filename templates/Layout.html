@@ -12,6 +12,7 @@
   <link rel="shortcut icon" href="/favicon.ico">
   {{ head }}
   <meta name="google-site-verification" content="tJEnNpw90aAlRgukFlyCTGZtXdjxVuGJmh-vk7p2g3g">
+  <meta property="fb:admins" content="1262756276">
   {% if not error %}
     <meta property="og:title" content="{{ title }} · Codeforces.mn">
     <meta property="og:type" content="website">
@@ -243,6 +244,17 @@
 
     ga("create", "UA-4030321-7", "auto");
     ga("send", "pageview");
+  </script>
+
+  #:1 script: facebook comments
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/mn_MN/sdk.js#xfbml=1&version=v2.5&appId=888802607881779";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, "script", "facebook-jssdk"));
   </script>
   {# endfold #}
   {% block bottom %} {% endblock %}
