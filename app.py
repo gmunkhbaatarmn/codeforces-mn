@@ -7,7 +7,7 @@ import opengraph
 from datetime import datetime
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, memcache
-from parse import date_format, relative, html2text
+from utils import date_format, relative, html2text
 from models import Problem, Contest, Suggestion
 
 

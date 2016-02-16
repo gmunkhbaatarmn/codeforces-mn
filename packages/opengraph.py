@@ -14,7 +14,7 @@ def fetch_id(url, retry=0):
     response = json.loads(get_url(request_url, headers=headers).content)
 
     # Retry: object is not registered yet
-    if not "og_object" in response and retry < 5:
+    if "og_object" not in response and retry < 5:
         time.sleep(1.0)
         return fetch_id(url, retry=retry+1)
     # endfold
