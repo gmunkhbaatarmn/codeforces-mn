@@ -12,7 +12,7 @@ Run on local computer
 - `cd codeforces-mn`
 - `dev_appserver.py .`
 - For first time, launch link on browser
-  [http://localhost:8080/setup](http://localhost:8080/setup)
+  [http://localhost:8080/update?complete](http://localhost:8080/update?complete)
 
 
 Contributing
