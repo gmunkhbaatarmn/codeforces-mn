@@ -23,6 +23,9 @@ class Problem(Model):
     credits = db.StringProperty(default="")
     identifier = db.StringProperty()  # unique identifier
 
+    # open graph supports
+    og_id = db.IntegerProperty(default=0)
+
     # time, memory, input, output, tests
     meta_json = db.TextProperty(default="{}")
 

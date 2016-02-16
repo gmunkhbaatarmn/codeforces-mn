@@ -3,6 +3,7 @@ import json
 import time
 import topcoder
 import codeforces
+import opengraph
 from datetime import datetime
 from markdown2 import markdown
 from natrix import app, route, data, info, warning, memcache
@@ -23,6 +24,7 @@ app.config["context"] = lambda x: {
     "count_done": data.fetch("count_done"),
     "relative": relative,
     "upcoming_contests": data.fetch("upcoming_contests", []),
+    "comments": data.fetch("comments", []),
 }
 app.config["route-shortcut"] = {
     "<code>": "(\w+)",
@@ -43,7 +45,7 @@ def internal_error(x):
 
 @route(":before")
 def before(x):
-    # Redirect www urls to non-www
+    # redirect www urls to non-www
     if x.request.url.startswith("www."):
         url = "http://%s" % x.request.url.replace("www.", "")
         x.redirect(url, permanent=True)
@@ -565,5 +567,27 @@ def update(x):
     data.write("upcoming_contests", upcoming_contests)
     # endfold
 
-    info("Executed seconds: %.1f" % (time.time() - start_t))
-    x.response("Executed seconds: %.1f" % (time.time() - start_t))
+    x.response("Executed seconds: %.1f" % (time.time() - start_t), log="info")
+
+
+@route("/update-comments")
+def update_comments(x):
+    start_t = time.time()
+
+    # Create opengraph ID for new problems
+    for p in Problem.all().filter("og_id =", 0):
+        p.og_id = opengraph.fetch_id("http://codeforces.mn" + p.link)
+        p.save()
+
+    # Update comments
+    comments = []
+    problems = [(p.og_id, p.code) for p in Problem.all().order("-code")]
+    for page in range((len(problems) + 49) / 50):
+        start, until = page * 50, (page + 1) * 50
+        comments += opengraph.fetch_comments(problems[start:until])
+
+    comments = sorted(comments, key=lambda i: -i["created_time"])
+    data.write("comments", comments[-100:])
+    # endfold
+
+    x.response("Executed seconds: %.1f" % (time.time() - start_t), log="info")

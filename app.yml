@@ -22,6 +22,10 @@ handlers:
   script: app.app
   login: admin
 
+- url: /update-comments
+  script: app.app
+  login: admin
+
 - url: /setup
   script: app.app
   login: admin
