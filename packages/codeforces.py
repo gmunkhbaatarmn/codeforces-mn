@@ -54,8 +54,6 @@ def mongolians():
 
 
 def problem(code):
-    # todo: support for: 524-A, 524-B
-
     # Fetch html source
     url = "http://codeforces.com/problemset/problem/%s/%s"
     r = get_url(url % tuple(code.strip().split("-")))
