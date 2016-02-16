@@ -176,11 +176,9 @@ def ratings_update_codeforces(x):
             "change": ratings[-1]["newRating"] - ratings[-1]["oldRating"],
             "contest_id": ratings[-1]["contestId"],
         })
-
     data.write("Rating:codeforces", result)
 
-    info("Executed seconds: %.1f" % (time.time() - now))
-    x.response("Executed seconds: %.1f" % (time.time() - now))
+    x.response("Executed seconds: %.1f" % (time.time() - now), log="info")
 
 
 @route("/ratings/update-topcoder")
@@ -205,11 +203,9 @@ def ratings_update(x):
             "change": user["new_rating"] - user["old_rating"],
             "contest_id": user["contest_id"],
         })
-
     data.write("Rating:topcoder", result)
 
-    info("Executed seconds: %.1f" % (time.time() - now))
-    x.response("Executed seconds: %.1f" % (time.time() - now))
+    x.response("Executed seconds: %.1f" % (time.time() - now), log="info")
 
 
 # Suggestion
