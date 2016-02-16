@@ -6,8 +6,7 @@ api_version: 1
 threadsafe: true
 
 handlers:
-# todo: renew humans.txt
-- url: /(favicon\.ico|robots\.txt|humans\.txt)
+- url: /(favicon\.ico|robots\.txt)
   static_files: static/\1
   upload: static/.*
 
@@ -20,6 +19,10 @@ handlers:
   expiration: "7d"
 
 - url: /update
+  script: app.app
+  login: admin
+
+- url: /update-comments
   script: app.app
   login: admin
 

@@ -12,6 +12,7 @@
   <link rel="shortcut icon" href="/favicon.ico">
   {{ head }}
   <meta name="google-site-verification" content="tJEnNpw90aAlRgukFlyCTGZtXdjxVuGJmh-vk7p2g3g">
+  <meta property="fb:admins" content="1262756276">
   {% if not error %}
     <meta property="og:title" content="{{ title }} · Codeforces.mn">
     <meta property="og:type" content="website">
@@ -45,7 +46,7 @@
   {% if sidebar != "no" %}
     <div id="sidebar">
       {% block sidebar %} {% endblock %}
-      #:0 Ойрд болох тэмцээнүүд
+      #:1 Ойрд болох тэмцээнүүд
       <div class="box">
         <h2>Болох тэмцээнүүд</h2>
         <div class="text">
@@ -156,6 +157,24 @@
           </tr>
         </table>
       </div>
+
+      #:1 Сэтгэгдлүүд
+      <div class="box">
+        <h2>Сэтгэгдлүүд</h2>
+        <div>
+          {% for c in comments[:10] %}
+            <div>
+              <a href="https://www.facebook.com/profile.php?id={{ c.from_id }}">{{ c.from_name }}</a> &rarr; <a href="http://codeforces.mn/problemset/problem/{{ c.code.replace("-", "/").strip() }}">{{ c.code.strip() }}</a>:
+              <br>
+              <span style="color:#666">{{ c.message.replace("\n", " ")[:255] }}</span>
+              <br>
+              <div style="text-align:right">
+                <a href="http://codeforces.mn/problemset/problem/{{ c.code.replace("-", "/").strip() }}" style="color:#9197a3">{{ c.created_time|relative }}</a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
       {# endfold #}
     </div>
   {% endif %}
@@ -243,6 +262,17 @@
 
     ga("create", "UA-4030321-7", "auto");
     ga("send", "pageview");
+  </script>
+
+  #:1 script: facebook comments
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/mn_MN/sdk.js#xfbml=1&version=v2.5&appId=888802607881779";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, "script", "facebook-jssdk"));
   </script>
   {# endfold #}
   {% block bottom %} {% endblock %}

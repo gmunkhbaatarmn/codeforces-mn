@@ -1,4 +1,8 @@
 cron:
+- description: Check new comments
+  url: /update-comments
+  schedule: every 15 minutes
+
 - description: Auto add new contests
   url: /update
   schedule: every 3 hours from 00:10 to 23:59

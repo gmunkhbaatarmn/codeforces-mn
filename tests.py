@@ -1,8 +1,7 @@
 import sys
 import nose
 import logging
-import topcoder
-import codeforces
+from glob import glob
 from nose.tools import ok_ as ok, eq_ as eq
 from nose.plugins.attrib import attr
 from google.appengine.ext.testbed import Testbed
@@ -11,6 +10,8 @@ from google.appengine.ext.testbed import Testbed
 def setup():
     " Google App Engine testbed configuration "
     progress("setup")
+    sys.path.append("./packages")
+    sys.path.extend(glob("./packages/*.zip"))
 
     # hide `debug`, `info` level logs
     logging.root = logging.RootLogger(logging.WARNING)
@@ -45,6 +46,7 @@ def progress(message):
 # Module: codeforces
 def test_codeforces_api():
     progress("codeforces.api")
+    import codeforces
 
     eq(len(codeforces.api("user.info", handles="Petr;tourist")), 2)
 
@@ -53,6 +55,7 @@ def test_codeforces_api():
 
 def test_codeforces_mongolians():
     progress("codeforces.mongolians")
+    import codeforces
 
     handles = codeforces.mongolians()
 
@@ -64,6 +67,7 @@ def test_codeforces_mongolians():
 
 def test_codeforces_problem():
     progress("codeforces.problem")
+    import codeforces
 
     codeforces.problem(" 51-B")
     codeforces.problem("575-I")
@@ -74,6 +78,7 @@ def test_codeforces_problem():
 
 def test_codeforces_upcoming_contests():
     progress("codeforces.upcoming_contests")
+    import codeforces
 
     for i in codeforces.upcoming_contests():
         ok(isinstance(i["site"], basestring))
@@ -87,6 +92,7 @@ def test_codeforces_upcoming_contests():
 # Module: topcoder
 def test_topcoder_mongolians():
     progress("topcoder.mongolians")
+    import topcoder
 
     handles = topcoder.mongolians()
 
@@ -100,6 +106,7 @@ def test_topcoder_mongolians():
 
 def test_topcoder_user_info():
     progress("topcoder.user_info")
+    import topcoder
 
     u = topcoder.user_info(22833617)
 
@@ -111,9 +118,9 @@ def test_topcoder_user_info():
     progress("topcoder.user_info\n")
 
 
-@attr("focus")
 def test_topcoder_upcoming_contests():
     progress("topcoder.upcoming_contests")
+    import topcoder
 
     for i in topcoder.upcoming_contests():
         ok(isinstance(i["site"], basestring))
@@ -122,6 +129,27 @@ def test_topcoder_upcoming_contests():
         ok(isinstance(i["start_at"], int))
 
     progress("topcoder.upcoming_contests\n")
+
+
+# Module: opengraph
+def test_opengraph_fetch_id():
+    progress("opengraph.fetch_id")
+    import opengraph
+
+    url = "http://codeforces.mn/problemset/problem/625/E"
+    eq(opengraph.fetch_id(url), 1278889565460171)
+
+    progress("opengraph.fetch_id\n")
+
+
+@attr("focus")
+def test_opengraph_fetch_comments():
+    progress("opengraph.fetch_comments")
+    import opengraph
+    ids = [(1278889565460171, "625-E"), (827387507370816, "625-D"),
+           (935692406527535, "625-C"), (1019738524749056, "625-B")]
+    opengraph.fetch_comments(ids)
+    progress("opengraph.fetch_comments\n")
 
 
 if __name__ == "__main__":

@@ -20,7 +20,7 @@ sys.path.append("./packages")
 info       # for `from natrix import info`
 taskqueue  # for `from natrix import taskqueue`
 
-__version__ = "0.1.1"
+__version__ = "0.1.1+"
 
 
 # Core classes
@@ -157,6 +157,12 @@ class Response(object):
         if kwargs.get("encode") == "json":
             value = json.dumps(value)
             self.headers["Content-Type"] = "application/json"
+
+        if kwargs.get("log") == "info":
+            info(value)
+
+        if kwargs.get("log") == "warning":
+            warning(value)
 
         self.body += ensure_ascii("%s" % value)
     # endfold

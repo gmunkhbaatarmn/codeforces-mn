@@ -1,4 +1,4 @@
-from natrix import Model, db, json, warning
+from natrix import Model, db, json
 
 
 class Suggestion(Model):
@@ -22,6 +22,9 @@ class Problem(Model):
     note = db.TextProperty(default="")
     credits = db.StringProperty(default="")
     identifier = db.StringProperty()  # unique identifier
+
+    # open graph supports
+    og_id = db.IntegerProperty(default=0)
 
     # time, memory, input, output, tests
     meta_json = db.TextProperty(default="{}")
@@ -47,27 +50,17 @@ class Contest(Model):
     id = db.IntegerProperty()
     name = db.StringProperty()
     start_at = db.IntegerProperty()
-    problems_json = db.StringProperty()
+    problems_json = db.StringProperty()  # dict of {letter: code}
     translated_count = db.IntegerProperty(default=0)
 
     @property
     def problems(self):
-        # list of tuple (letter, problemset code)
-        result = []
-        if not self.problems_json:
-            # todo: resolve this warning logs
-            warning("Contest: %s" % self.id)
-        data = json.loads(self.problems_json or "{}")
+        problems = json.loads(self.problems_json or "{}")
 
-        for letter, code in sorted(data.items()):
-            result.append([letter, code])
-        return result
+        return [(k, v) for k, v in sorted(problems.items())]
 
     @property
     def problems_object(self):
-        result = []
+        problems = json.loads(self.problems_json or "{}")
 
-        for letter, code in sorted(self.problems, key=lambda p: p[0]):
-            result.append([letter, Problem.find(code=code)])
-
-        return result
+        return [(k, Problem.find(code=v)) for k, v in sorted(problems.items())]
