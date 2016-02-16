@@ -2,9 +2,8 @@
 import time
 import urllib
 import html2text as h2t
-from datetime import datetime, timedelta
 from logging import info
-from httplib import HTTPException
+from datetime import datetime, timedelta
 from google.appengine.api import urlfetch, urlfetch_errors
 from google.appengine.runtime import apiproxy_errors
 
@@ -73,19 +72,6 @@ def date_format(date, format="%Y/%m/%d"):
         utc_date = utc_date + timedelta(hours=8)
         return utc_date.strftime(format)
     return date
-
-
-def url_open(url, retry=0):
-    # todo: remove `url_open` and replace with `get_url`
-    try:
-        return urllib.urlopen(url)
-    except (apiproxy_errors.DeadlineExceededError, IOError, HTTPException):
-        info("Delayed (%s): %s" % (retry, url))
-
-    if retry < 10:
-        return url_open(url, retry + 1)
-
-    raise HTTPException("Network Error: %s" % url)
 
 
 def html2text(string):
