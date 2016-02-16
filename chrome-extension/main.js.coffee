@@ -23,7 +23,7 @@ STYLE =
 #:1 Mongolian flag for language chooser
 $ ->
   $("#header .lang-chooser > div:first").prepend """
-    <a href="http://codeforces.mn/">
+    <a href="http://codeforces.mn/" style="text-decoration:none">
       <img src="http://codeforces.mn/images/flag-mn.png" title="Монголоор">
     </a>
   """
@@ -199,6 +199,21 @@ if location.pathname.match(/\/problemset\/problem\//)
 
     $(".mn-please a").on("click", translate)
 
+    permalink = "http://codeforces.mn/problemset/problem/"
+    permalink += problem_id.replace("-", "/")
+
+    $(".problem-statement").after """
+      <div class="fb-comments" data-href="#{permalink}" data-width="100%"></div>
+      <div id="fb-root"></div>
+      <script>(function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/mn_MN/sdk.js#xfbml=1&version=v2.5&appId=888802607881779";
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, "script", "facebook-jssdk"));
+      </script>
+    """
 
 #:1 Page: /contests/            - List of contests
 if location.pathname.start_with("/contests")
@@ -284,6 +299,22 @@ if location.pathname.match(/^\/contest\/\d+\/problem\//)
       """
 
     $(".mn-please a").on "click", translate
+
+    permalink = "http://codeforces.mn/problemset/problem/"
+    permalink += problem_id.replace("-", "/")
+
+    $(".problem-statement").after """
+      <div class="fb-comments" data-href="#{permalink}" data-width="100%"></div>
+      <div id="fb-root"></div>
+      <script>(function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/mn_MN/sdk.js#xfbml=1&version=v2.5&appId=888802607881779";
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, "script", "facebook-jssdk"));
+      </script>
+    """
 # endfold
 
 #:1 Function: translate problem statement
