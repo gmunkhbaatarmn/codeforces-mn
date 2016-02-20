@@ -8,7 +8,7 @@ def upcoming_contests():
     " Returns list of {site, link, start_at} "
     result = []
 
-    r = get_url("http://api.topcoder.com/v2/dataScience/challenges/upcoming")
+    r = get_url("https://api.topcoder.com/v2/dataScience/challenges/upcoming")
 
     assert r.status_code == 200, r.status_code  # validate: ok response
     assert r.final_url is None, r.final_url     # validate: no redirect
@@ -48,7 +48,7 @@ def upcoming_contests():
 
 def mongolians():
     " Returns list of (handle, id) "
-    r = get_url("http://community.topcoder.com/tc?module=AlgoRank&cc=496")
+    r = get_url("https://community.topcoder.com/tc?module=AlgoRank&cc=496")
 
     assert r.status_code == 200  # validate: ok response
 
@@ -65,7 +65,7 @@ def mongolians():
 
 
 def user_info(user_id):
-    r = get_url("http://community.topcoder.com/tc?module=BasicData"
+    r = get_url("https://community.topcoder.com/tc?module=BasicData"
                 "&c=dd_rating_history&cr=%s" % user_id)
 
     assert r.status_code == 200  # validate: ok response
