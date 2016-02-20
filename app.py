@@ -45,6 +45,17 @@ def internal_error(x):
 
 @route(":before")
 def before(x):
+    # Don't redirect: appengine cron job
+    if x.request.headers.get("x-appengine-cron"):
+        return
+
+    # Don't redirect: appengine taskqueue task
+    if x.request.headers.get("x-appengine-taskname"):
+        return
+    # endfold
+
+    # todo: redirect codeforces-mn.appspot.com  -> codeforces.mn
+
     # Redirect: `http://www.codeforces.mn/`  -> `https://codeforces.mn/`
     if x.request.url.startswith("http://www."):
         url = "https://%s" % x.request.url[len("http://www."):]
