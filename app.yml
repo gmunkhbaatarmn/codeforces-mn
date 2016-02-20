@@ -4,6 +4,7 @@ version: live
 runtime: python27
 api_version: 1
 threadsafe: true
+# Expires: 2016-05-19 renew ssl certificate
 
 handlers:
 - url: /(favicon\.ico|robots\.txt)

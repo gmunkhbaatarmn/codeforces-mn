@@ -45,10 +45,21 @@ def internal_error(x):
 
 @route(":before")
 def before(x):
-    # redirect www urls to non-www
-    if x.request.url.startswith("www."):
-        url = "http://%s" % x.request.url.replace("www.", "")
+    # Redirect: `http://www.codeforces.mn/`  -> `https://codeforces.mn/`
+    if x.request.url.startswith("http://www."):
+        url = "https://%s" % x.request.url[len("http://www."):]
         x.redirect(url, permanent=True)
+
+    # Redirect: `http://codeforces.mn/`      -> `https://codeforces.mn/`
+    if x.request.url.startswith("http://"):
+        url = "https://%s" % x.request.url[len("http://"):]
+        x.redirect(url, permanent=True)
+
+    # Redirect: `https://www.codeforces.mn/` -> `https://codeforces.mn/`
+    if x.request.url.startswith("https://www."):
+        url = "https://%s" % x.request.url[len("https://www."):]
+        x.redirect(url, permanent=True)
+    # endfold
 
 
 @route("/")
