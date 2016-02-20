@@ -1,17 +1,17 @@
 {
   "name": "Codeforces Mongolia",
   "short_name": "Codeforces.mn",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "manifest_version": 2,
   "description": "Codeforces.com Mongolian translation",
-  "homepage_url": "http://github.com/gmunkhbaatarmn/codeforces-mn",
+  "homepage_url": "https://github.com/gmunkhbaatarmn/codeforces-mn",
   "icons": {
     "16": "icon.png",
     "48": "icon.png",
     "128": "icon.png"
   },
   "permissions": [
-    "http://codeforces.mn/*",
+    "https://codeforces.mn/*",
     "http://codeforces.com/*"
   ],
   "content_scripts": [{

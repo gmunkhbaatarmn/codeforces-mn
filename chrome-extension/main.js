@@ -22,10 +22,10 @@ VERSION = "0.2.5";
 STYLE = "<style>\n  .mn-please a          { font-weight:bold; cursor:pointer }\n  .mn-statement ul      { margin-bottom:1em }\n  .mn-statement .credit { text-align:right; font-style:italic }\n  .sample-tests .title  { font-family:sans-serif !important;\n                          font-size:1em !important;\n                          text-transform:none !important }\n</style>";
 
 $(function() {
-  return $("#header .lang-chooser > div:first").prepend("<a href=\"http://codeforces.mn/\" style=\"text-decoration:none\">\n  <img src=\"http://codeforces.mn/images/flag-mn.png\" title=\"Монголоор\">\n</a>");
+  return $("#header .lang-chooser > div:first").prepend("<a href=\"https://codeforces.mn/\" style=\"text-decoration:none\">\n  <img src=\"https://codeforces.mn/images/flag-mn.png\" title=\"Монголоор\">\n</a>");
 });
 
-$.get("http://codeforces.mn/extension?" + VERSION, function(text) {
+$.get("https://codeforces.mn/extension?" + VERSION, function(text) {
   var c, i, j, k, l, len, len1, len2, ready, ref, ref1, ref2, storage, t, total;
   storage = {};
   ref = text.split("\n")[0].split("|");
@@ -142,7 +142,7 @@ if (location.pathname.match(/\/problemset\/problem\//)) {
       $(".problem-statement .header .title").after("<div class=\"mn-please\"><a>Монголоор унших</a></div>");
     }
     $(".mn-please a").on("click", translate);
-    permalink = "http://codeforces.mn/problemset/problem/";
+    permalink = "https://codeforces.mn/problemset/problem/";
     permalink += problem_id.replace("-", "/");
     return $(".problem-statement").after("<div class=\"fb-comments\" data-href=\"" + permalink + "\" data-width=\"100%\"></div>\n<div id=\"fb-root\"></div>\n<script>(function(d, s, id) {\n  var js, fjs = d.getElementsByTagName(s)[0];\n  if (d.getElementById(id)) return;\n  js = d.createElement(s); js.id = id;\n  js.src = \"//connect.facebook.net/mn_MN/sdk.js#xfbml=1&version=v2.5&appId=888802607881779\";\n  fjs.parentNode.insertBefore(js, fjs);\n}(document, \"script\", \"facebook-jssdk\"));\n</script>");
   });
@@ -204,7 +204,7 @@ if (location.pathname.match(/^\/contest\/\d+\/problem\//)) {
       $(".problem-statement .header .title").after("<div class=\"mn-please\"><a>Монголоор унших</a></div>");
     }
     $(".mn-please a").on("click", translate);
-    permalink = "http://codeforces.mn/problemset/problem/";
+    permalink = "https://codeforces.mn/problemset/problem/";
     permalink += problem_id.replace("-", "/");
     return $(".problem-statement").after("<div class=\"fb-comments\" data-href=\"" + permalink + "\" data-width=\"100%\"></div>\n<div id=\"fb-root\"></div>\n<script>(function(d, s, id) {\n  var js, fjs = d.getElementsByTagName(s)[0];\n  if (d.getElementById(id)) return;\n  js = d.createElement(s); js.id = id;\n  js.src = \"//connect.facebook.net/mn_MN/sdk.js#xfbml=1&version=v2.5&appId=888802607881779\";\n  fjs.parentNode.insertBefore(js, fjs);\n}(document, \"script\", \"facebook-jssdk\"));\n</script>");
   });
@@ -223,7 +223,7 @@ translate = function() {
   $(".mn-please").fadeOut("fast", function() {
     return $(this).html("<strong>Орчуулж байна...</strong>").fadeIn("fast");
   });
-  return $.get("http://codeforces.mn/extension/" + problem_id + ".html?" + VERSION, function(r) {
+  return $.get("https://codeforces.mn/extension/" + problem_id + ".html?" + VERSION, function(r) {
     var $r, body, curr, script;
     $(".problem-statement").addClass("mn-statement");
     $r = $("<div/>").html(r);

@@ -23,14 +23,14 @@ STYLE =
 #:1 Mongolian flag for language chooser
 $ ->
   $("#header .lang-chooser > div:first").prepend """
-    <a href="http://codeforces.mn/" style="text-decoration:none">
-      <img src="http://codeforces.mn/images/flag-mn.png" title="Монголоор">
+    <a href="https://codeforces.mn/" style="text-decoration:none">
+      <img src="https://codeforces.mn/images/flag-mn.png" title="Монголоор">
     </a>
   """
 # endfold
 
 #:1 Update data
-$.get "http://codeforces.mn/extension?#{VERSION}", (text) ->
+$.get "https://codeforces.mn/extension?#{VERSION}", (text) ->
   storage = {}
   for i in text.split("\n")[0].split("|")
     storage["problem:#{i}"] = 1
@@ -199,7 +199,7 @@ if location.pathname.match(/\/problemset\/problem\//)
 
     $(".mn-please a").on("click", translate)
 
-    permalink = "http://codeforces.mn/problemset/problem/"
+    permalink = "https://codeforces.mn/problemset/problem/"
     permalink += problem_id.replace("-", "/")
 
     $(".problem-statement").after """
@@ -300,7 +300,7 @@ if location.pathname.match(/^\/contest\/\d+\/problem\//)
 
     $(".mn-please a").on "click", translate
 
-    permalink = "http://codeforces.mn/problemset/problem/"
+    permalink = "https://codeforces.mn/problemset/problem/"
     permalink += problem_id.replace("-", "/")
 
     $(".problem-statement").after """
@@ -330,7 +330,7 @@ translate = ->
   $(".mn-please").fadeOut "fast", ->
     $(this).html("<strong>Орчуулж байна...</strong>").fadeIn("fast")
 
-  $.get "http://codeforces.mn/extension/#{problem_id}.html?#{VERSION}", (r) ->
+  $.get "https://codeforces.mn/extension/#{problem_id}.html?#{VERSION}", (r) ->
     $(".problem-statement").addClass("mn-statement")
 
     $r = $("<div/>").html(r)
