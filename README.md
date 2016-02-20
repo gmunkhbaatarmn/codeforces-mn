@@ -2,7 +2,7 @@
 [![Issue][issue-img]][issue-url]
 
 Mongolian translation of [codeforces.com](http://www.codeforces.com/).
-Runs live on [codeforces.mn](http://www.codeforces.mn/)
+Runs live on [codeforces.mn](https://codeforces.mn/)
 
 
 Run on local computer

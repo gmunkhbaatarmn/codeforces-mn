@@ -583,7 +583,7 @@ def update_comments(x):
 
     # Create opengraph ID for new problems
     for p in Problem.all().filter("og_id =", 0):
-        p.og_id = opengraph.fetch_id("http://codeforces.mn" + p.link)
+        p.og_id = opengraph.fetch_id("https://codeforces.mn" + p.link)
         p.save()
 
     # Update comments
