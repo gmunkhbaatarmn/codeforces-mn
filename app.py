@@ -54,23 +54,26 @@ def before(x):
         return
     # endfold
 
-    # todo: redirect codeforces-mn.appspot.com  -> codeforces.mn
+    # Redirect: `codeforces-mn.appspot.com`  -> `codeforces.mn`
+    if x.request.host == "codeforces-mn.appspot.com":
+        to_replace = ("codeforces-mn.appspot.com", "codeforces.mn", 1)
+        url = x.request.url.replace(*to_replace)
+        x.redirect(url, permanent=True)
 
     # Redirect: `http://www.codeforces.mn/`  -> `https://codeforces.mn/`
     if x.request.url.startswith("http://www."):
-        url = "https://%s" % x.request.url[len("http://www."):]
+        url = x.request.url.replace("http://www.", "https://", 1)
         x.redirect(url, permanent=True)
 
     # Redirect: `http://codeforces.mn/`      -> `https://codeforces.mn/`
     if x.request.url.startswith("http://"):
-        url = "https://%s" % x.request.url[len("http://"):]
+        url = x.request.url.replace("http://", "https://", 1)
         x.redirect(url, permanent=True)
 
     # Redirect: `https://www.codeforces.mn/` -> `https://codeforces.mn/`
     if x.request.url.startswith("https://www."):
-        url = "https://%s" % x.request.url[len("https://www."):]
+        url = x.request.url.replace("https://www.", "https://")
         x.redirect(url, permanent=True)
-    # endfold
 
 
 @route("/")
