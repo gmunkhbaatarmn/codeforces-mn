@@ -6,7 +6,7 @@ import codeforces
 import opengraph
 from datetime import datetime
 from markdown2 import markdown
-from natrix import app, route, data, info, warning, memcache
+from natrix import app, route, data, info, warning, memcache, __version__
 from utils import date_format, relative, html2text
 from models import Problem, Contest, Suggestion
 
@@ -613,3 +613,9 @@ def update_comments(x):
     # endfold
 
     x.response("Executed seconds: %.1f" % (time.time() - start_t), log="info")
+
+
+@route("/natrix-version")
+def natrix_version(x):
+    badge_text = "natrix-%s-yellowgreen" % __version__
+    x.redirect("http://img.shields.io/badge/%s.svg" % badge_text)

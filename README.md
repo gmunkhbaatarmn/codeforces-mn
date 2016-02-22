@@ -1,5 +1,6 @@
 [![Build][build-img]][build-url]
 [![Issue][issue-img]][issue-url]
+[![Natrix][natrix-version-img]][natrix-version-url]
 
 Mongolian translation of [codeforces.com](http://www.codeforces.com/).
 Runs live on [codeforces.mn](https://codeforces.mn/)
@@ -28,3 +29,6 @@ See [Open Issues](https://github.com/gmunkhbaatarmn/codeforces-mn/issues).
 
 [issue-img]: https://img.shields.io/github/issues/gmunkhbaatarmn/codeforces-mn.svg
 [issue-url]: https://github.com/gmunkhbaatarmn/codeforces-mn/issues
+
+[natrix-version-img]: https://codeforces.mn/natrix-version
+[natrix-version-url]: https://github.com/gmunkhbaatarmn/natrix
