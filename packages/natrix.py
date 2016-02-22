@@ -9,18 +9,21 @@ import hashlib
 import importlib
 import traceback
 from cgi import FieldStorage, parse_qs
+from glob import glob
 from time import sleep
 from logging import info, warning, error
 from datetime import datetime
 from google.appengine.ext import db
 from google.appengine.api import memcache, taskqueue
+from google.appengine.api.logservice import logservice
 
 sys.path.append("./packages")
 
-info       # for `from natrix import info`
-taskqueue  # for `from natrix import taskqueue`
+info        # for `from natrix import info`
+taskqueue   # for `from natrix import taskqueue`
+logservice  # for `from natrix import logservice`
 
-__version__ = "0.1.1+"
+__version__ = "0.1.2"
 
 
 # Core classes
@@ -285,6 +288,14 @@ class Handler(object):
             template_path = self.config.get("template-path") or "./templates"
             loader = jinja2.FileSystemLoader(template_path)
 
+        # plugin containing templates
+        template_paths = []
+        for p in self.config.get(":plugins", []):
+            template_paths.append("%s/templates" % p.replace(".", "/"))
+        plugins_loader = jinja2.FileSystemLoader(template_paths)
+
+        loader = jinja2.ChoiceLoader([loader, plugins_loader])
+
         env = jinja2.Environment(loader=loader,
                                  line_comment_prefix="#:",
                                  extensions=["jinja2.ext.loopcontrols"])
@@ -319,10 +330,12 @@ class Handler(object):
         final_context.update(context or {})
         final_context.update(kwargs)
 
+        env.globals.update(final_context)
+
         # context functions can be jinja filter
         env.filters.update(final_context)
 
-        return env.get_template(template).render(final_context)
+        return env.get_template(template).render()
 
     def redirect(self, url=None, permanent=False, code=302, delay=0):
         if not url:
@@ -388,6 +401,7 @@ class Application(object):
             self.routes.append(r)
 
         self.config = config or {}  # none to dict
+        self.config[":modules"] = [p[9:-3] for p in glob("handlers/[!_]*.py")]
 
     def __call__(self, environ, start_response):
         """ Called by WSGI when a request comes in
@@ -627,10 +641,23 @@ class Application(object):
             return func
 
         # 2. Includer
-        # `route("/", "path.handler")`
-        controller, name = handler_path.split(".")
-        module = importlib.import_module("controllers.%s" % controller)
-        handler = getattr(module, name)
+        if isinstance(handler_path, basestring):
+            # `route("/", "path.to.handler:function")`
+            module_path, name = handler_path.split(":")
+
+            # app handler
+            if module_path in self.config[":modules"]:
+                importable = "handlers.%s" % module_path
+            # plugin handler
+            else:
+                importable = "%s.handlers" % module_path
+
+            module = importlib.import_module(importable)
+            handler = getattr(module, name)
+
+        else:
+            # `route("/", module.handler)`
+            handler = handler_path
 
         self.routes += [(route, order, handler)]
         self.routes = sorted(self.routes)
@@ -703,14 +730,14 @@ def cookie_decode(key, value, max_age=None):
     # Decode: must be a correct base64
     try:
         json_value = encoded_value.decode("base64")
-    except:
+    except Exception:
         warning("Incorrect base64 string: %r" % encoded_value, exc_info=True)
         return None
 
     # Decode: must be a correct json
     try:
         return json.loads(json_value)
-    except:
+    except Exception:
         warning("Incorrect json string: %r" % json_value, exc_info=True)
         return None
 
