@@ -81,13 +81,13 @@ def html2text(string):
     string = string.replace("<i>", "")
     string = string.replace("</i>", "")
     string = string.replace('<sup class="upper-index">', "^{")
-    string = string.replace('</sup>', "}")
+    string = string.replace("</sup>", "}")
 
     string = string.replace('<sub class="lower-index">', "_{")
-    string = string.replace('</sub>', "}")
+    string = string.replace("</sub>", "}")
 
     string = string.replace('<span class="tex-span">', "$")
-    string = string.replace('</span>', "$")
+    string = string.replace("</span>", "$")
 
     h = h2t.HTML2Text()
     h.body_width = 0
