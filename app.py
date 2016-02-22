@@ -61,17 +61,17 @@ def before(x):
         x.redirect(url, permanent=True)
 
     # Redirect: `http://www.codeforces.mn/`  -> `https://codeforces.mn/`
-    if x.request.url.startswith("http://www."):
+    if x.request.url.startswith("http://www.codeforces.mn/"):
         url = x.request.url.replace("http://www.", "https://", 1)
         x.redirect(url, permanent=True)
 
     # Redirect: `http://codeforces.mn/`      -> `https://codeforces.mn/`
-    if x.request.url.startswith("http://"):
+    if x.request.url.startswith("http://codeforces.mn/"):
         url = x.request.url.replace("http://", "https://", 1)
         x.redirect(url, permanent=True)
 
     # Redirect: `https://www.codeforces.mn/` -> `https://codeforces.mn/`
-    if x.request.url.startswith("https://www."):
+    if x.request.url.startswith("https://www.codeforces.mn/"):
         url = x.request.url.replace("https://www.", "https://")
         x.redirect(url, permanent=True)
 
