@@ -512,6 +512,8 @@ def update(x):
         updated = True
 
     if updated:
+        problems_og = [(_.og_id, _.code) for _ in Problem.all().order("-code")]
+        data.write("problems:og", problems_og)
         data.write("count_all", Problem.all(keys_only=True).count(9999))
 
     # Check: new contests
@@ -578,7 +580,6 @@ def update(x):
 
     if updated:
         data.write("count:contest-all", Contest.all(keys_only=True).count(999))
-    # endfold
 
     # Check: upcoming contests
     upcoming_contests = codeforces.upcoming_contests()
@@ -602,7 +603,7 @@ def update_comments(x):
 
     # Update comments
     comments = []
-    problems = [(p.og_id, p.code) for p in Problem.all().order("-code")]
+    problems = data.fetch("problems:og", [])
     for page in range((len(problems) + 49) / 50):
         start, until = page * 50, (page + 1) * 50
         comments += opengraph.fetch_comments(problems[start:until])
