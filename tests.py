@@ -137,7 +137,7 @@ def test_opengraph_fetch_id():
     import opengraph
 
     url = "https://codeforces.mn/problemset/problem/625/E"
-    eq(opengraph.fetch_id(url), 1278889565460171)
+    eq(opengraph.fetch_id(url), 1018527811553664)
 
     progress("opengraph.fetch_id\n")
 
