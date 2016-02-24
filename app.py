@@ -565,6 +565,7 @@ def update(x):
             # find: original problem from problemset
             original = Problem.find(identifier=meta["identifier"])
             if not original:
+                # next: problems: 598-F 586-F 585-D 435-C 382-D 66-C 48-H
                 warning("Contest's problem not listed in problemset %s" % code)
                 continue
 

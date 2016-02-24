@@ -33,7 +33,7 @@ def fetch_comments(ids_codes):
     # Re-format response
     result = []
     for i in response:
-        for c in response[i]["data"]:
+        for c in response[i].get("data", []):
             result.append({
                 "id": int(i),
                 "code": dic[int(i)],
