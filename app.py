@@ -6,25 +6,27 @@ import codeforces
 import opengraph
 from datetime import datetime
 from markdown2 import markdown
-from natrix import app, route, data, info, warning, memcache, __version__
 from utils import date_format, relative, html2text
+from natrix import app, route, data, info, warning, memcache, __version__
 from models import Problem, Contest, Suggestion
 
 
 # Application settings
 app.config["session-key"] = "Tiy3ahhiefux2hailaiph4echidaelee3daighahdahruPhoh"
 app.config["context"] = lambda x: {
-    "date_format": date_format,
     "top": data.fetch("Rating:contribution", []),
     "codeforces": data.fetch("Rating:codeforces", []),
     "topcoder": data.fetch("Rating:topcoder", []),
-    "markdown": lambda x: markdown(x, extras=["code-friendly"]),
-    "suggestion_count": Suggestion.all(keys_only=True).count(),
+
     "count_all": data.fetch("count_all"),
     "count_done": data.fetch("count_done"),
-    "relative": relative,
     "upcoming_contests": data.fetch("upcoming_contests", []),
     "comments": data.fetch("comments", []),
+    "suggestion_count": Suggestion.all(keys_only=True).count(),
+
+    "markdown": lambda x: markdown(x, extras=["code-friendly"]),
+    "relative": relative,
+    "date_format": date_format,
 }
 app.config["route-shortcut"] = {
     "<code>": "(\w+)",
@@ -35,7 +37,7 @@ app.config["route-shortcut"] = {
 # Home
 @route(":error-404")
 def not_found(x):
-    x.render("error-404.html", error="404")
+    x.render("error-404.html")
 
 
 @route(":error-500")
@@ -149,10 +151,7 @@ def problemset_problem(x, contest_id, index):
 
     if not problem:
         # it maybe contest' problem
-        contest = Contest.find(id=contest_id)
-        if not contest:
-            x.abort(404)
-
+        contest = Contest.find_or_404(id=contest_id)
         code = dict(contest.problems).get(index)
         if not code:
             x.abort(404)
