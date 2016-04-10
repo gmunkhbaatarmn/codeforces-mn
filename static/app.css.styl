@@ -1,25 +1,18 @@
-@import "nib"
-
-.text-center { text-align: center !important }
+@import 'nib'; normalize-css()
 
 a
   color #0000cc
   text-decoration none
-a:hover
-  text-decoration underline
+
+  &:hover
+    text-decoration underline
 
 body
   font-size 87.5%
-  font-family Verdana, Arial, sans-serif;
-
-#container
-  margin 0 auto
-  width 1200px
+  font-family Verdana, Arial, sans-serif
 
 code
   color #8b2e2e
-
-.text-normal { font-weight: normal }
 
 blockquote
   border-left 3px solid #ccc
@@ -27,27 +20,32 @@ blockquote
   margin 0
   background #fafafa
 
-// .w01 .w02 ... .w08 .w09
-for i in range(1, 9)
-  .w0{i} { width: i * 10px }
+#container
+  margin 0 auto
+  width 1200px
+// endfold
 
-// .w10 .w11 ... .w98 .w99
-for i in range(10, 99)
-  .w{i} { width: i * 10px }
+// .w01 .w02 ... .w98 .w99 { width: i * 10px }
+  for i in range(1, 9)
+    .w0{i} { width: i * 10px }
 
+  for i in range(10, 99)
+    .w{i} { width: i * 10px }
+// endfold
 .left        { float: left        !important }
 .right       { float: right       !important }
 .no-float    { float: none        !important }
 .text-left   { text-align: left   !important }
 .text-center { text-align: center !important }
 .text-right  { text-align: right  !important }
+.text-normal { font-weight: normal           }
 .hidden      { display: none      !important }
 .centered    { margin: 0 auto     !important }
-
 .border-left-none  { border-left:  none !important }
 .border-right-none { border-right: none !important }
+.hidden            { display: none }
+// endfold
 
-//:1 others
 .button
   color #fff
   background-color #5cb85c
@@ -62,23 +60,24 @@ for i in range(10, 99)
   text-align center
   user-select none
   text-decoration none
-.button:hover
-  background-color #47a447
-  border-color #398439
+
+  &:hover
+    background-color #47a447
+    border-color #398439
+
 .external
   background url("../images/external.png") no-repeat 100% 1px
   padding-right 18px
-.hidden
-  display none
+// endfold
 
-//:1 header
 #header
+  clearfix()
   height 5em
   margin 14px 1em 0
-  clearfix()
 
 #header .logo
   background url("../images/codeforces-logo.png") no-repeat
+  position relative
   display block
   float left
   width 300px
@@ -86,40 +85,45 @@ for i in range(10, 99)
   text-decoration none
   font-weight bold
   font-size 11px
-  position relative
-#header .logo:before
-  content "Монгол"
-  position absolute
-  top 45px
-  display inline-block
-  width 213px
-  text-align right
-  color #333
-#header .logo:after
-  content "орчуулга"
-  position absolute
-  top 45px
-  left 216px
-  display inline-block
-  color #3b5998
+
+  &:before
+    content "Монгол"
+    position absolute
+    top 45px
+    display inline-block
+    width 213px
+    text-align right
+    color #333
+
+  &:after
+    content "орчуулга"
+    position absolute
+    top 45px
+    left 216px
+    display inline-block
+    color #3b5998
 
 #header .lang
   float right
-#header .lang a
-  display block
-  float left
-  margin-left 5px
-  width 24px
-  height 24px
-  font-size 0
-#header .lang a.mn
-  background url("../images/flag-mn.png")
-#header .lang a.en
-  background url("../images/flag-en.png")
-#header .lang a.ru
-  background url("../images/flag-ru.png")
 
-//:1 menu
+  a
+    display block
+    float left
+    margin-left 5px
+    width 24px
+    height 24px
+    font-size 0
+
+  a.mn
+    background url("../images/flag-mn.png")
+
+  a.en
+    background url("../images/flag-en.png")
+
+  a.ru
+    background url("../images/flag-ru.png")
+// endfold
+
 #menu
   border 1px solid #b9b9b9
   position relative
@@ -132,27 +136,30 @@ for i in range(10, 99)
   font-family "Ubuntu Condensed", sans-serif
   font-size 16px
   list-style none
-  float left
   display block
+  float left
   margin 11px 24px 0 0
   text-transform uppercase
   line-height 22px
-// "suggestions"
-#menu li:last-child
-  float right
-  margin-right 0
 
-#menu li.current
-  border-bottom 3px solid #3b5998
+  &.current
+    border-bottom 3px solid #3b5998
+
+  // suggestion menu
+  &:last-child
+    float right
+    margin-right 0
+
 #menu li a
   color #000
   text-decoration none
+// endfold
 
-//:1 sidebar
 #sidebar
   float right
   width 280px
   margin 2em 1em 1em 0
+
 #sidebar .box
   border 1px solid #b9b9b9
   position relative
@@ -215,8 +222,8 @@ for i in range(10, 99)
 #sidebar .box .text
   font-size 13px
   color #555
+// endfold
 
-//:1 content
 #content
   margin 2em 320px 1em 1em
   color #222
@@ -236,15 +243,17 @@ for i in range(10, 99)
 
 #content .post-title
   margin-top 0
+// endfold
 
 .warning
   color #ff0202
   font-weight bold
+
 .success
   color #00b600
   font-weight bold
+// endfold
 
-//:1 content table
 #content .table-title
   padding 4px 0 0 6px
   font-size 1em
@@ -253,35 +262,60 @@ for i in range(10, 99)
   border-radius 7px 7px 0 0
   background #e1e1e1
   color #222
+
 #content .table-container
   background #e1e1e1
   border 3px solid #e1e1e1
-  border-radius 0px 0px 5px 5px
+  border-radius 0 0 5px 5px
+
 #content .table-container table
   background #fff
   width 100%
   border-radius 5px 5px 3px 3px
-#content .table-container table td, table th
+
+#content .table-container table tr.dark
+  td
+    background-color #f8f8f8
+
+#content .table-container table tr th
   border-right 1px solid #e1e1e1
   padding 0.5em
   font-size 0.9em
   text-align center
   overflow hidden
-#content .table-container table td
+
+#content .table-container table tr th[data-sort]
+  cursor pointer
+  user-select none
+
+  &:after
+    content "\0020"
+    width 10px
+    height 16px
+    float right
+
+  &.sorting-asc:after
+    content " ↑"
+  &.sorting-desc:after
+    content " ↓"
+
+#content .table-container table tr td
+  @extends #content .table-container table tr th
+
   border-top 1px solid #e1e1e1
   text-align left
-#content table tr.dark td
-  background-color #f8f8f8
+// endfold
 
-//:1 content pagination
 #content .pagination ul
+  clearfix()
   margin 1em 0
   padding 0
-  clearfix()
+
 #content .pagination ul li
   display block
   float left
   margin-right 7px
+
 #content .pagination ul li a
   padding 4px
   color #333
@@ -291,73 +325,89 @@ for i in range(10, 99)
   height 17px
   line-height 17px
   border 1px solid transparent
+
 #content .pagination ul li.active a
   border 1px solid #ddd
   background-color #eee
   color #000
+
 #content .pagination ul li.inactive
   font-size 28px
   height 27px
   line-height 22px
   color #ccc
+
 #content .pagination ul li.plain
   line-height 27px
   height 27px
+
 #content .pagination ul li a.arrow
   font-size 28px
   line-height 10px
+// endfold
 
-//:1 content problem-statement
-#content .problem-statement
+.problem-statement
   font-family "Helvetica Neue", Helvetica, Arial, sans-serif
-#content .problem-statement .credit
+
+.problem-statement .credit
   text-align right
   font-style italic
-#content .problem-statement h1
+
+.problem-statement .sample
+  border 1px solid #888
+  border-bottom 0
+  margin-bottom 1em
+
+.problem-statement p
+  line-height 1.5
+
+.problem-statement h1
   font-size 150%
   text-align center
   margin 0
   margin-bottom 0.5em
   font-weight normal
   line-height 21px
-// input output
-#content .problem-statement h2
+
+.problem-statement h2  // input output
   font-size 16px
   margin 1.5em 0 -0.5em
-// header
-#content .problem-statement h3
-  font-weight normal
-  text-align center
-  margin 0
-  font-size 13px
-  color #333
-  line-height 21px
-#content .problem-statement h3 a
-  color #a0a
-  text-decoration none
-#content .problem-statement h3 a:hover
-  text-decoration underline
 
-#content .problem-statement h3 strong
+.problem-statement h3
+  color #333
+  font-size 13px
   font-weight normal
-#content .problem-statement h3 strong:after
-  content ":"
-// sample tests
-#content .problem-statement h4
+  line-height 21px
+  margin 0
+  text-align center
+
+  a
+    color #a0a
+    text-decoration none
+  a:hover
+    text-decoration underline
+
+  strong
+    font-weight normal
+  strong:after
+    content ":"
+
+.problem-statement h4  // sample tests
   font-size 14px
   margin 1em 0 0.5em
-#content .problem-statement .sample
-  border 1px solid #888
-  border-bottom 0
-  margin-bottom 1em
-#content .problem-statement h5
+
+.problem-statement h5
   margin 0
   padding 2px 6px
   line-height 21px
   font-size 13px
   border-top 0
   border-bottom 0
-#content .problem-statement pre
+
+.problem-statement li
+  line-height 1.5
+
+.problem-statement pre
   color #800
   line-height 1.25em
   padding 2px 6px
@@ -365,74 +415,88 @@ for i in range(10, 99)
   background-color #efefef
   border-top 1px solid #888
   border-bottom 1px solid #888
-#content .problem-statement p
-  line-height 1.5
-#content .problem-statement li
-  line-height 1.5
-//:1 rating
+// endfold
+
 .rating-up
   color #008000
   font-weight 600
   text-decoration none
+
 .rating-down
   color gray
   font-weight 600
   text-decoration none
+// endfold
+
 .recent
   background #e5ffe6
-//:1 user-{color}
+// endfold
+
 .user-red
-  color red !important
+  color #f00 !important
   font-weight bold
   text-decoration none
+
 .user-orange
   color #ff8c00 !important
   font-weight bold
   text-decoration none
+
 .user-blue
-  color blue !important
-  font-weight bold
-  text-decoration none
-.user-green
-  color green !important
-  font-weight bold
-  text-decoration none
-.user-gray
-  color gray !important
+  color #00f !important
   font-weight bold
   text-decoration none
 
-// colors - codeforces
+.user-green
+  color #008000 !important
+  font-weight bold
+  text-decoration none
+
+.user-gray
+  color #808080 !important
+  font-weight bold
+  text-decoration none
+// endfold
+
 .cf-user-red
   @extends .user-red
+
 .cf-user-orange
   @extends .user-orange
+
 .cf-user-purple
-  color #a0a !important;
+  color #a0a !important
   font-weight bold
   text-decoration none
+
 .cf-user-blue
   @extends .user-blue
+
 .cf-user-green
   @extends .user-green
+
 .cf-user-gray
   @extends .user-gray
+// endfold
 
-// color - topcoder
 .tc-user-red
   @extends .user-red
+
 .tc-user-yellow
   color #ddcc00 !important
   font-weight bold
   text-decoration none
+
 .tc-user-blue
   @extends .user-blue
+
 .tc-user-green
   @extends .user-green
+
 .tc-user-gray
   @extends .user-gray
+// endfold
 
-//:1 footer
 #footer
   margin-top 1em
   padding 1em 0
@@ -440,23 +504,12 @@ for i in range(10, 99)
   text-align center
   font-size 1em
   clear both
+
 #footer p
   color #777
   font-size 12px
+
 #footer p a
   color #777
   font-weight bold
-
-//:1 table column sort
-table th[data-sort]
-  cursor pointer
-  user-select none
-table th[data-sort]:after
-  content "\0020"
-  width 10px
-  height 16px
-  float right
-table th.sorting-asc:after
-  content " ↑"
-table th.sorting-desc:after
-  content " ↓"
+// endfold
