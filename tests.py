@@ -4,12 +4,12 @@ import logging
 from glob import glob
 from nose.tools import ok_ as ok, eq_ as eq
 from nose.plugins.attrib import attr
-from google.appengine.ext.testbed import Testbed
 
 
 def setup():
     " Google App Engine testbed configuration "
     progress("setup")
+    from google.appengine.ext.testbed import Testbed
     sys.path.append("./packages")
     sys.path.extend(glob("./packages/*.zip"))
 
