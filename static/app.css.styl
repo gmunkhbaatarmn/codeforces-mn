@@ -192,6 +192,10 @@ blockquote
 
 #sidebar .box table th
   border 1px solid #b9b9b9
+  padding 4px
+  font-size 12px
+  text-align center
+
   border-top 0
   border-right 0
 
@@ -199,19 +203,7 @@ blockquote
   border-left 0
 
 #sidebar .box table td
-  border 1px solid #b9b9b9
-  border-right none
-  border-top none
-  padding 4px
-  text-align center
-  font-size 0.9em
-  font-size 12px
-
-#sidebar .box table th tr:nth-child(1)
-  width 20px
-
-#sidebar .box table th tr:nth-child(2)
-  width 140px
+  @extends #sidebar .box table th
 
 #sidebar .box table tr:last-child td
   border-bottom 0
