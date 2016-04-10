@@ -25,24 +25,32 @@ def fetch_id(url, retry=0):
 def fetch_comments(ids_codes):
     " Returns list of comments "
     dic = {i: code for i, code in ids_codes}
-    request = ",".join(map(str, dic.keys()))
     headers = {"Authorization": "OAuth %s" % APP_TOKEN}
+
+    fields = "message,created_time,from"
+    request = ",".join(map(str, dic.keys()))
+    request += "&fields=comments.filter(stream){%s},%s" % (fields, fields)
+
     request_url = "https://graph.facebook.com/v2.5/comments?ids=%s" % request
     response = json.loads(get_url(request_url, headers=headers).content)
 
-    # Re-format response
+    def reformat_comment(i, comment):
+        return {
+            "id": int(i),
+            "code": dic[int(i)],
+            "from_id": int(comment["from"]["id"]),
+            "from_name": comment["from"]["name"],
+            "created_time": to_timestamp(comment["created_time"]),
+            "message": comment["message"],
+        }
+    # endfold
+
     result = []
     for i in response:
-        for c in response[i].get("data", []):
-            result.append({
-                "id": int(i),
-                "code": dic[int(i)],
-                "from_id": int(c["from"]["id"]),
-                "from_name": c["from"]["name"],
-                "created_time": to_timestamp(c["created_time"]),
-                "message": c["message"],
-            })
-    # endfold
+        for comment in response[i].get("data", []):
+            result.append(reformat_comment(i, comment))
+            for reply in comment.get("comments", {}).get("data", []):
+                result.append(reformat_comment(i, reply))
 
     return result
 

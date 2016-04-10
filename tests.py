@@ -118,7 +118,6 @@ def test_topcoder_user_info():
     progress("topcoder.user_info\n")
 
 
-@attr("focus")
 def test_topcoder_upcoming_contests():
     progress("topcoder.upcoming_contests")
     import topcoder
@@ -143,11 +142,13 @@ def test_opengraph_fetch_id():
     progress("opengraph.fetch_id\n")
 
 
+@attr("focus")
 def test_opengraph_fetch_comments():
     progress("opengraph.fetch_comments")
     import opengraph
-    ids = [(1278889565460171, "625-E"), (827387507370816, "625-D"),
-           (935692406527535, "625-C"), (1019738524749056, "625-B")]
+    ids = [
+        (1018527811553664, "625-E"), (1046173305433464, "546-D"),
+    ]
     opengraph.fetch_comments(ids)
     progress("opengraph.fetch_comments\n")
 
