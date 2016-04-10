@@ -22,11 +22,17 @@ def upcoming_contests():
 
         # Parse: start_at
         start_at = c["registrationStartDate"]
-        start_at = datetime.strptime(start_at, "%Y-%m-%d %H:%M EST")
-        start_at = int(start_at.strftime("%s"))
-
-        # timezone "EST" is mean "UTC-05"
-        start_at += 3600 * 5
+        if start_at.endswith(" EDT"):
+            # timezone: UTC-04. EDT - Eastern Daylight (Savings) Time
+            start_at = datetime.strptime(start_at, "%Y-%m-%d %H:%M EDT")
+            start_at = int(start_at.strftime("%s"))
+            start_at += 3600 * 5
+        else:
+            # timezone: UTC-05. EST - Eastern Standard Time (UTC-05)
+            assert start_at.endswith(" EST")
+            start_at = datetime.strptime(start_at, "%Y-%m-%d %H:%M EST")
+            start_at = int(start_at.strftime("%s"))
+            start_at += 3600 * 5
 
         # registration starts 4 hour before contest start
         start_at += 3600 * 4
