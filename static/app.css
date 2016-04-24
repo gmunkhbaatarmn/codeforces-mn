@@ -982,6 +982,11 @@ blockquote {
   font-weight: bold;
   text-decoration: none;
 }
+.cf-user-cyan {
+  color: #03a89e !important;
+  font-weight: bold;
+  text-decoration: none;
+}
 .tc-user-yellow {
   color: #dc0 !important;
   font-weight: bold;
