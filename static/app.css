@@ -672,7 +672,7 @@ blockquote {
   border-radius: 7px 7px 0 0;
   margin-bottom: 1.5em;
 }
-#sidebar .box > h2 {
+#sidebar .box > h1 {
   padding: 0 0 0.3em 0.5em;
   border-bottom: 1px solid #b9b9b9;
   color: #3b5998;
@@ -682,7 +682,7 @@ blockquote {
   position: relative;
   height: 18px;
 }
-#sidebar .box > h2:before {
+#sidebar .box > h1:before {
   content: "→";
   font-weight: normal;
   margin-right: 5px;
