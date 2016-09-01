@@ -6,7 +6,7 @@ import codeforces
 import opengraph
 from datetime import datetime
 from markdown2 import markdown
-from utils import date_format, relative, html2text
+from utils import date_format, parse_time, relative, html2text
 from natrix import app, route, data, info, warning, memcache, __version__
 from models import Problem, Contest, Suggestion
 
@@ -25,6 +25,7 @@ app.config["context"] = lambda x: {
     "suggestion_count": Suggestion.all(keys_only=True).count(),
 
     "markdown": lambda x: markdown(x, extras=["code-friendly"]),
+    "parse_time": parse_time,
     "relative": relative,
     "date_format": date_format,
 }
