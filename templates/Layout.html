@@ -65,7 +65,7 @@
                     {% set hour = "00" ~ time // 3600 %}
                     {% set minute = "00" ~ (time % 3600) // 60 %}
                     {% set seconds = "00" ~ time % 60 %}
-                    <span class="countDownTimer" contestId="{{ contest_id }}">{{ hour[-2:] }}:{{ minute[-2:] }}:{{ seconds[-2:] }}</span>
+                    <span class="js-countdown-timer" contestId="{{ contest_id }}">{{ hour[-2:] }}:{{ minute[-2:] }}:{{ seconds[-2:] }}</span>
                   {% endif %}
                 </td>
               </tr>
@@ -212,11 +212,11 @@
   <script>
     $(function() {
       var timer = setInterval(function(){
-        if ($(".countDownTimer").length == 0) {
+        if ($(".js-countdown-timer").length == 0) {
           clearInterval(timer);
           return;
         }
-        $(".countDownTimer").each(function(){
+        $(".js-countdown-timer").each(function() {
           var data = $(this).html().split(":");
           var hour = parseInt(data[0]);
           var minute = parseInt(data[1]);
@@ -226,15 +226,15 @@
           var new_hour = parseInt( total_seconds / 3600 );
           var new_minute = parseInt( (total_seconds % 3600) / 60 );
           var new_seconds = total_seconds % 60;
-
-          new_time = ("00" + new_hour).slice(-2)
+          var new_time = ("00" + new_hour).slice(-2)
              + ":" + ("00" + new_minute).slice(-2)
              + ":" + ("00" + new_seconds).slice(-2);
+
           if (new_time == "00:00:00") {
-            $( this ).removeClass("countDownTimer");
-            $( this ).html("Тэмцээн эхэлсэн");
+            $(this).removeClass("js-countdown-timer");
+            $(this).html("Тэмцээн эхэлсэн");
           } else {
-            $( this ).html(new_time);
+            $(this).html(new_time);
           }
         })
       }, 1000)
