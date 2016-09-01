@@ -54,7 +54,7 @@
               {% if contest.start_at <= int(now.strftime("%s")) %}
                 {% continue %}
               {% endif %}
-              {% set seconds_to = contest.start_at - int(now.strftime("%s")) - 86400 %}
+              {% set seconds_to = contest.start_at - int(now.strftime("%s")) %}
               <tr>
                 <td>
                   <a href="{{ contest.link }}" target="_blank" style="font-weight:bold">{{ contest.name }}</a>
