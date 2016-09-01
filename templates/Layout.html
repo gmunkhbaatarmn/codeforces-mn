@@ -58,7 +58,15 @@
                 <td>
                   <a href="{{ contest.link }}" target="_blank" style="font-weight:bold">{{ contest.name }}</a>
                   <br>
-                  {{ contest_time(contest.start_at - int(now.strftime("%s"))) }}
+                  {% set time = contest.start_at - int(now.strftime("%s"))) %}
+                  {% if time > 2 * 86400 %}
+                    {{ time // 86400 }} өдрийн дараа
+                  {% else %}
+                    {% set hour = "00" ~ time // 3600 %}
+                    {% set minute = "00" ~ (time % 3600) // 60 %}
+                    {% set seconds = "00" ~ time % 60 %}
+                    <span class="countDownTimer" contestId="{{ contest_id }}">{{ hour[-2:] }}:{{ minute[-2:] }}:{{ seconds[-2:] }}</span>
+                  {% endif %}
                 </td>
               </tr>
             {% endfor %}
@@ -209,28 +217,28 @@
           return;
         }
         $(".countDownTimer").each(function(){
-          data = $( this ).html().split(":");
-          hour = parseInt(data[0]);
-          minute = parseInt(data[1]);
-          seconds = parseInt(data[2]);
+          var data = $(this).html().split(":");
+          var hour = parseInt(data[0]);
+          var minute = parseInt(data[1]);
+          var seconds = parseInt(data[2]);
 
-          total_seconds = hour * 3600 + minute * 60 + seconds - 1;
-          new_hour = parseInt( total_seconds / 3600 );
-          new_minute = parseInt( (total_seconds % 3600) / 60 );
-          new_seconds = total_seconds % 60;
+          var total_seconds = hour * 3600 + minute * 60 + seconds - 1;
+          var new_hour = parseInt( total_seconds / 3600 );
+          var new_minute = parseInt( (total_seconds % 3600) / 60 );
+          var new_seconds = total_seconds % 60;
 
           new_time = ("00" + new_hour).slice(-2)
              + ":" + ("00" + new_minute).slice(-2)
              + ":" + ("00" + new_seconds).slice(-2);
-          if (new_time == "00:00:00"){
+          if (new_time == "00:00:00") {
             $( this ).removeClass("countDownTimer");
             $( this ).html("Тэмцээн эхэлсэн");
           } else {
             $( this ).html(new_time);
           }
-        });
-      }, 1000);
-    });
+        })
+      }, 1000)
+    })
   </script>
   #:1 script: mathjax
   <script>
