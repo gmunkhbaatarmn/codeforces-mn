@@ -1,4 +1,5 @@
 # coding: utf-8
+import re
 import time
 import urllib
 import html2text as h2t
@@ -40,6 +41,14 @@ def get_url(url, params=None, retry=0, headers=None, cookie=None):
 
     time.sleep(1)
     return get_url(url, params=params, retry=retry+1, headers=headers)
+
+
+def parse_time(time_string):
+    " Parse formatted time string and return datetime object "
+    # Format: Unixtimestamp (integer) Example: 1472712775
+    if re.search("^\d+$", "%s" % time_string):
+        return datetime.fromtimestamp(int(time_string))
+    # endfold
 
 
 def relative(timestamp):

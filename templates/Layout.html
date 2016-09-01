@@ -54,18 +54,15 @@
               {% if contest.start_at <= int(now.strftime("%s")) %}
                 {% continue %}
               {% endif %}
+              {% set seconds_to = contest.start_at - int(now.strftime("%s")) - 86400 %}
               <tr>
                 <td>
                   <a href="{{ contest.link }}" target="_blank" style="font-weight:bold">{{ contest.name }}</a>
                   <br>
-                  {% set time = contest.start_at - int(now.strftime("%s"))) %}
-                  {% if time > 2 * 86400 %}
-                    {{ time // 86400 }} өдрийн дараа
+                  {% if seconds_to > 2 * 86400 %}
+                    {{ seconds_to // 86400 }} өдрийн дараа
                   {% else %}
-                    {% set hour = "00" ~ time // 3600 %}
-                    {% set minute = "00" ~ (time % 3600) // 60 %}
-                    {% set seconds = "00" ~ time % 60 %}
-                    <span class="js-countdown-timer">{{ hour[-2:] }}:{{ minute[-2:] }}:{{ seconds[-2:] }}</span>
+                    <span class="js-countdown-timer" data-seconds="{{ seconds_to }}">{{ parse_time(seconds_to).strftime("%H:%M:%S") }}</span>
                   {% endif %}
                 </td>
               </tr>
@@ -211,33 +208,28 @@
   #:1 script: countdown timer
   <script>
     $(function() {
-      var timer = setInterval(function(){
+      var timer = setInterval(function() {
         if ($(".js-countdown-timer").length == 0) {
           clearInterval(timer);
           return;
         }
+
         $(".js-countdown-timer").each(function() {
-          var data = $(this).html().split(":");
-          var hour = parseInt(data[0]);
-          var minute = parseInt(data[1]);
-          var seconds = parseInt(data[2]);
+          var total_seconds = parseInt($(this).data("seconds")) - 1;
 
-          var total_seconds = hour * 3600 + minute * 60 + seconds - 1;
-          var new_hour = parseInt( total_seconds / 3600 );
-          var new_minute = parseInt( (total_seconds % 3600) / 60 );
-          var new_seconds = total_seconds % 60;
-          var new_time = ("00" + new_hour).slice(-2)
-             + ":" + ("00" + new_minute).slice(-2)
-             + ":" + ("00" + new_seconds).slice(-2);
-
-          if (new_time == "00:00:00") {
+          if (total_seconds <= 0) {
             $(this).removeClass("js-countdown-timer");
             $(this).html("Тэмцээн эхэлсэн");
           } else {
-            $(this).html(new_time);
+            $(this).data("seconds", total_seconds);
+
+            var hours = ("00" + parseInt(total_seconds / 3600)).slice(-2);
+            var minutes = ("00" + parseInt(total_seconds % 3600 / 60)).slice(-2);
+            var seconds = ("00" + parseInt(total_seconds % 60)).slice(-2);
+            $(this).html(hours + ":" + minutes + ":" + seconds);
           }
-        })
-      }, 1000)
+        });
+      }, 1000);
     })
   </script>
   #:1 script: mathjax
@@ -257,7 +249,7 @@
         $(this).closest("table").find("tr.hidden").removeClass("hidden");
         $(this).closest("tr").fadeOut().remove();
       });
-      $(".sortable-table").stupidtable()
+      $(".sortable-table").stupidtable();
     });
   </script>
   #:1 script: analytics
