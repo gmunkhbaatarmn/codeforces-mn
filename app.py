@@ -471,7 +471,7 @@ def update(x):
 
     # Check: new problems
     updated = False
-    limit = 50  # check only latest few problems, and it can enough
+    limit = 50  # check only latest few problems, it can be enough
     for problem in codeforces.api("problemset.problems")["problems"]:
         # Stop: if reach the limit
         limit -= 1
@@ -492,6 +492,7 @@ def update(x):
 
         # Skip: if problem parsing failed
         if not meta.get("content"):
+            warning("Problem parsing failed: %s" % code)
             continue
 
         # Skip: already added problem (by smart duplication detect)
@@ -518,7 +519,7 @@ def update(x):
 
     # Check: new contests
     updated = False
-    limit = 10  # check only latest few contests, and it can enough
+    limit = 10  # check only latest few contests, it can be enough
     for contest in codeforces.api("contest.list"):
         # Stop: if reach the limit
         limit -= 1
@@ -526,7 +527,7 @@ def update(x):
             break
         # endfold
 
-        # Skip: if not allow submission
+        # Skip: if not allow submission (special event contests)
         if contest["id"] in [562, 541]:
             continue
 
@@ -536,12 +537,9 @@ def update(x):
         # Skip: if not yet started
         if contest["phase"] == "BEFORE":
             continue
-        # endfold
-
-        c = Contest.find(id=contest["id"]) or Contest(id=contest["id"])
 
         # Skip: if already added
-        if c.name:
+        if Contest.find(id=contest["id"]):
             continue
         # endfold
 
@@ -560,6 +558,7 @@ def update(x):
 
             # skip: if problem parsing failed
             if not meta:
+                warning("Contest problem parsing failed: %s" % code)
                 continue
 
             # find: original problem from problemset
@@ -572,6 +571,7 @@ def update(x):
             problems[p["index"]] = original.code
         # endfold
 
+        c = Contest(id=contest["id"])
         c.name = contest["name"]
         c.start_at = contest["startTimeSeconds"]
         c.problems_json = json.dumps(problems)
