@@ -463,9 +463,8 @@ def extension_problem(x, contest_id, index):
     x.render("problem-embed.html", locals())
 
 
-@route("/update")
-def update(x):
-    " new contests, new problems "
+@route("/update-new-problems")
+def update_new_problems(x):
     start_t = time.time()
     complete_update = "complete" in x.request.query
 
@@ -522,8 +521,15 @@ def update(x):
         problems_og = [(_.og_id, _.code) for _ in Problem.all().order("-code")]
         data.write("problems:og", problems_og)
         data.write("count_all", Problem.all(keys_only=True).count(9999))
+    # endfold
 
     x.response("Executed seconds: %.1f" % (time.time() - start_t), log="info")
+
+
+@route("/update-new-contests")
+def update_new_contests(x):
+    start_t = time.time()
+    complete_update = "complete" in x.request.query
 
     # Check: new contests
     updated = False
