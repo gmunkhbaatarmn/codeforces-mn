@@ -551,7 +551,7 @@ def update_new_contests(x):
             continue
 
         # Skip: if not allow submission (special event contests)
-        if contest["id"] in [562, 541]:
+        if contest["id"] in [695, 649, 648, 647, 646, 640, 636, 562, 541]:
             message = "Skipping read-only contest: %s\n" % contest["id"]
             continue
 
