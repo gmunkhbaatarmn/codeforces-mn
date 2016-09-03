@@ -7,7 +7,7 @@ import opengraph
 from datetime import datetime
 from markdown2 import markdown
 from utils import date_format, parse_time, relative, html2text
-from natrix import app, route, data, info, warning, memcache, __version__
+from natrix import app, route, data, info, memcache, __version__
 from models import Problem, Contest, Suggestion
 
 
@@ -480,35 +480,36 @@ def update(x):
         # endfold
 
         code = "%3s-%s" % (problem["contestId"], problem["index"])
-        p = Problem.find(code=code) or Problem(code=code)
 
         # Skip: already added problem
-        if p.content:
+        if Problem.find(code=code):
             continue
         # endfold
 
-        info("Adding problem: %s" % code)
-        meta = codeforces.problem(p.code)
+        x.response.write("Adding problem: %s\n" % code, log="info")
+        meta = codeforces.problem(code)
 
-        # Skip: if problem parsing failed
+        # Skip: if problem parsing failed [warning]
         if not meta.get("content"):
-            warning("Problem parsing failed: %s" % code)
+            x.response.write("Problem parsing failed: %s\n" % code, log="warning")
             continue
 
-        # Skip: already added problem (by smart duplication detect)
+        # Skip: if problem already added [warning]
         original = Problem.find(identifier=meta["identifier"])
         if original:
-            warning("Can't add problem: %s" % p.code)
-            warning("Because it's copy of %s" % original.code)
+            x.response.write("Can't add problem: %s\n" % code, log="warning")
+            x.response.write("It's copy of %s\n" % original.code, log="warning")
             continue
         # endfold
 
+        p = Problem(code=code)
         p.title = problem["name"]
         p.content = meta.pop("content")
         p.note = meta.pop("note")
         p.identifier = meta.pop("identifier")
         p.meta_json = json.dumps(meta)
-        p.save()
+        # p.save
+        x.response.write("Save: %s. %s\n" % (p.code, p.title))
 
         updated = True
 
@@ -516,6 +517,8 @@ def update(x):
         problems_og = [(_.og_id, _.code) for _ in Problem.all().order("-code")]
         data.write("problems:og", problems_og)
         data.write("count_all", Problem.all(keys_only=True).count(9999))
+
+    x.response("Executed seconds: %.1f" % (time.time() - start_t), log="info")
 
     # Check: new contests
     updated = False
@@ -543,30 +546,35 @@ def update(x):
             continue
         # endfold
 
-        info("Adding contest: %s" % contest["id"])
+        x.response.write("Adding contest: %s\n" % contest["id"], log="info")
 
-        # Connect problem index to problemset problem code
+        # connect problem index to problemset problem code
         problems = {}
-        params = {
-            "contestId": contest["id"],
-            "from": 1,
-            "count": 1,
-        }
-        for p in codeforces.api("contest.standings", **params)["problems"]:
+        params = {"contestId": contest["id"], "from": 1, "count": 1}
+        try:
+            api_response = codeforces.api("contest.standings", **params)
+        except AssertionError as e:
+            message = "contest get fail: %s: %s" % (contest["id"], e)
+            x.response.write(message, log="warning")
+            continue
+
+        for p in api_response["problems"]:
             code = "%3s-%s" % (p["contestId"], p["index"])
             meta = codeforces.problem(code)
 
-            # skip: if problem parsing failed
+            # Skip: if problem parsing failed
             if not meta:
-                warning("Contest problem parsing failed: %s" % code)
+                x.response.write("Parsing failed: %s\n" % code, log="warning")
                 continue
 
-            # find: original problem from problemset
+            # Skip: if not included in problemset
             original = Problem.find(identifier=meta["identifier"])
             if not original:
                 # next: problems: 598-F 586-F 585-D 435-C 382-D 66-C 48-H
-                warning("Contest's problem not listed in problemset %s" % code)
+                message = "Problem not in problemset: %s\n" % code
+                x.response.write(message, log="warning")
                 continue
+            # endfold
 
             problems[p["index"]] = original.code
         # endfold
@@ -575,18 +583,27 @@ def update(x):
         c.name = contest["name"]
         c.start_at = contest["startTimeSeconds"]
         c.problems_json = json.dumps(problems)
-        c.save()
+        # c.save
+        x.response.write("Save: %s %s\n" % (c.id, c.name), log="warning")
 
         updated = True
 
     if updated:
         data.write("count:contest-all", Contest.all(keys_only=True).count(999))
+    # endfold
 
-    # Check: upcoming contests
+    x.response("Executed seconds: %.1f" % (time.time() - start_t), log="info")
+
+
+@route("/update-upcoming-contests")
+def update_upcoming_contests(x):
+    start_t = time.time()
+
+    # Update upcoming contests
     upcoming_contests = codeforces.upcoming_contests()
     upcoming_contests += topcoder.upcoming_contests()
-    upcoming_contests = sorted(upcoming_contests, key=lambda i: i["start_at"])
 
+    upcoming_contests = sorted(upcoming_contests, key=lambda i: i["start_at"])
     data.write("upcoming_contests", upcoming_contests)
     # endfold
 

@@ -3,8 +3,8 @@ cron:
   url: /update-comments
   schedule: every 15 minutes
 
-- description: Auto add new contests
-  url: /update
+- description: Check new upcoming contests for certain widget
+  url: /update-upcoming-contests
   schedule: every 3 hours from 00:10 to 23:59
 
 - description: CodeForces rating update
