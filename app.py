@@ -465,10 +465,11 @@ def extension_problem(x, contest_id, index):
 
 @route("/update-new-problems")
 def update_new_problems(x):
+    x.response("DISABLED", log="info")
     start_t = time.time()
-    complete_update = "complete" in x.request.query
 
     # Check: new problems
+    complete_update = "complete" in x.request.query
     updated = False
     limit = 50  # check only latest few problems, it can be enough
     for problem in codeforces.api("problemset.problems")["problems"]:
@@ -482,7 +483,7 @@ def update_new_problems(x):
 
         # Skip: known issues
         if code in ["524-A", "524-B"]:
-            x.response.write("Skipping known issue: %s" % code, log="info")
+            x.response.write("Skipping known issue: %s\n" % code, log="info")
             continue
 
         # Skip: already added problem
@@ -493,12 +494,12 @@ def update_new_problems(x):
         x.response.write("Adding problem: %s\n" % code, log="info")
         meta = codeforces.problem(code)
 
-        # Skip: if problem parsing failed [warning]
+        # Skip: if problem parsing failed
         if not meta.get("content"):
-            x.response.write("Problem parsing failed: %s\n" % code, log="warning")
+            x.response.write("Parsing failed: %s\n" % code, log="warning")
             continue
 
-        # Skip: if problem already added [warning]
+        # Skip: if problem already added
         original = Problem.find(identifier=meta["identifier"])
         if original:
             x.response.write("Can't add problem: %s\n" % code, log="warning")
@@ -528,10 +529,12 @@ def update_new_problems(x):
 
 @route("/update-new-contests")
 def update_new_contests(x):
+    x.response("DISABLED", log="info")
+
     start_t = time.time()
-    complete_update = "complete" in x.request.query
 
     # Check: new contests
+    complete_update = "complete" in x.request.query
     updated = False
     limit = 10  # check only latest few contests, it can be enough
     for contest in codeforces.api("contest.list"):
@@ -541,11 +544,19 @@ def update_new_contests(x):
             break
         # endfold
 
+        # Skip: if contest known to not found
+        if contest["id"] in [693]:
+            message = "Skipping known not-found contest: %s\n" % contest["id"]
+            x.response.write(message, log="info")
+            continue
+
         # Skip: if not allow submission (special event contests)
         if contest["id"] in [562, 541]:
+            message = "Skipping read-only contest: %s\n" % contest["id"]
             continue
 
         if contest["id"] in [537, 532, 419, 326, 324, 308, 247, 211, 206, 170]:
+            message = "Skipping read-only contest: %s\n" % contest["id"]
             continue
 
         # Skip: if not yet started
@@ -565,7 +576,7 @@ def update_new_contests(x):
         try:
             api_response = codeforces.api("contest.standings", **params)
         except AssertionError as e:
-            message = "contest get fail: %s: %s" % (contest["id"], e)
+            message = "contest get fail: %s: %s\n" % (contest["id"], e)
             x.response.write(message, log="warning")
             continue
 
