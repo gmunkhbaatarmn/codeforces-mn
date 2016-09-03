@@ -481,6 +481,11 @@ def update(x):
 
         code = "%3s-%s" % (problem["contestId"], problem["index"])
 
+        # Skip: known issues
+        if code in ["524-A", "524-B"]:
+            x.response.write("Skipping known issue: %s" % code, log="info")
+            continue
+
         # Skip: already added problem
         if Problem.find(code=code):
             continue
