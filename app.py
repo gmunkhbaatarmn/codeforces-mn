@@ -537,7 +537,7 @@ def update_new_problems(x):
 
 @route("/update-new-contests")
 def update_new_contests(x):
-    # x.response("DISABLED", log="info")
+    x.response("DISABLED", log="info")
     start_t = time.time()
 
     # Check: new contests
@@ -626,8 +626,7 @@ def update_new_contests(x):
         c.name = contest["name"]
         c.start_at = contest["startTimeSeconds"]
         c.problems_json = json.dumps(problems)
-        # c.save
-        x.response.write("Save: %s %s\n" % (c.id, c.name), log="warning")
+        c.save()
 
         updated = True
 
