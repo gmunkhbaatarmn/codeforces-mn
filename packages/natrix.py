@@ -3,8 +3,10 @@ import re
 import sys
 import hmac
 import json
-import jinja2
 import Cookie
+import jinja2
+import string
+import urllib
 import hashlib
 import importlib
 import traceback
@@ -17,13 +19,14 @@ from google.appengine.ext import db
 from google.appengine.api import memcache, taskqueue
 from google.appengine.api.logservice import logservice
 
+
 sys.path.append("./packages")
 
 info        # for `from natrix import info`
 taskqueue   # for `from natrix import taskqueue`
 logservice  # for `from natrix import logservice`
 
-__version__ = "0.1.2"
+__version__ = "0.1.4"
 
 
 # Core classes
@@ -114,7 +117,7 @@ class Request(object):
         # Field: path       | /path/page.html
         self.path = ensure_unicode(environ["PATH_INFO"])
 
-        # Field: path_query | /path=page.html?x=y&z
+        # Field: path_query | /path/page.html?x=y&z
         self.path_query = self.path
         if self.query:
             self.path_query += "?%s" % self.query
@@ -321,10 +324,14 @@ class Handler(object):
             "environ": os.environ,
         }
 
-        # context from app.config
+        # context from app.config["context"]
         config_context = self.config["context"]
         if callable(config_context):
             config_context = config_context(self)
+
+        # context from x.request.context
+        request_context = getattr(self.request, "context", {})
+        final_context.update(request_context)
 
         final_context.update(config_context)
         final_context.update(context or {})
@@ -518,8 +525,10 @@ class Application(object):
             # endfold
 
         # response headers must be str not unicode
-        for k in response.headers:
-            response.headers[k] = ensure_ascii(response.headers[k])
+        for key, value in response.headers.iteritems():
+            value = ensure_ascii(value)
+            value = urllib.quote(value, safe=string.printable)
+            response.headers[key] = value
         start_response(response.status, response.headers.items())
         return [response.body]
     # endfold
@@ -885,3 +894,39 @@ class Data(db.Model):
 app = Application()
 route = app.route   # alias
 data = Data  # alias
+
+
+def _update():
+    " check and update "
+    url_tags = "https://api.github.com/repos/gmunkhbaatarmn/natrix/tags"
+    url_natrix = "https://github.com/gmunkhbaatarmn/natrix/raw/%s/natrix.py"
+
+    sys.stdout.write("Checking for updates...\n\n")
+
+    latest_version = json.loads(urllib.urlopen(url_tags).read())[0]["name"]
+    source_latest = urllib.urlopen(url_natrix % latest_version).read()
+    source_local = open(__file__).read()
+
+    if "v" + __version__ == latest_version and source_local == source_latest:
+        sys.stdout.write("Great! Natrix is up-to-date.\n")
+        return
+
+    if "v" + __version__ == latest_version and source_local != source_latest:
+        sys.stdout.write("WARNING: Natrix is locally edited.\n")
+        sys.exit(1)
+    else:
+        sys.stdout.write("WARNING: This is an old version of Natrix\n")
+        sys.stdout.write("  Natrix (local) version: v%s\n" % __version__)
+        sys.stdout.write("  Natrix (latest) version: %s\n\n" % latest_version)
+        sys.exit(1)
+
+    if "--check-only" in sys.argv:
+        return
+
+    if "y" in raw_input("Save `natrix-%s.py`? [y/n] " % latest_version):
+        sys.stdout.write("  Saved to ./natrix-%s.py\n" % latest_version)
+        open("natrix-%s.py" % latest_version, "w+").write(source_latest)
+
+
+if __name__ == "__main__":
+    _update()
