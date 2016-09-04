@@ -15,4 +15,4 @@ ci-dependency:
 ci-test:
 	flake8 --inline-quotes '"' .
 	python tests.py
-	@#todo: upgrade and check natrix.py version
+	python packages/natrix.py --check-only
