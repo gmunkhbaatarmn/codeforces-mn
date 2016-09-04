@@ -58,8 +58,12 @@ def problem(code):
     url = "http://codeforces.com/problemset/problem/%s/%s"
     r = get_url(url % tuple(code.strip().split("-")))
 
-    assert r.status_code == 200, r.status_code  # validate: ok response
-    assert r.final_url is None, r.final_url     # validate: no redirect
+    try:
+        assert r.status_code == 200, r.status_code  # validate: ok response
+        assert r.final_url is None, r.final_url     # validate: no redirect
+    except AssertionError:
+        warning("Can't parse problem: %s" % code, exc_info=True)
+        return {}
     # endfold
 
     tree = lxml.html.fromstring(r.content)

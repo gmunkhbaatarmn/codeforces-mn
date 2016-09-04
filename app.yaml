@@ -18,11 +18,7 @@ handlers:
   static_dir: static
   expiration: "7d"
 
-- url: /update
-  script: app.app
-  login: admin
-
-- url: /update-comments
+- url: /update-.*
   script: app.app
   login: admin
 
