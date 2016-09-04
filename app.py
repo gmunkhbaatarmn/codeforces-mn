@@ -511,8 +511,8 @@ def update_new_problems(x):
         # Skip: if problem already added
         original = Problem.find(identifier=meta["identifier"])
         if original and code not in ["627-E"]:
-            x.response.write("Can't add problem: %s\n" % code, log="warning")
-            x.response.write("It's copy of %s\n" % original.code, log="warning")
+            message = "Cannot add problem: %s (it is copy of %s)\n"
+            x.response.write(message % (code, original.code), log="warning")
             continue
         # endfold
 
