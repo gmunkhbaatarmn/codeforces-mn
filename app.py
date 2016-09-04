@@ -465,7 +465,7 @@ def extension_problem(x, contest_id, index):
 
 @route("/update-new-problems")
 def update_new_problems(x):
-    x.response("DISABLED", log="info")
+    # x.response("DISABLED", log="info")
     start_t = time.time()
 
     # Check: new problems
@@ -529,8 +529,7 @@ def update_new_problems(x):
 
 @route("/update-new-contests")
 def update_new_contests(x):
-    x.response("DISABLED", log="info")
-
+    # x.response("DISABLED", log="info")
     start_t = time.time()
 
     # Check: new contests
@@ -544,13 +543,21 @@ def update_new_contests(x):
             break
         # endfold
 
+        # Skip: future contests, since stopped
+        if contest["id"] > 710:
+            continue
+
         # Skip: if contest known to not found
         if contest["id"] in [693]:
             message = "Skipping known not-found contest: %s\n" % contest["id"]
             x.response.write(message, log="info")
             continue
 
-        # Skip: if not allow submission (special event contests)
+        # Skip: if known duplicated contest
+        if contest["id"] in [655]:
+            continue
+
+        # Skip: if not allow submission (mostly special event contests)
         if contest["id"] in [695, 649, 648, 647, 646, 640, 636, 562, 541]:
             message = "Skipping read-only contest: %s\n" % contest["id"]
             continue
@@ -568,7 +575,8 @@ def update_new_contests(x):
             continue
         # endfold
 
-        x.response.write("Adding contest: %s\n" % contest["id"], log="info")
+        message = "Adding contest: %s %s\n" % (contest["id"], contest["name"])
+        x.response.write(message, log="info")
 
         # connect problem index to problemset problem code
         problems = {}
@@ -583,6 +591,11 @@ def update_new_contests(x):
         for p in api_response["problems"]:
             code = "%3s-%s" % (p["contestId"], p["index"])
             meta = codeforces.problem(code)
+
+            # Set index manually for known err cases
+            if code in ["645-A", "645-E"]:
+                problems[p["index"]] = code
+                continue
 
             # Skip: if problem parsing failed
             if not meta:
