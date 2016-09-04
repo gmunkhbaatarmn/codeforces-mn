@@ -465,7 +465,7 @@ def extension_problem(x, contest_id, index):
 
 @route("/update-new-problems")
 def update_new_problems(x):
-    # x.response("DISABLED", log="info")
+    x.response("DISABLED", log="info")
     start_t = time.time()
 
     # Check: new problems
@@ -481,6 +481,14 @@ def update_new_problems(x):
 
         code = "%3s-%s" % (problem["contestId"], problem["index"])
 
+        # Skip: future contests, since stopped
+        if problem["contestId"] > 710:
+            continue
+
+        # Skip: multi-variation problems
+        if len(problem["index"]) != 1:
+            continue
+
         # Skip: known issues
         if code in ["524-A", "524-B"]:
             x.response.write("Skipping known issue: %s\n" % code, log="info")
@@ -491,7 +499,8 @@ def update_new_problems(x):
             continue
         # endfold
 
-        x.response.write("Adding problem: %s\n" % code, log="info")
+        message = "Adding problem: %s %s\n" % (code, problem["name"])
+        x.response.write(message, log="info")
         meta = codeforces.problem(code)
 
         # Skip: if problem parsing failed
@@ -501,7 +510,7 @@ def update_new_problems(x):
 
         # Skip: if problem already added
         original = Problem.find(identifier=meta["identifier"])
-        if original:
+        if original and code not in ["627-E"]:
             x.response.write("Can't add problem: %s\n" % code, log="warning")
             x.response.write("It's copy of %s\n" % original.code, log="warning")
             continue
@@ -513,8 +522,7 @@ def update_new_problems(x):
         p.note = meta.pop("note")
         p.identifier = meta.pop("identifier")
         p.meta_json = json.dumps(meta)
-        # p.save
-        x.response.write("Save: %s. %s\n" % (p.code, p.title))
+        p.save()
 
         updated = True
 
