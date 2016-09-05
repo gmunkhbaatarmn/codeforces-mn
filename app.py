@@ -657,13 +657,20 @@ def update_comments(x):
     start_t = time.time()
 
     # Create opengraph ID for new problems
+    updated = 0
     for p in Problem.all().filter("og_id =", 0):
         p.og_id = opengraph.fetch_id("https://codeforces.mn" + p.link)
         p.save()
+        updated += int(p.og_id > 0)
+
+    if updated:
+        problems_og = [(_.og_id, _.code) for _ in Problem.all().order("-code")]
+        data.write("problems:og", problems_og)
 
     # Update comments
     comments = []
     problems = data.fetch("problems:og", [])
+    problems = filter(lambda i: i > 0, problems)
     for page in range((len(problems) + 49) / 50):
         start, until = page * 50, (page + 1) * 50
         comments += opengraph.fetch_comments(problems[start:until])

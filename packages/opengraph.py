@@ -1,23 +1,21 @@
 import json
-import time
 from utils import get_url
+from logging import warning
 from datetime import datetime
 
 
 APP_TOKEN = "888802607881779|LX-gcFsW9-qGbr2qCXgSJMIO-7Y"
 
 
-def fetch_id(url, retry=0):
+def fetch_id(url):
     " Returns open graph id of URL "
     headers = {"Authorization": "OAuth %s" % APP_TOKEN}
     request_url = "https://graph.facebook.com/v2.5/?id=%s" % url
     response = json.loads(get_url(request_url, headers=headers).content)
 
-    # Retry: object is not registered yet
-    if "og_object" not in response and retry < 5:
-        time.sleep(1.0)
-        return fetch_id(url, retry=retry+1)
-    # endfold
+    if "og_object" not in response:
+        warning("og object is not yet ready:\n%s" % json.dumps(response))
+        return 0
 
     return int(response["og_object"]["id"])
 
