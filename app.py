@@ -320,7 +320,7 @@ def suggestion_publish(x):
     problem.save()
 
     # Cache count query
-    count_all = Problem.all().count(3000)
+    count_all = Problem.all().count(4000)
     count_done = 0
     for p in Problem.all().filter("credits >", ""):
         if p.credits == u"[орчуулагдаж байгаа]":
