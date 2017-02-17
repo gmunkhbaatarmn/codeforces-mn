@@ -1,17 +1,21 @@
 #:1 macro user(handle, point)
 {% macro user(handle, point) %}
-  {%   if point >= 100 %}
-    {% set color = "red" %}
-  {% elif point >=  75 %}
-    {% set color = "orange" %}
-  {% elif point >=  50 %}
-    {% set color = "blue" %}
-  {% elif point >=  25 %}
-    {% set color = "green" %}
+  {% if handle == "Баатархүү" %}
+    <span style="color:#20b2aa !important; text-decoration:none; font-weight:bold">{{ handle }}</span>
   {% else %}
-    {% set color = "gray" %}
+    {%   if point >= 100 %}
+      {% set color = "red" %}
+    {% elif point >=  75 %}
+      {% set color = "orange" %}
+    {% elif point >=  50 %}
+      {% set color = "blue" %}
+    {% elif point >=  25 %}
+      {% set color = "green" %}
+    {% else %}
+      {% set color = "gray" %}
+    {% endif %}
+    <span class="user-{{ color }}">{{ handle }}</span>
   {% endif %}
-  <span class="user-{{ color }}">{{ handle }}</span>
 {% endmacro %}
 
 
