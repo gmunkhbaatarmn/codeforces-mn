@@ -3,6 +3,7 @@ import re
 import sys
 import hmac
 import json
+import time
 import Cookie
 import jinja2
 import string
@@ -26,7 +27,7 @@ info        # for `from natrix import info`
 taskqueue   # for `from natrix import taskqueue`
 logservice  # for `from natrix import logservice`
 
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 
 
 # Core classes
@@ -46,8 +47,7 @@ class Request(object):
         # Field: params
         self.params = parse_qs(environ["QUERY_STRING"], keep_blank_values=1)
 
-        content_type = environ.get("HTTP_CONTENT_TYPE", "")
-        content_type = content_type or environ.get("CONTENT_TYPE", "")
+        content_type = environ.get("HTTP_CONTENT_TYPE", "") or environ.get("CONTENT_TYPE", "")
         if "wsgi.input" in environ:
             wsgi_input = environ["wsgi.input"]
             if content_type.startswith("multipart/form-data"):
@@ -301,6 +301,7 @@ class Handler(object):
 
         env = jinja2.Environment(loader=loader,
                                  line_comment_prefix="#:",
+                                 autoescape=self.config.get("jinja:autoescape", False),
                                  extensions=["jinja2.ext.loopcontrols"])
 
         # default context
@@ -309,20 +310,23 @@ class Handler(object):
             "int": int,
             "bool": bool,
             "float": float,
+            "list": list,
             "reversed": reversed,
             "sorted": sorted,
             "max": max,
             "min": min,
 
             "json": json,
+            "time": time,
             "now": datetime.now(),
 
             "request": self.request,
             "session": self.session,
-            "flash": self.flash,
             "config": self.config,
             "environ": os.environ,
         }
+        if kwargs.get("use_flash", True):
+            final_context["flash"] = self.flash
 
         # context from app.config["context"]
         config_context = self.config["context"]
@@ -375,7 +379,7 @@ class Handler(object):
             return
 
         cookie = cookie_encode(self.config["session-key"], self.session)
-        cookie_value = "session=%s; path=/;" % cookie
+        cookie_value = "session=%s; path=/; HttpOnly" % cookie
         self.response.headers["Set-Cookie"] = cookie_value
 
         cookie = Cookie.SimpleCookie()
@@ -404,7 +408,7 @@ class Application(object):
         self.routes = []
         for r in (routes or []):
             if len(r) == 2:
-                r = (r[0], 0, r[1])
+                r = (0, r[0], r[1])
             self.routes.append(r)
 
         self.config = config or {}  # none to dict
@@ -426,7 +430,7 @@ class Application(object):
 
         try:
             # Before
-            for rule, _, before_handler in self.routes:
+            for _, rule, before_handler in self.routes:
                 if rule != ":before":
                     continue
 
@@ -535,7 +539,7 @@ class Application(object):
 
     def get_handler(self, request_path, request_method):
         " Returns (handler, args) or (none, none) "
-        for rule, _, handler in self.routes:
+        for _, rule, handler in self.routes:
             rule = ensure_unicode(rule)
             rule = rule.replace("<int>", "(int:\d+)")
             rule = rule.replace("<string>", "([^/]+)")
@@ -558,13 +562,13 @@ class Application(object):
 
             " match url "
             # has any groups
-            re_groups = re.compile('''
+            re_groups = re.compile("""
               \(        # `(` character. Marks group start
               (
                 [^\)]+  # Until ")" character
               )
               \)        # `)` character. Marks group ends
-            ''', re.VERBOSE)
+            """, re.VERBOSE)
 
             convert_rules = []
             for group in re.findall(re_groups, rule):
@@ -590,7 +594,7 @@ class Application(object):
             x.response.code = 404
             x.response.body = "Error 404"
 
-        for rule, _, handler in self.routes:
+        for _, rule, handler in self.routes:
             if rule == ":error-404":
                 return handler
 
@@ -603,7 +607,7 @@ class Application(object):
             x.response.headers["Content-Type"] = "text/plain;error"
             x.response.body = "".join(lines)
 
-        for rule, _, handler in self.routes:
+        for _, rule, handler in self.routes:
             if rule == ":error-500":
                 return handler
 
@@ -623,7 +627,7 @@ class Application(object):
             except x.response.Sent:
                 pass
 
-    def route(self, route, handler_path=None, order=0):
+    def route(self, route, handler_path=None, priority=1):
         """ Initialize and add route
 
             Usage 1. Decorator method
@@ -638,19 +642,20 @@ class Application(object):
 
         >>> route("/", "path.handler")
         """
-        # 1. Decorator
+        # Usage 1. Decorator
         # `route("/")(handler)` <=> `func(handler)`
         # need to return `func`
         if handler_path is None:
             def func(handler):
-                self.routes += [(route, order, handler)]
+                self.routes += [(priority, route, handler)]
                 self.routes = sorted(self.routes)
 
                 return handler
             return func
+        # endfold
 
-        # 2. Includer
         if isinstance(handler_path, basestring):
+            # Usage 2. Includer (string)
             # `route("/", "path.to.handler:function")`
             module_path, name = handler_path.split(":")
 
@@ -663,12 +668,14 @@ class Application(object):
 
             module = importlib.import_module(importable)
             handler = getattr(module, name)
-
+            # endfold
         else:
+            # Usage 2. Includer (function)
             # `route("/", module.handler)`
             handler = handler_path
+            # endfold
 
-        self.routes += [(route, order, handler)]
+        self.routes += [(priority, route, handler)]
         self.routes = sorted(self.routes)
 
         return handler
@@ -826,7 +833,7 @@ class ModelMixin(object):
     # endfold
 
     @classmethod
-    def find(cls, *args, **kwargs):
+    def find(cls, **kwargs):
         query = cls.all()
         for name, value in kwargs.items():
             query.filter("%s =" % name, value)
@@ -834,15 +841,15 @@ class ModelMixin(object):
         return query.get()
 
     @classmethod
-    def find_or_404(cls, *args, **kwargs):
-        entity = cls.find(*args, **kwargs)
+    def find_or_404(cls, **kwargs):
+        entity = cls.find(**kwargs)
         if not entity:
             raise Response.Sent404
         return entity
 
     @classmethod
-    def get_or_404(cls, id):
-        entity = cls.get_by_id(id)
+    def get_or_404(cls, id_):
+        entity = cls.get_by_id(id_)
         if not entity:
             raise Response.Sent404
         return entity
