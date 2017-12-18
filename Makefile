@@ -13,6 +13,6 @@ ci-dependency:
 	@pip install nose appengine-sdk jinja2 lxml pyyaml
 
 ci-test:
-	flake8 --inline-quotes '"' .
+	flake8 --max-line-length=100 --inline-quotes '"' .
 	python tests.py
 	python packages/natrix.py --check-only
