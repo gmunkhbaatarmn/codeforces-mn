@@ -75,11 +75,11 @@ def relative(timestamp):
     return u"%s хоногийн өмнө" % (seconds / 60 / 60 / 24)
 
 
-def date_format(date, format="%Y/%m/%d"):
+def date_format(date, format_="%Y/%m/%d"):
     if str(date).isdigit():
         utc_date = datetime.utcfromtimestamp(int(date))
         utc_date = utc_date + timedelta(hours=8)
-        return utc_date.strftime(format)
+        return utc_date.strftime(format_)
     return date
 
 

@@ -104,8 +104,8 @@ def contest_list_paged(x, page):
 
 
 @route("/contest/<int>")
-def contest_dashboard(x, id):
-    contest = Contest.find_or_404(id=id)
+def contest_dashboard(x, id_):
+    contest = Contest.find_or_404(id=id_)
 
     x.render("contest-dashboard.html", locals())
 
@@ -296,8 +296,8 @@ def suggestion_publish(x):
     if not x.session.get("moderator"):
         x.redirect("/suggestion")
 
-    id = x.request["id"]
-    suggestion = Suggestion.get_by_id(int(id))
+    id_ = x.request["id"]
+    suggestion = Suggestion.get_by_id(int(id_))
     problem = Problem.find(code=suggestion.code)
 
     source = x.request["source"].strip()
@@ -392,8 +392,8 @@ def suggestion_delete(x):
 
 
 @route("/suggestion/<int>")
-def suggestion_review(x, id):
-    suggestion = Suggestion.get_or_404(id)
+def suggestion_review(x, id_):
+    suggestion = Suggestion.get_or_404(id_)
     problem = Problem.find(code=suggestion.code)
 
     x.render("suggestion-review.html", locals())

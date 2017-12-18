@@ -47,7 +47,7 @@ class Problem(Model):
 
 
 class Contest(Model):
-    id = db.IntegerProperty()
+    id = db.IntegerProperty()  # noqa: A003
     name = db.StringProperty()
     start_at = db.IntegerProperty()
     problems_json = db.StringProperty()  # dict of {letter: code}

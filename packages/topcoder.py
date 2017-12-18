@@ -63,9 +63,9 @@ def mongolians():
 
     result = []
     for a in tree.xpath(selector):
-        id = int(a.attrib["href"].split("cr=")[1].split("&tab=")[0])
+        id_ = int(a.attrib["href"].split("cr=")[1].split("&tab=")[0])
         handle = a.text.strip()
-        result.append([handle, id])
+        result.append([handle, id_])
 
     return result
 
