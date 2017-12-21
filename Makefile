@@ -1,6 +1,11 @@
 all:
 	@echo "Please see Makefile"
 
+run:
+	concurrently \
+		"dev_appserver.py . --port=9090 --admin_port=9000 --datastore_path=.datastore.dump" \
+		"stylus --watch static/app.css.styl --out static/app.css -u nib -u rupture --include-css"
+
 deploy:
 	appcfg.py update .
 
