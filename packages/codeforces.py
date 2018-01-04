@@ -50,7 +50,7 @@ def mongolians():
     tree = lxml.html.document_fromstring(r.content)
     selector = "//div[contains(@class,'ratingsDatatable')]//tr//td[2]//a"
 
-    return [i.text.strip() for i in tree.xpath(selector)]
+    return [i.text_content().strip() for i in tree.xpath(selector)]
 
 
 def problem(code):
