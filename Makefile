@@ -12,10 +12,12 @@ deploy:
 dev-deploy:
 	appcfg.py update . --version=dev
 
-ci-dependency:
+ci-init:
 	@pip install flake8
 	@pip install flake8-print flake8-quotes flake8-blind-except pep8-naming
-	@pip install nose appengine-sdk jinja2 lxml pyyaml
+	@pip install flake8-builtins flake8-commas flake8-comprehensions
+	@pip install nose
+	@pip install appengine-sdk jinja2 lxml pyyaml
 
 ci-test:
 	flake8 --max-line-length=100 --inline-quotes '"' .

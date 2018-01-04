@@ -3,6 +3,6 @@ cache: pip
 python:
   - "2.7"
 install:
-  - make ci-dependency
+  - make ci-init
 script:
   - make ci-test
