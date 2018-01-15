@@ -29,7 +29,7 @@ def upcoming_contests():
             start_at += 3600 * 5
         else:
             # timezone: UTC-05. EST - Eastern Standard Time (UTC-05)
-            assert start_at.endswith(" EST")
+            assert start_at.endswith(" EST"), start_at
             start_at = datetime.strptime(start_at, "%Y-%m-%d %H:%M EST")
             start_at = int(start_at.strftime("%s"))
             start_at += 3600 * 5
