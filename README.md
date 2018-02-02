@@ -1,34 +1,17 @@
-[![Build][build-img]][build-url]
-[![Issue][issue-img]][issue-url]
-[![Natrix][natrix-version-img]][natrix-version-url]
+# Codeforces.com сайтын бодлогуудыг Монгол орчуулгатайгаар үзэх
 
-Mongolian translation of [codeforces.com](http://www.codeforces.com/).
-Runs live on [codeforces.mn](https://codeforces.mn/)
+[Chrome Web Store URL](https://chrome.google.com/webstore/detail/codeforces-mongolia/fghdlncknpkheekfjgdlnahjpomhbpbj)
 
+- Problemset, Contest dashboard-руу орох үед Монголоор орчуулагдсан бодлогуудын
+  өмнө ягаан од ялгарч харагдана.
 
-Run on local computer
-=====================
+- Ягаан одтой буюу орчуулагдсан бодлогыг нээгээд бодлогын нэрний доор байх
+  "Монголоор унших" гэсэн линк дээр дарахад бодлогын өгүүлбэр өөрөө
+  орчуулагдсан байх болно.
 
-- `git clone git@github.com:gmunkhbaatarmn/codeforces-mn.git`
-- `cd codeforces-mn`
-- `dev_appserver.py .`
-- For first time, launch link on browser
-  [http://localhost:8080/update?complete](http://localhost:8080/update?complete)
+- Бодлогын өгүүлбэрийг Англиар уншихыг хүсвэл хуудсаа refresh хийхэд л
+  хангалттай.
 
-
-Contributing
-============
-
-See [Open Issues](https://github.com/gmunkhbaatarmn/codeforces-mn/issues).
-
-- If you found any problems, please report on issues page.
-- If you made any change, send me pull request.
-
-[build-img]: https://img.shields.io/travis/gmunkhbaatarmn/codeforces-mn.svg
-[build-url]: https://travis-ci.org/gmunkhbaatarmn/codeforces-mn
-
-[issue-img]: https://img.shields.io/github/issues/gmunkhbaatarmn/codeforces-mn.svg
-[issue-url]: https://github.com/gmunkhbaatarmn/codeforces-mn/issues
-
-[natrix-version-img]: https://codeforces.mn/natrix-version
-[natrix-version-url]: https://github.com/gmunkhbaatarmn/natrix
+- Contests цэс рүү орох үед тухайн тэмцээний хэдэн бодлого нь орчуулагдсан
+  талаар мэдээлэл харагдана. Бүх бодлогууд орчуулагдсан байвал ягаан өнгөөр
+  харагдана.
