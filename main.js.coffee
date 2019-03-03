@@ -392,31 +392,7 @@ translate = ->
 
     $(".mn-please").fadeOut("fast")
 
-    #:2 Include: mathjax config
-    script = document.createElement("script")
-    script.type = "text/x-mathjax-config"
-    script.text = """
-      MathJax.Hub.Config({
-        tex2jax: {
-          inlineMath: [["$", "$"]],
-          displayMath: [["$$", "$$"]]
-        },
-        TeX: {
-          extensions: [
-            "AMSmath.js",
-            "AMSsymbols.js",
-            "noErrors.js"
-          ]
-        },
-        jax: ["input/TeX", "output/HTML-CSS"],
-        extensions: ["tex2jax.js"],
-        showMathMenu: false
-      });
-    """
-    document.head.appendChild(script)
-
-    #:2 Include: mathjax source
-    script = document.createElement("script")
-    script.type = "text/javascript"
-    script.src = "//cdn.mathjax.org/mathjax/latest/MathJax.js"
-    document.head.appendChild(script)
+    # render MathJax
+    el = document.createElement('script')
+    el.innerHTML = 'MathJax.Hub.Queue(["Typeset",MathJax.Hub]);'
+    document.head.appendChild(el)
