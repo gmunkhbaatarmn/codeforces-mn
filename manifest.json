@@ -12,12 +12,13 @@
   },
   "permissions": [
     "https://codeforces.mn/*",
+    "https://codeforces.com/*",
     "http://codeforces.com/*"
   ],
   "content_scripts": [{
     "all_frames": true,
     "run_at": "document_start",
-    "matches": ["http://codeforces.com/*"],
+    "matches": ["http://codeforces.com/*", "https://codeforces.com/*"],
     "js": ["jquery.js", "main.js"]
   }]
 }
