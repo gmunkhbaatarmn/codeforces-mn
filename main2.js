@@ -180,8 +180,126 @@ if (location.pathname === '/') {
 }
 
 //: Page: /problemset/          List of problems (empty)
+if (location.pathname.match(/\/problemset(?!\/problem\/)/)) {
+  // Highlight translated problems
+  $(function() {
+    $('head').append(`
+      <style>
+        .problems tr td:nth-child(2) > div:first-child {
+          margin-left: 14px
+        }
+        .problems .mn td:nth-child(2) > div:first-child {
+          margin-left: 0
+        }
+        .problems .mn td:nth-child(2) > div:first-child a:before {
+          content: "✱ ";
+          color: #c900a9;
+          display: inline-block;
+          float: left;
+          margin-right: 4px;
+          text-decoration: none
+        }
+      </style>
+    `)
+    let storage = JSON.parse(localStorage.mn || '{}')
+
+    $('.problems tr').each(function(idx, elm) {
+      // Skip header
+      if (! $(elm).find('td.id').text().trim()) {
+        return
+      }
+      let problem_id = $(elm).find('td.id').text().trim()
+      problem_id = problem_id.replace(/(\d+)/, '$1-')
+      if (storage[`problem:${problem_id}`]) {
+        $(elm).addClass('mn')
+      }
+    })
+  })
+}
 
 //: Page: /problemset/problem   Read a problem (empty)
+
+//: Page: /contests/            List of contests
+if (location.pathname.startsWith('/contests')) {
+  // Content list with translated problem count
+  $(function() {
+    $('head').append(`
+      <style>
+        .mn      { font-size:0.9em; color:#666666 }
+        .mn-full { font-size:0.9em; color:#c900a9; font-weight:bold }
+      </style>
+    `)
+
+    let storage = JSON.parse(localStorage.mn || '{}')
+
+    $('.contests-table tr td:nth-child(1)').each(function(idx, elm) {
+      // Select only contests are possible to practice
+      // (possible contest has "Enter" and "Virtual participation" links both)
+      if ($(elm).find('a').length < 2) {
+        return
+      }
+
+      let contest_id = $(elm).find('a:first').attr('href').replace('/contest/', '')
+      while (contest_id.length < 3) {
+        contest_id = `0${contest_id}`
+      }
+
+      if (! storage[`contest:${contest_id}`]) {
+        return
+      }
+      let ready = storage[`contest:${contest_id}`].ready || 0
+      let total = storage[`contest:${contest_id}`].total || 0
+
+      if (ready <= 0) {
+        return
+      }
+      let class_ = ready === total ? 'mn-full' : 'mn'
+      $(elm).append(`<span class="${class_}">Орчуулагдсан: ${ready} / ${total}</span>`)
+    })
+  })
+}
+
+//: Page: /contest/ID/          List of problems in contest
+if (location.pathname.match(/^\/contest\/\d+\/?$/)) {
+  // Highlight translated problems
+  $(function() {
+    $('head').append(`
+      <style>
+        .problems tr td:nth-child(2) > div:first-child {
+          margin-left: 14px
+        }
+        .problems .mn td:nth-child(2) > div:first-child {
+          margin-left: 0
+        }
+        .problems .mn td:nth-child(2) > div:first-child a:before {
+          content: "✱ ";
+          color: #c900a9;
+          display: inline-block;
+          float: left;
+          margin-right: 4px;
+          text-decoration: none
+        }
+      </style>
+    `)
+    let storage = JSON.parse(localStorage.mn || '{}')
+
+    $('.problems tr').each(function(idx, elm) {
+      // Skip header
+      if (! $(elm).find('td.id').text().trim()) {
+        return
+      }
+
+      let problem_id = location.pathname.replace('/contest/', '').replace('/', '')
+      problem_id = problem_id + '-' + $(elm).find('td.id').text().trim()
+
+      if (storage[`problem:${problem_id}`]) {
+        $(elm).addClass('mn')
+      }
+    })
+  })
+}
+
+//: Page: /contest/ID/problem/  Read a problem in contest (empty)
 // endfold
 
 //: Function: translate problem statement
